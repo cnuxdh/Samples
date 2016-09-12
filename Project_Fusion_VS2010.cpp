@@ -47,7 +47,7 @@ int MyGetFileRows(char* file)
 /* V1.1: mosaic "jpeg" + "geo" format in "product" directory
  input: list.txt  outfile  output_resolution  
 */
-int _tmain_yitu(int argc, _TCHAR* argv[])
+int _tmain_yitu(int argc, char* argv[])
 //int _tmain(int argc, _TCHAR* argv[])
 {	
 	if( argc!=5 )
@@ -125,8 +125,8 @@ int _tmain_yitu(int argc, _TCHAR* argv[])
 }
 
 //for directly mosaic RGB *.tif 
-//int _tmain_directMosaic(int argc, _TCHAR* argv[])
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain_directMosaic(int argc, char* argv[])
+//int main(int argc, char* argv[])
 {
 
 	if(argc!=5)
@@ -170,8 +170,8 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 //for multi-band mosaic in "product" directory
-int _tmain_mb(int argc, _TCHAR* argv[])
-//int _tmain(int argc, _TCHAR* argv[])
+//int _tmain_mb(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	if(argc!=5)
 	{
@@ -237,7 +237,7 @@ int _tmain_mb(int argc, _TCHAR* argv[])
 /*
  input: imagepath  outfile  nlevel  
 */
-int _tmain_v_1_0(int argc, _TCHAR* argv[])
+int _tmain_v_1_0(int argc, char* argv[])
 {
 	//string filename = "d:\\test.yml";
 	//cout<<filename<<endl;

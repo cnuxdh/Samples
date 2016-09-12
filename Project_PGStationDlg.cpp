@@ -19908,6 +19908,7 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//char* imagepath = "F:\\Data\\UAV\\byler\\2-sub-1\\product";
 	char* imagepath = "F:\\Data\\MultiBand\\100m_TIF10\\product";
 
+
 	char** filenames = NULL;
 	int n=0;
 	int nfile=0;
@@ -19923,7 +19924,7 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
 	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
 	//GeoTiffBlend(filenames, 10, "d:\\blend1.tif", 0.2);
-	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.002, 0);
+	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.1, 0);
 	
 }
 
