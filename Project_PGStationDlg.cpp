@@ -158,7 +158,20 @@
 //#include "cv.h"
 //#include "cxcore.h"
 //#include "highgui.h"
-#include "cvaux.h"
+//#include "cvaux.h"
+
+
+#ifdef OPENCV_1X 
+#include "cv.h"
+#include "highgui.h"
+#include "cxcore.h"
+#else
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+using namespace cv;
+#endif
+
 
 
 #include <string>
@@ -19906,16 +19919,17 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//char* imagepath = "F:\\Data\\UAV\\byler\\1-sub\\test";
 	//char* imagepath = "F:\\Data\\UAV\\¹ãÎ÷\\10105\\product";
 	//char* imagepath = "F:\\Data\\UAV\\byler\\2-sub-1\\product";
-	char* imagepath = "F:\\Data\\MultiBand\\100m_TIF10\\product";
+	//char* imagepath = "F:\\Data\\MultiBand\\100m_TIF10\\product";
+	char* imagepath = "F:\\Data\\TestData\\product";
 
 
 	char** filenames = NULL;
 	int n=0;
 	int nfile=0;
 	
-	GetDirFileName(filenames, imagepath, &n, &nfile, "tif", 0);
+	GetDirFileName(filenames, imagepath, &n, &nfile, "jpeg", 0);
 	filenames = f2c(nfile, 256);
-	GetDirFileName(filenames, imagepath, &n, &nfile, "tif", 1);
+	GetDirFileName(filenames, imagepath, &n, &nfile, "jpeg", 1);
 
 	//stGeoInfo geoInfo;
 	//GetGeoInformation( filenames[0], geoInfo);
@@ -19924,7 +19938,7 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
 	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
 	//GeoTiffBlend(filenames, 10, "d:\\blend1.tif", 0.2);
-	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.1, 0);
+	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.2, 0);
 	
 }
 
@@ -20011,11 +20025,11 @@ void CProject_PGStationDlg::OnPanoramicProjectiontoplane()
 
 	direction[0]=1;		direction[1]=0;		direction[2]=0;
 	sprintf(outputfile, "%s_left.jpg", panofile);
-	PanoToPlane(panofile, outputfile, vangle, hangle, direction, focalLenRation);
+	//PanoToPlane(panofile, outputfile, vangle, hangle, direction, focalLenRation);
 
 	direction[0]=-1;		direction[1]=0;		direction[2]=0;
 	sprintf(outputfile, "%s_right.jpg", panofile);
-	PanoToPlane(panofile, outputfile, vangle, hangle, direction, focalLenRation);
+	//PanoToPlane(panofile, outputfile, vangle, hangle, direction, focalLenRation);
 
 
 
@@ -20334,6 +20348,7 @@ void CProject_PGStationDlg::OnCrowddensityBackground()
 	cvNamedWindow("BG", 1);
 	cvNamedWindow("FG", 1);
 
+	/*
 	//create BG model
 	CvBGStatModel* bg_model = cvCreateFGDStatModel( tmp_frame );
 
@@ -20355,6 +20370,7 @@ void CProject_PGStationDlg::OnCrowddensityBackground()
 
 	cvReleaseBGStatModel( &bg_model );
 	cvReleaseCapture(&cap);
+	*/
 
 }
 
