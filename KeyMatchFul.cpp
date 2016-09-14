@@ -801,6 +801,7 @@ int main(int argc, char **argv)
 		WriteProgressValueToFile(dstep);
 
 		//0.convert the current image feature to OpenSift format
+		printf("convert the feature point .... \n");
 		struct feature* feats = (struct feature*)malloc( num_keys[i]*sizeof(struct feature) );
 		for(int ki=0; ki<num_keys[i]; ki++)
 		{
@@ -815,6 +816,7 @@ int main(int argc, char **argv)
 		clock_t start = clock();    
 		//match the points in other images
 		//1. block by block
+		//printf("block by block ... \n");
 		int nBlock = i / nImageStep;
 		for(int bi=0; bi<nBlock; bi++)
 		{
@@ -822,7 +824,7 @@ int main(int argc, char **argv)
 			int nI = 0;
 			for(int bj=(bi*nImageStep); bj<((bi+1)*nImageStep); bj++)
 			{			
-				struct kd_node* kd_tree = kdtree_build(feats, num_keys[bj]);
+				struct kd_node* kd_tree = kdtree_build(feats, num_keys[i]);
 				param[nI].kd_tree  = kd_tree;		// the current image feature points
 				param[nI].keys     = keys[bj];		// the other image feature points
 				param[nI].num_keys = num_keys[bj];	// the number of feature points
@@ -867,10 +869,12 @@ int main(int argc, char **argv)
 		}
 
 		//2. for the remaining images
+		//printf("processing the remaining images ... \n");
 		int nI = 0;
 		for(int bj=(nBlock*nImageStep); bj<i; bj++)
 		{
-			struct kd_node* kd_tree = kdtree_build(feats, num_keys[bj]);
+			//printf("%d ", bj);
+			struct kd_node* kd_tree = kdtree_build(feats, num_keys[i]);
 			param[nI].kd_tree  = kd_tree;		// the current image feature points
 			param[nI].keys     = keys[bj];		// the other image feature points
 			param[nI].num_keys = num_keys[bj];	// the number of feature points
@@ -878,6 +882,7 @@ int main(int argc, char **argv)
 			nI++;
 		}		
 		//parallel computing
+		//printf("\n number of threads: %d \n", nI);
 		running_count = 0;
 		threadList.clear();				
 		for (int j = 0; j < nI; j++) 
