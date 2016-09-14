@@ -470,7 +470,7 @@ void RunMatchOpenSift(void *aArg)
 		param->ratio,
 		&index1, &index2, &matchNum );
 	
-	printf("match number: %d \n", matchNum);
+	//printf("pair index:%d  match number: %d-%d %d \n", param->i, param->left, param->right, matchNum);
 		
 	//printf("output matching result... \n");
 	if (matchNum >= 16) 
@@ -494,7 +494,7 @@ void RunMatchOpenSift(void *aArg)
   
 
 //multiple thread based on opensift
-int main_mt(int argc, char **argv) 
+int main_old(int argc, char **argv) 
 {
     char *list_in;
     char *file_out;
@@ -828,7 +828,7 @@ int main(int argc, char **argv)
 				param[nI].kd_tree  = kd_tree;		// the current image feature points
 				param[nI].keys     = keys[bj];		// the other image feature points
 				param[nI].num_keys = num_keys[bj];	// the number of feature points
-				param[nI].i = index;                // the index of match pair
+				//param[nI].i = index;                // the index of match pair
 				param[nI].left = i;
 				param[nI].right = bj;
 				nI++;
@@ -842,11 +842,14 @@ int main(int argc, char **argv)
 			{
 				vecMatchPair[index].left  = param[j].left;
 				vecMatchPair[index].right = param[j].right;
+				param[j].i = index;                // the index of match pair
 
 				lock_guard<mutex> guard(gMutex); 
 				while (running_count == cpu_count)
 					gCV.wait(gMutex);
 				running_count++;	
+				
+				//printf("%d ", running_count);
 
 				threadList.push_back(new thread(RunMatchOpenSift, &param[j]));  
 
@@ -880,7 +883,7 @@ int main(int argc, char **argv)
 			param[nI].kd_tree  = kd_tree;		// the current image feature points
 			param[nI].keys     = keys[bj];		// the other image feature points
 			param[nI].num_keys = num_keys[bj];	// the number of feature points
-			param[nI].i = index;                // the index of match pair
+			//param[nI].i = index;                // the index of match pair
 			param[nI].left = i;
 			param[nI].right = bj;
 			nI++;
@@ -893,12 +896,21 @@ int main(int argc, char **argv)
 		{
 			vecMatchPair[index].left  = param[j].left;
 			vecMatchPair[index].right = param[j].right;
+			
+			param[j].i = index;                // the index of match pair
+			
 			lock_guard<mutex> guard(gMutex); 
 			while (running_count == cpu_count)
 				gCV.wait(gMutex);
+			
 			running_count++;	
+			
+			//printf("running count: %d ", running_count);
+
 			threadList.push_back(new thread(RunMatchOpenSift, &param[j]));  
-			index++;						
+
+			index++;		
+			//printf("index: %d \n", index);
 		}
 		//wait the threads
 		list<thread*>::iterator it;
