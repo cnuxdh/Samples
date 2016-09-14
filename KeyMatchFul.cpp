@@ -829,6 +829,8 @@ int main(int argc, char **argv)
 				param[nI].keys     = keys[bj];		// the other image feature points
 				param[nI].num_keys = num_keys[bj];	// the number of feature points
 				param[nI].i = index;                // the index of match pair
+				param[nI].left = i;
+				param[nI].right = bj;
 				nI++;
 			}
 
@@ -879,6 +881,8 @@ int main(int argc, char **argv)
 			param[nI].keys     = keys[bj];		// the other image feature points
 			param[nI].num_keys = num_keys[bj];	// the number of feature points
 			param[nI].i = index;                // the index of match pair
+			param[nI].left = i;
+			param[nI].right = bj;
 			nI++;
 		}		
 		//parallel computing
