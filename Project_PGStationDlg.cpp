@@ -649,6 +649,7 @@ BEGIN_MESSAGE_MAP(CProject_PGStationDlg, CDialog)
 	ON_COMMAND(ID_SELECT_FILES, &CProject_PGStationDlg::OnSelectFiles)
 	ON_COMMAND(ID_XML_JPEG, &CProject_PGStationDlg::OnXmlJpeg)
 	ON_COMMAND(ID_FORMAT_AUV, &CProject_PGStationDlg::OnFormatAuv)
+	ON_COMMAND(ID_PLY_MOSAIC, &CProject_PGStationDlg::OnPlyMosaic)
 	END_MESSAGE_MAP()
 
 
@@ -21278,4 +21279,39 @@ void CProject_PGStationDlg::OnFormatAuv()
 		fclose(ofp);
 	}
 	fclose(fp);
+}
+
+void CProject_PGStationDlg::OnPlyMosaic()
+{
+	// TODO: Add your command handler code here
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//6. merge the ply
+	char modelPath[512] = "F:\\Data\\UAV\\É½Î÷Ê¡_º½ÅÄÕÕÆ¬\\º½ÅÄÕÕÆ¬\\mvs\\models";
+	//strcpy(modelPath, pdlg->m_strMVSModelDirectory);
+	char** filenames = NULL;
+	int n=0,nfile=0;
+	GetDirFileName(filenames, modelPath, &n, &nfile, "ply", 0);
+	filenames = f2c(nfile, 256);
+	GetDirFileName(filenames, modelPath, &n, &nfile, "ply", 1);
+
+	vector<stTrack> allTracks;
+	for(int i=0; i<nfile; i++)
+	{
+		vector<stTrack> st;
+		ReadPMVSPly(filenames[i], st);
+		for(int k=0; k<st.size(); k++)
+		{
+			allTracks.push_back( st[k] );
+		}
+
+	}
+	char plyfile[512] = "d:\\m.ply";
+	//strcpy(plyfile, pdlg->m_strPMVSPlyFile);
+	WritePMVSPly(plyfile, allTracks);
+	//////////////////////////////////////////////////////////////////////////
+
+
 }

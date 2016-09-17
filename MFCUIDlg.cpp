@@ -28,6 +28,9 @@
 
 #include "commonfile.h"
 
+#include "bundlerio.hpp"
+
+
 #include <TlHelp32.h>
 
 
@@ -310,8 +313,8 @@ int  CMFCUIDlg::InitProductDirectory()
 	int index = path.ReverseFind('\\');
 	path = path.Left(index+1);
 
-	CString productPath = path + "product";
-	CreateDir(productPath);
+	CString tempProductPath = path + "product";
+	CreateDir(tempProductPath);
 	
 	CString resultPath = path + "result";
 	CreateDir(resultPath);
@@ -322,16 +325,20 @@ int  CMFCUIDlg::InitProductDirectory()
 
 	CreateDir(m_strMVSDirectory); 
 
-	CString m_strMVSImageDirectory  = m_strMVSDirectory+"\\visualize";
+	m_strMVSImageDirectory  = m_strMVSDirectory+"\\visualize";
 	CreateDir(m_strMVSImageDirectory);
 
-	CString m_strMVSCameraDirectory = m_strMVSDirectory+"\\txt";
+	m_strMVSCameraDirectory = m_strMVSDirectory+"\\txt";
 	CreateDir(m_strMVSCameraDirectory);
 
-	CString m_strMVSModelDirectory  = m_strMVSDirectory+"\\models";
+	m_strMVSModelDirectory  = m_strMVSDirectory+"\\models";
 	CreateDir(m_strMVSModelDirectory);
 
 
+	//save the PMVS ply file
+	m_strPMVSPlyFile    = resultPath + "\\model.ply";
+	
+	
 	return 0;
 }
 
@@ -404,10 +411,8 @@ BOOL CMFCUIDlg::OnInitDialog()
 	m_strMatchFile      = m_strProductPath + "\\match_init.txt";
 	m_strBundleOutFile  = m_strProductPath + "\\bundle.out";
 	m_strFilteredPoints = m_strProductPath + "\\fpt.txt";
-		
-	m_strProgressFile = m_strProductPath + "\\progress.txt";
-	
 
+	m_strProgressFile = m_strProductPath + "\\progress.txt";
 	
 	FILE* fp = fopen(m_strProgressFile, "w");
 	fprintf(fp, "%lf", 0);
@@ -419,6 +424,8 @@ BOOL CMFCUIDlg::OnInitDialog()
 	m_projectFilesVec.push_back(m_strMatchFile);
 	m_projectFilesVec.push_back(m_strBundleOutFile);
 	m_projectFilesVec.push_back(m_strFilteredPoints);
+	//m_projectFilesVec.push_back(m_strPMVSPlyFile);
+
 
 	DeleteTempProjectFiles();
 
@@ -426,7 +433,11 @@ BOOL CMFCUIDlg::OnInitDialog()
 	m_nScaleImageHt = 900;
 	m_dMosaicResolution = 0.1;
 	m_dMosaicRatio = 1;
-	m_bIsBlend = 0;
+	m_bIsBlend = 1;
+
+	//for point cloud filtering
+	m_nNeiborPts = 1024;
+	m_dSigma = 0.6;
 
 	m_dProgressValue = 0;
 	m_pDlgProgressDlg = NULL;
@@ -502,19 +513,17 @@ void CMFCUIDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			if(m_pDlgProgressDlg!=NULL)
 			{
-				//m_pDlgProgressDlg->UpdateWindow();
-				//m_pDlgProgressDlg->ShowWindow(SW_SHOWMINIMIZED);
 				if( m_pDlgProgressDlg!=NULL )
 				{
 					delete m_pDlgProgressDlg;
 					m_pDlgProgressDlg = NULL;
 				}
-				//m_pDlgProgressDlg->ShowWindow(SW_HIDE);
 			}
 		}
 	}
 	else
 	{
+
 		//CDialogEx::OnSysCommand(nID, lParam);
 	}
 
@@ -634,6 +643,9 @@ int CMFCUIDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	return 0;
 }
+
+
+
 void CMFCUIDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
@@ -735,6 +747,8 @@ void CMFCUIDlg::OnLoadImages()
 		SetMenuEnable();
 	}
 }
+
+
 
 /*
 char **f2c (int nr, int nc)
@@ -1243,6 +1257,7 @@ UINT  CMFCUIDlg::ProcessMVS(LPVOID pParam)
 	fprintf(progressFp, "%lf", 0.0);
 	fclose(progressFp);
 
+	
 	//1. Generate camera file
 	pdlg->m_pDlgProgressDlg->SetWindowTextA("生成相机投影文件.....");
 	if( bIsFileExit(listFile) && bIsFileExit(bundleoutfile))
@@ -1292,7 +1307,7 @@ UINT  CMFCUIDlg::ProcessMVS(LPVOID pParam)
 	pdlg->m_pDlgProgressDlg->SetWindowTextA("分块处理.....");
 	if( bIsFileExit(listFile) && bIsFileExit(bundleoutfile))
 	{
-		sprintf(cmdString, "%s\\cmvs.exe %s 48 8",
+		sprintf(cmdString, "%s\\cmvs.exe %s 20 6",  //prefix maximage[=100] CPU[=4]
 			pdlg->m_strExePath,
 			pdlg->m_strMVSDirectory+"\\");	
 		printf("%s \n", cmdString);
@@ -1303,12 +1318,12 @@ UINT  CMFCUIDlg::ProcessMVS(LPVOID pParam)
 	pdlg->m_pDlgProgressDlg->SetWindowTextA("分块处理.....");
 	if( bIsFileExit(listFile) && bIsFileExit(bundleoutfile))
 	{
-		sprintf(cmdString, "%s\\genOption.exe %s 1 2 0.7 7 2 ", //level csize threshold wsize minImageNum
+		sprintf(cmdString, "%s\\genOption.exe %s 4 2 0.7 7 2 ", //level csize threshold wsize minImageNum
 			pdlg->m_strExePath,
 			pdlg->m_strMVSDirectory+"\\");	
 		printf("%s \n", cmdString);
 		InvokeExe(cmdString);
-	}		
+	}	
 	
 	//6. PMVS
 	progressFp = fopen(pdlg->m_strProgressFile, "w");
@@ -1339,10 +1354,38 @@ UINT  CMFCUIDlg::ProcessMVS(LPVOID pParam)
 		}
 	}	
 	
+		
+	//////////////////////////////////////////////////////////////////////////
 	//6. merge the ply
+	char modelPath[512];
+	strcpy(modelPath, pdlg->m_strMVSModelDirectory);
+	char** filenames = NULL;
+	int n=0,nfile=0;
+	GetDirFileName(filenames, modelPath, &n, &nfile, "ply", 0);
+	filenames = f2c(nfile, 256);
+	GetDirFileName(filenames, modelPath, &n, &nfile, "ply", 1);
 
-
-
+	vector<stTrack> allTracks;
+	for(int i=0; i<nfile; i++)
+	{
+		stTrack* st;
+		int nTrack;
+		ReadPMVSPly(filenames[i], &st, &nTrack);
+		
+		for(int k=0; k<nTrack; k++)
+		{
+			allTracks.push_back( st[k] );
+		}
+		free(st);
+	}
+	printf("ply file: %s \n", pdlg->m_strPMVSPlyFile);
+	
+	char plyfile[512];
+	strcpy(plyfile, pdlg->m_strPMVSPlyFile);
+	WritePMVSPly(plyfile, allTracks);
+	//////////////////////////////////////////////////////////////////////////
+	
+	
 	pdlg->m_bIsThreadOn = false;
 
 	pdlg->m_pDlgProgressDlg->ShowWindow(SW_HIDE);
@@ -1366,18 +1409,41 @@ UINT CMFCUIDlg::ProcessOrtho(LPVOID pParam)
 	strcpy(bundleoutfile, pdlg->m_strBundleOutFile);
 	char filteredPtFile[256];
 	strcpy(filteredPtFile, pdlg->m_strFilteredPoints);
+	char pmvsPlyFile[256];
+	strcpy(pmvsPlyFile, pdlg->m_strPMVSPlyFile);
+
+	pdlg->m_bIsThreadOn = true;
 
 	//5. point cloud smoothing based on sparse point cloud
-	if( bIsFileExit(bundleoutfile) )
+	printf("point cloud smoothing .... \n");
+	if( bIsFileExit(pmvsPlyFile) )
 	{
-		sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s 60 0.6 %s ",
+		sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s %d %lf %s ",
 			pdlg->m_strExePath, 
-			bundleoutfile, 
+			pmvsPlyFile, 
+			pdlg->m_nNeiborPts,
+			pdlg->m_dSigma,
 			filteredPtFile);
 		InvokeExe(cmdString);
-	}	
+	}
+	else if( bIsFileExit(bundleoutfile) )
+	{		
+		sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s %d %lf %s ",
+			pdlg->m_strExePath, 
+			pmvsPlyFile, 
+			pdlg->m_nNeiborPts*0.1,
+			pdlg->m_dSigma,
+			filteredPtFile);	
+		InvokeExe(cmdString);
+	}
+	else
+	{
+		printf("No point cloud \n");
+		return -1;
+	}
 
 	//6. generate ortho-images
+	printf("generating orthoimage .... \n");
 	pdlg->m_pDlgProgressDlg->SetProgressValue(0);
 	pdlg->m_pDlgProgressDlg->SetWindowTextA(" 生成正射影像.....");
 	if( bIsFileExit(listFile) && bIsFileExit(bundleoutfile) && bIsFileExit(filteredPtFile)  ) // && bIsBundler )
@@ -1396,6 +1462,7 @@ UINT CMFCUIDlg::ProcessOrtho(LPVOID pParam)
 	pdlg->m_pDlgProgressDlg->ShowWindow(SW_HIDE);
 	pdlg->KillTimer(100);
 
+	pdlg->m_bIsThreadOn = false;
 
 	CString strlog = "正射影像生成完毕，请点击 '处理->输出' 来镶嵌图像。 \r\n";
 	pdlg->OutputMessage(strlog);	
@@ -1559,14 +1626,45 @@ UINT  CMFCUIDlg::ProcessAll(LPVOID pParam)
 
 
 	//5. point cloud smoothing
-	if( bIsFileExit(bundleoutfile) )
+	char pmvsPlyFile[256];
+	strcpy(pmvsPlyFile, pdlg->m_strPMVSPlyFile);
+	if( bIsFileExit(pmvsPlyFile) )
 	{
-		sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s 60 0.6 %s ",
+		sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s %d %lf %s ",
 			pdlg->m_strExePath, 
-			bundleoutfile, 
+			pmvsPlyFile, 
+			pdlg->m_nNeiborPts,
+			pdlg->m_dSigma,
 			filteredPtFile);
+
 		InvokeExe(cmdString);
-	}	
+	}
+	else if( bIsFileExit(bundleoutfile) )
+	{		
+
+		sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s %d %lf %s ",
+			pdlg->m_strExePath, 
+			pmvsPlyFile, 
+			pdlg->m_nNeiborPts*0.1,
+			pdlg->m_dSigma,
+			filteredPtFile);
+
+		InvokeExe(cmdString);
+	}
+	else
+	{
+		printf("No point cloud \n");
+		return -1;
+	}
+
+	//if( bIsFileExit(bundleoutfile) )
+	//{
+	//	sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s 60 0.6 %s ",
+	//		pdlg->m_strExePath, 
+	//		bundleoutfile, 
+	//		filteredPtFile);
+	//	InvokeExe(cmdString);
+	//}	
 
 	//6. generate ortho-images
 	pdlg->m_pDlgProgressDlg->SetProgressValue(0);
@@ -1590,7 +1688,14 @@ UINT  CMFCUIDlg::ProcessAll(LPVOID pParam)
 	char outfile[256];
 	strcpy(outfile, pdlg->m_strMosaicFile);
 	printf("mosaic resolution: %lf \n", pdlg->m_dMosaicResolution);
-	int type = 0;	
+	
+	//int type = 1;	
+	int type = 0;
+	if(pdlg->m_bIsBlend)
+		type = 1;
+	else
+		type = 0;
+
 	pdlg->m_pDlgProgressDlg->SetWindowTextA("[共5步|第5步]: 图像镶嵌.....");
 	if( bIsFileExit(listFile) )
 	{
@@ -2025,25 +2130,32 @@ int CMFCUIDlg::OpenProject(char* filename)
 	//reading list.txt
 	char listFile[256];
 	strcpy(listFile, m_strListFile);
+	char imagelistFile[256];
+	strcpy(imagelistFile, m_strImageListFile);
+
 	if(bIsFileExit(listFile))
 	{
 		m_fileVector.clear();
 
 		int nLine = GetFileRows(listFile);
 
+		FILE* fpImageList = fopen(imagelistFile, "w");
 		FILE* fp = fopen(listFile, "r");
-		//while(!feof(fp))
 		for(int i=0; i<nLine; i++)
 		{
 			char filename[256];
 			int t;
 			double f;
 			fscanf(fp, "%s %d %lf", filename, &t, &f);
+
+			fprintf(fpImageList, "%s \n", filename);
+
 			CString sFile;
 			sFile.Format("%s", filename);
 			m_fileVector.push_back(sFile);
 		}
 		fclose(fp);
+		fclose(fpImageList);
 
 		m_fileList.DeleteAllItems();		
 		int index = 0;
