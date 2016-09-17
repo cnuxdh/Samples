@@ -1430,7 +1430,7 @@ UINT CMFCUIDlg::ProcessOrtho(LPVOID pParam)
 	{		
 		sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s %d %lf %s ",
 			pdlg->m_strExePath, 
-			pmvsPlyFile, 
+			bundleoutfile, 
 			pdlg->m_nNeiborPts*0.1,
 			pdlg->m_dSigma,
 			filteredPtFile);	
@@ -1644,7 +1644,7 @@ UINT  CMFCUIDlg::ProcessAll(LPVOID pParam)
 
 		sprintf(cmdString, "%s\\Project_PCLFilter_VS2010.exe %s %d %lf %s ",
 			pdlg->m_strExePath, 
-			pmvsPlyFile, 
+			bundleoutfile, 
 			pdlg->m_nNeiborPts*0.1,
 			pdlg->m_dSigma,
 			filteredPtFile);
