@@ -196,6 +196,7 @@ int main(int argc, char* argv[])
 
 	char* tiffile;
 	char* jpegfile;
+	char* geofile;
 
 	int nfile = nImageNumber;
 	char** filenames = f2c(nfile, 256);
@@ -211,13 +212,14 @@ int main(int argc, char* argv[])
 
 		GenerateProductFile(rawfile, "product", "tif", &tiffile);
 		GenerateProductFile(rawfile, "product", "jpeg", &jpegfile);
+		GenerateProductFile(rawfile, "product", "geo", &geofile);
 
 		if( IsFileExist(tiffile) )
 		{
 			strcpy( filenames[index], tiffile );
 			index ++;
 		}
-		else if(IsFileExist(jpegfile))
+		else if(IsFileExist(jpegfile) && IsFileExist(geofile))
 		{
 			strcpy( filenames[index], jpegfile );
 			index ++;
