@@ -226,11 +226,9 @@ int main(int argc, char* argv[])
 		}
 	}
 	fclose(fp);
-
-
+	
 	MosaicGeoTiff(filenames, index, outfile, outResolution, nType);	
-
-
+	
 	FreeArray_char(filenames, nfile, 256);
 
 	return 0;
