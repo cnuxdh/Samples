@@ -650,6 +650,7 @@ BEGIN_MESSAGE_MAP(CProject_PGStationDlg, CDialog)
 	ON_COMMAND(ID_XML_JPEG, &CProject_PGStationDlg::OnXmlJpeg)
 	ON_COMMAND(ID_FORMAT_AUV, &CProject_PGStationDlg::OnFormatAuv)
 	ON_COMMAND(ID_PLY_MOSAIC, &CProject_PGStationDlg::OnPlyMosaic)
+	ON_COMMAND(ID_TEMPLATE_FUNCTION, &CProject_PGStationDlg::OnTemplateFunction)
 	END_MESSAGE_MAP()
 
 
@@ -19921,6 +19922,7 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//char* imagepath = "F:\\Data\\UAV\\广西\\10105\\product";
 	//char* imagepath = "F:\\Data\\UAV\\byler\\2-sub-1\\product";
 	//char* imagepath = "F:\\Data\\MultiBand\\100m_TIF10\\product";
+	//char* imagepath = "F:\\Data\\TestData\\product";
 	char* imagepath = "F:\\Data\\TestData\\product";
 
 
@@ -19939,7 +19941,7 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
 	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
 	//GeoTiffBlend(filenames, 10, "d:\\blend1.tif", 0.2);
-	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.2, 0);
+	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.0789, 1);
 	
 }
 
@@ -21313,5 +21315,34 @@ void CProject_PGStationDlg::OnPlyMosaic()
 	WritePMVSPly(plyfile, allTracks);
 	//////////////////////////////////////////////////////////////////////////
 
+}
+
+template<typename T>
+int TestTemplateFunc()
+{
+	/*T* pBuffer = new T[100];
+	for(int i=0; i<100; i++)
+		T[i] = i;*/
+
+	char* filepath = "F:\\Data\\UAV\\广西\\10105\\result\\111.tif";
+	stGeoInfo geoinfo;
+	GetGeoInformation(filepath, geoinfo);
+	int ht = geoinfo.ht;
+	int wd = geoinfo.wd;
+
+	T* pbuffer = new T[ht*wd];
+
+	ReadGeoFileByte(filepath, 1, 1, T);
+
+	delete[] T;
+
+	return 0;
+}
+
+void CProject_PGStationDlg::OnTemplateFunction()
+{
+	// TODO: Add your command handler code here
+	
+	//TestTemplateFunc();
 
 }
