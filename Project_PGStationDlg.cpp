@@ -19921,18 +19921,18 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//char* imagepath = "F:\\Data\\UAV\\byler\\1-sub\\test";
 	//char* imagepath = "F:\\Data\\UAV\\¹ãÎ÷\\10105\\product";
 	//char* imagepath = "F:\\Data\\UAV\\byler\\2-sub-1\\product";
-	//char* imagepath = "F:\\Data\\MultiBand\\100m_TIF10\\product";
+	char* imagepath = "F:\\Data\\MultiBand\\100m_TIF10\\product";
 	//char* imagepath = "F:\\Data\\TestData\\product";
-	char* imagepath = "F:\\Data\\TestData\\product";
+	//char* imagepath = "F:\\Data\\TestData\\product";
 
 
 	char** filenames = NULL;
 	int n=0;
 	int nfile=0;
 	
-	GetDirFileName(filenames, imagepath, &n, &nfile, "jpeg", 0);
+	GetDirFileName(filenames, imagepath, &n, &nfile, "tif", 0);
 	filenames = f2c(nfile, 256);
-	GetDirFileName(filenames, imagepath, &n, &nfile, "jpeg", 1);
+	GetDirFileName(filenames, imagepath, &n, &nfile, "tif", 1);
 
 	//stGeoInfo geoInfo;
 	//GetGeoInformation( filenames[0], geoInfo);
@@ -19941,7 +19941,7 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
 	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
 	//GeoTiffBlend(filenames, 10, "d:\\blend1.tif", 0.2);
-	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.0789, 1);
+	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.0008, 1);
 	
 }
 
