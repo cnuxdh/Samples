@@ -208,8 +208,7 @@ int main(int argc, char* argv[])
 		double focalLen;
 		char rawfile[256];
 		fscanf(fp, "%s ", rawfile);
-
-
+		
 		GenerateProductFile(rawfile, "product", "tif", &tiffile);
 		GenerateProductFile(rawfile, "product", "jpeg", &jpegfile);
 		GenerateProductFile(rawfile, "product", "geo", &geofile);
