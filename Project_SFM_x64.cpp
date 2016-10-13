@@ -14,23 +14,29 @@ int main(int argc, char** argv[])
 {
 	printf("SFM integration .... \n");
 
-	
-	//generating the tracks
+	//1. generating the image feature points
 	vector<ImgFeature> imgFeatures;
+
+
+	//2. matching images 
+	vector<PairMatchRes> matchRes; 
+
+
+	
+	//3.generating the tracks
+	/* test
 	imgFeatures.resize(3);
 	imgFeatures[0].featPts.resize(6);
 	imgFeatures[1].featPts.resize(6);
 	imgFeatures[2].featPts.resize(6);
-
 	char* matchfile = "c:\\temp\\match_file.txt";
-	vector<PairMatchRes> matchRes; 
 	LoadMatchFile(matchfile, matchRes);
+	*/
 
 	vector<TrackInfo> tracks; 
 	CGenerateTracksBase* pGenerateTrack = new CFastGenerateTrack();
 	pGenerateTrack->GenerateTracks(imgFeatures, matchRes, tracks);
-
-
+	
 	for(int i=0; i<tracks.size(); i++)
 	{
 		printf("track: %d \n", i);
@@ -40,6 +46,7 @@ int main(int argc, char** argv[])
 		}
 		printf("\n");
 	}
+
 
 	return 0;
 }
