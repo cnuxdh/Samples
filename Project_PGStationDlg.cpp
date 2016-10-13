@@ -79,7 +79,7 @@
 #include "PRLib/BeltDetectSimple.h"
 #include "PRLib/track.h"
 #include "PRLib/smoke.h"
-#include "PRLib/eigenObject.h"
+//#include "PRLib/eigenObject.h"
 #include "PRLib/export.h"
 
 //SIFTlib
@@ -126,7 +126,7 @@
 #include "imagelib/util.h"
 #include "BundlerDll/BundlerDll/exports.h"
 #include "siftGPU/SiftGPU.h"
-#include "matrix/matrix.h"
+//#include "matrix/matrix.h"
 
 
 //IDL
@@ -2585,26 +2585,26 @@ void CProject_PGStationDlg::OnBundlerGeneratetracks()
 	// generate tracks, track corresponds to the ground points, which 
 	// have projections in several images	
 
-	char binpath[256];
-	strcpy(binpath, AfxGetApp()->m_pszHelpFilePath);
-	char* pdes = strrchr(binpath, '\\');
-	int index = pdes-binpath;
-	strcpy(binpath+index, "\0");
+	//char binpath[256];
+	//strcpy(binpath, AfxGetApp()->m_pszHelpFilePath);
+	//char* pdes = strrchr(binpath, '\\');
+	//int index = pdes-binpath;
+	//strcpy(binpath+index, "\0");
 
-	//load image and key data
-	char imageList[256];
-	sprintf(imageList, "%s\\list.txt", binpath);
-	LoadImageList(imageList);
+	////load image and key data
+	//char imageList[256];
+	//sprintf(imageList, "%s\\list.txt", binpath);
+	//LoadImageList(imageList);
 
-	//load match result
-	char cMatchInit[256];
-	sprintf(cMatchInit, "%s\\matches.init.txt", binpath);
-    LoadMatchTable(cMatchInit);
+	////load match result
+	//char cMatchInit[256];
+	//sprintf(cMatchInit, "%s\\matches.init.txt", binpath);
+ //   LoadMatchTable(cMatchInit);
 
-	//generate tracks
-	char cTracks[256];
-	sprintf(cTracks, "%s\\bundle\\constraints.txt", binpath);
-	GenerateTracks(cTracks);
+	////generate tracks
+	//char cTracks[256];
+	//sprintf(cTracks, "%s\\bundle\\constraints.txt", binpath);
+	//GenerateTracks(cTracks);
 }
 
 void CProject_PGStationDlg::OnBundlerBundlerSrc()
@@ -2617,8 +2617,8 @@ void CProject_PGStationDlg::OnBundlerBundlerSrc()
 	int index = pdes-binpath;
 	strcpy(binpath+index, "\0");
 
-	BundleInitPath(binpath);
-	RunBundle();
+	//BundleInitPath(binpath);
+	//RunBundle();
 }
 
 void CProject_PGStationDlg::OnBundlerBundler()
@@ -5583,99 +5583,66 @@ void CProject_PGStationDlg::OnCudaInit()
 	//findCapableDevice();
 }
 
-#include "engine.h"
+//#include "engine.h"
+
 #define BUFSIZE 256
 #pragma comment(lib, "libeng.lib")
 #pragma comment(lib, "libmx.lib")
 #pragma comment(lib, "libmat.lib")
 void CProject_PGStationDlg::OnDebugCallmatlab()
 {
+	
 	// TODO: Add your command handler code here
-	Engine *ep;
-	mxArray *T = NULL, *a = NULL, *d = NULL;
-    mxArray *D = NULL;
-	mxArray *mx = NULL;
-	char buffer[BUFSIZE+1];
-	double *Dreal, *Dimag;
-	double time[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-	int i,j;
+	//Engine *ep;
+	//mxArray *T = NULL, *a = NULL, *d = NULL;
+ //   mxArray *D = NULL;
+	//mxArray *mx = NULL;
+	//char buffer[BUFSIZE+1];
+	//double *Dreal, *Dimag;
+	//double time[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+	//int i,j;
 
 
-	if ( !(ep = engOpen(NULL)) ) 
-	{
-		printf("can not start matlab engine! \n");
-		return;
-	}
+	//if ( !(ep = engOpen(NULL)) ) 
+	//{
+	//	printf("can not start matlab engine! \n");
+	//	return;
+	//}
 
-	/*
-	//Create a variable from our data
-	T = mxCreateDoubleMatrix(1, 10, mxREAL);
-	memcpy((char *) mxGetPr(T), (char *) time, 10*sizeof(double));
 
-	
-	//* Place the variable T into the MATLAB workspace
-	engPutVariable(ep, "T", T);
+	//engEvalString(ep, "rand('seed',0)");
+	//engEvalString(ep, "x = rand(100,1)*4-2;");
+	//engEvalString(ep, "y = rand(100,1)*4-2;");
+	//engEvalString(ep, "z = x.*exp(-x.^2-y.^2");
 
-	
-	engEvalString(ep, "D = sin(T);");
-	//engEvalString(ep, "D = .5.*(-9.8).*T.^2;");
+	//engEvalString(ep, "ti = -2:.25:2"); 
+	//engEvalString(ep, "[XI,YI] = meshgrid(ti,ti)");
+	//engEvalString(ep, "ZI = griddata(x,y,z,XI,YI)");
+ //   //engEvalString(ep, "d=ZI(:); d(find(isnan(d)==1))=0");
+	////engEvalString(ep, "mesh(XI,YI,ZI), hold");
+	////engEvalString(ep, "plot3(x,y,z,'o'), hold off");
 
-	
-	//engEvalString(ep, "figure;");
-	engEvalString(ep, "plot(T,D);");
-	engEvalString(ep, "title('Position vs. Time for a falling object');");
-	engEvalString(ep, "xlabel('Time (seconds)');");
-	engEvalString(ep, "ylabel('Position (meters)');");
 
-	D = engGetVariable(ep, "D");
-	
-	double* out = mxGetPr(D);
-	for(int i=0; i<10; i++)
-		printf("%lf \n", out[i]);
+	//mx = engGetVariable(ep, "ZI");
+	//if(mx==NULL)
+	//{
+	//	printf("get variable error \n");
+	//}
+	//else
+	//{
+	//	double* out = mxGetPr(mx);
+	//	printf("\n");
+	//	for( j=0; j<17; j++)
+	//	{
+	//		for( i=0; i<17; i++)
+	//		{
+	//			printf("%lf ", out[j*17+i]);
+	//		}
+	//		printf("\n");
+	//	}
+	//}
 
-	mxDestroyArray(T);
-	mxDestroyArray(D);
-	*/
-
-	engEvalString(ep, "rand('seed',0)");
-	engEvalString(ep, "x = rand(100,1)*4-2;");
-	engEvalString(ep, "y = rand(100,1)*4-2;");
-	engEvalString(ep, "z = x.*exp(-x.^2-y.^2");
-
-	engEvalString(ep, "ti = -2:.25:2"); 
-	engEvalString(ep, "[XI,YI] = meshgrid(ti,ti)");
-	engEvalString(ep, "ZI = griddata(x,y,z,XI,YI)");
-    //engEvalString(ep, "d=ZI(:); d(find(isnan(d)==1))=0");
-	//engEvalString(ep, "mesh(XI,YI,ZI), hold");
-	//engEvalString(ep, "plot3(x,y,z,'o'), hold off");
-
-	/*
-	mx = engGetVariable(ep, "x");
-	double* out = mxGetPr(mx);
-	for( i=0; i<100; i++)
-		printf("%lf \n", out[i]);
-	*/
-
-	mx = engGetVariable(ep, "ZI");
-	if(mx==NULL)
-	{
-		printf("get variable error \n");
-	}
-	else
-	{
-		double* out = mxGetPr(mx);
-		printf("\n");
-		for( j=0; j<17; j++)
-		{
-			for( i=0; i<17; i++)
-			{
-				printf("%lf ", out[j*17+i]);
-			}
-			printf("\n");
-		}
-	}
-
-	engClose(ep);
+	//engClose(ep);
 }
 
 
@@ -10711,61 +10678,61 @@ void CProject_PGStationDlg::OnEigenobjectTrainging()
 {
 	// TODO: Add your command handler code here
 
-	char samplesPath[256] = "D:\\Data\\Logo\\classification\\vw";
+	/*char samplesPath[256] = "D:\\Data\\Logo\\classification\\vw";
 	char dataPath[256] = "d:\\pca.dat";
 
 	CEigenObjBase* pEigenObj = new CEigenLogo();
-	pEigenObj->Train(samplesPath, dataPath);
+	pEigenObj->Train(samplesPath, dataPath);*/
 }
 
 
 void CProject_PGStationDlg::OnEigenobjectRecognition()
 {
 	// TODO: Add your command handler code here
-	
-	char* trainedDataPath = "d:\\pca.dat";
-	char* benchPath = "D:\\Data\\Logo\\bench"; 
-	CEigenObjBase* pEigenObj = new CEigenLogo();
-	pEigenObj->Load(trainedDataPath);
+	//
+	//char* trainedDataPath = "d:\\pca.dat";
+	//char* benchPath = "D:\\Data\\Logo\\bench"; 
+	//CEigenObjBase* pEigenObj = new CEigenLogo();
+	//pEigenObj->Load(trainedDataPath);
 
-	printf("\n Bench Image... \n");
-	pEigenObj->GenerateBench(benchPath);
+	//printf("\n Bench Image... \n");
+	//pEigenObj->GenerateBench(benchPath);
 
-	
-	//1. normalized the images	
-	const int nht = 48;
-	const int nwd = 48;
-	int nDim = nht*nwd;
-	IplImage* pNormalImage = cvCreateImage( cvSize(nwd,nht), 8, 1);
-	float* pFeat = (float*)malloc(nht*nwd*sizeof(float)); 
+	//
+	////1. normalized the images	
+	//const int nht = 48;
+	//const int nwd = 48;
+	//int nDim = nht*nwd;
+	//IplImage* pNormalImage = cvCreateImage( cvSize(nwd,nht), 8, 1);
+	//float* pFeat = (float*)malloc(nht*nwd*sizeof(float)); 
 
-	//calculate the projection parameters of bench images
-	char samplesPath[256] = "D:\\Data\\Logo\\test\\vw";
-	//get the number of images(samples)
-	char** filenames = NULL;
-	int n,nfile;
-	n = nfile = 0;
-	GetDirFileName(filenames, samplesPath, &n, &nfile, "jpg", 0);
-	filenames = f2c(nfile, 256);
-	GetDirFileName(filenames, samplesPath, &n, &nfile, "jpg", 1);
+	////calculate the projection parameters of bench images
+	//char samplesPath[256] = "D:\\Data\\Logo\\test\\vw";
+	////get the number of images(samples)
+	//char** filenames = NULL;
+	//int n,nfile;
+	//n = nfile = 0;
+	//GetDirFileName(filenames, samplesPath, &n, &nfile, "jpg", 0);
+	//filenames = f2c(nfile, 256);
+	//GetDirFileName(filenames, samplesPath, &n, &nfile, "jpg", 1);
 
-	for(int i=0; i<nfile; i++)
-	{
-		//printf("%s \n", filenames[i]);
-		IplImage* pImage = cvLoadImage( filenames[i], 0);
-		cvResize(pImage, pNormalImage);
-		for(int m=0; m<nht; m++)
-			for(int n=0; n<nwd; n++)
-			{
-				pFeat[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
-			}		
-		
-		int nclass = pEigenObj->Recognize(pFeat, nDim);
-		
-		printf("%d \n", nclass);
+	//for(int i=0; i<nfile; i++)
+	//{
+	//	//printf("%s \n", filenames[i]);
+	//	IplImage* pImage = cvLoadImage( filenames[i], 0);
+	//	cvResize(pImage, pNormalImage);
+	//	for(int m=0; m<nht; m++)
+	//		for(int n=0; n<nwd; n++)
+	//		{
+	//			pFeat[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
+	//		}		
+	//	
+	//	int nclass = pEigenObj->Recognize(pFeat, nDim);
+	//	
+	//	printf("%d \n", nclass);
 
-		cvReleaseImage(&pImage);
-	}   
+	//	cvReleaseImage(&pImage);
+	//}   
 }
 
 void CProject_PGStationDlg::OnToolNormalize()
@@ -10793,39 +10760,39 @@ void CProject_PGStationDlg::OnToolNormalize()
 	}
 }
 
-
-double PCASim(IplImage* pNormalImage, CEigenObjBase* pEigenObj)
-{
-	int nht = pNormalImage->height;
-	int nwd = pNormalImage->width;
-
-	float* pbuffer = (float*)malloc(nht*nwd*sizeof(float));
-	for(int m=0; m<nht; m++)
-		for(int n=0; n<nwd; n++)
-		{
-			pbuffer[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
-		}	
-
-	//image normalization
-	ImageNorm(pbuffer, nht, nwd, IMAGE_MEAN_VALUE, IMAGE_STD);
-
-	//projection
-	float* projBuffer = (float*)malloc(nht*nwd*sizeof(float));
-	memcpy(projBuffer, pbuffer, nht*nwd*sizeof(float));
-	pEigenObj->Projection(projBuffer, nht*nwd);
-	//SaveBmp("d:\\norm.bmp", projBuffer, nht, nwd);
-
-	//similarity
-	//double dif = 0;
-	//for(int i=0; i<nht*nwd; i++)
-	double sim = SimilarityOfImage(pbuffer, projBuffer, nht, nwd);
-	//printf("Similarity: %lf \n", sim);
-
-	free(pbuffer);
-	free(projBuffer);
-
-	return sim;
-}
+//
+//double PCASim(IplImage* pNormalImage, CEigenObjBase* pEigenObj)
+//{
+//	int nht = pNormalImage->height;
+//	int nwd = pNormalImage->width;
+//
+//	float* pbuffer = (float*)malloc(nht*nwd*sizeof(float));
+//	for(int m=0; m<nht; m++)
+//		for(int n=0; n<nwd; n++)
+//		{
+//			pbuffer[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
+//		}	
+//
+//	//image normalization
+//	ImageNorm(pbuffer, nht, nwd, IMAGE_MEAN_VALUE, IMAGE_STD);
+//
+//	//projection
+//	float* projBuffer = (float*)malloc(nht*nwd*sizeof(float));
+//	memcpy(projBuffer, pbuffer, nht*nwd*sizeof(float));
+//	pEigenObj->Projection(projBuffer, nht*nwd);
+//	//SaveBmp("d:\\norm.bmp", projBuffer, nht, nwd);
+//
+//	//similarity
+//	//double dif = 0;
+//	//for(int i=0; i<nht*nwd; i++)
+//	double sim = SimilarityOfImage(pbuffer, projBuffer, nht, nwd);
+//	//printf("Similarity: %lf \n", sim);
+//
+//	free(pbuffer);
+//	free(projBuffer);
+//
+//	return sim;
+//}
 
 void CProject_PGStationDlg::OnEigenobjectProjection()
 {
@@ -10834,155 +10801,155 @@ void CProject_PGStationDlg::OnEigenobjectProjection()
 	//char testfile[256] = "D:\\Data\\Logo\\test\\benz1.jpg";
 	//IplImage* pImage = cvLoadImage(testfile, 0);
 
-	char* trainedDataPath = "d:\\pca.dat";
-	//char* benchPath = "D:\\Data\\Logo\\bench"; 
-	CEigenObjBase* pEigenObj = new CEigenLogo();
-	pEigenObj->Load(trainedDataPath);
+	//char* trainedDataPath = "d:\\pca.dat";
+	////char* benchPath = "D:\\Data\\Logo\\bench"; 
+	//CEigenObjBase* pEigenObj = new CEigenLogo();
+	//pEigenObj->Load(trainedDataPath);
 
-	IplImage* pImage = CloneCurrentImage();
-	if(pImage!=NULL)
-	{
-		int nht = EIGEN_OBJ_HT;
-		int nwd = EIGEN_OBJ_WD;
-		IplImage* pNormalImage = cvCreateImage( cvSize(nwd, nht), 8, 1);
-		cvResize(pImage, pNormalImage);
+	//IplImage* pImage = CloneCurrentImage();
+	//if(pImage!=NULL)
+	//{
+	//	int nht = EIGEN_OBJ_HT;
+	//	int nwd = EIGEN_OBJ_WD;
+	//	IplImage* pNormalImage = cvCreateImage( cvSize(nwd, nht), 8, 1);
+	//	cvResize(pImage, pNormalImage);
 
-		
-		double* pbuffer = (double*)malloc(nht*nwd*sizeof(double));
-		for(int m=0; m<nht; m++)
-			for(int n=0; n<nwd; n++)
-			{
-				pbuffer[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
-			}	
+	//	
+	//	double* pbuffer = (double*)malloc(nht*nwd*sizeof(double));
+	//	for(int m=0; m<nht; m++)
+	//		for(int n=0; n<nwd; n++)
+	//		{
+	//			pbuffer[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
+	//		}	
 
-		//image normalization
-		ImageNorm(pbuffer, nht, nwd, IMAGE_MEAN_VALUE, IMAGE_STD);
-		SaveBmp("d:\\norm.bmp", pbuffer, nht, nwd);
+	//	//image normalization
+	//	ImageNorm(pbuffer, nht, nwd, IMAGE_MEAN_VALUE, IMAGE_STD);
+	//	SaveBmp("d:\\norm.bmp", pbuffer, nht, nwd);
 
-		//similarity based on histogram 
-		double simHist = 0;
-		double* pAverageImage;
-		int     nDim;
-		pEigenObj->GetAverage(&pAverageImage, &nDim);
-		double hist1[256];
-		double hist2[256];
-		memset(hist1, 0, sizeof(double)*256);
-		memset(hist2, 0, sizeof(double)*256);
-		GenerateHist(pAverageImage, nDim, hist1);
-		GenerateHist(pbuffer, nDim, hist2);
-		simHist = HistSimilar(hist1, hist2, 256);
-		
+	//	//similarity based on histogram 
+	//	double simHist = 0;
+	//	double* pAverageImage;
+	//	int     nDim;
+	//	pEigenObj->GetAverage(&pAverageImage, &nDim);
+	//	double hist1[256];
+	//	double hist2[256];
+	//	memset(hist1, 0, sizeof(double)*256);
+	//	memset(hist2, 0, sizeof(double)*256);
+	//	GenerateHist(pAverageImage, nDim, hist1);
+	//	GenerateHist(pbuffer, nDim, hist2);
+	//	simHist = HistSimilar(hist1, hist2, 256);
+	//	
 
-		//projection
-		double* projBuffer = (double*)malloc(nht*nwd*sizeof(double));
-		memcpy(projBuffer, pbuffer, nht*nwd*sizeof(double));
-		pEigenObj->Projection(projBuffer, nht*nwd);
-		SaveBmp("d:\\proj.bmp", projBuffer, nht, nwd);
+	//	//projection
+	//	double* projBuffer = (double*)malloc(nht*nwd*sizeof(double));
+	//	memcpy(projBuffer, pbuffer, nht*nwd*sizeof(double));
+	//	pEigenObj->Projection(projBuffer, nht*nwd);
+	//	SaveBmp("d:\\proj.bmp", projBuffer, nht, nwd);
 
 
-		//similarity
-		//double dif = 0;
-		//for(int i=0; i<nht*nwd; i++)
-		double sim = SimilarityOfImage(pbuffer, projBuffer, nht, nwd);
-		printf("hist: %lf  eigen: %lf \n", simHist, sim);
+	//	//similarity
+	//	//double dif = 0;
+	//	//for(int i=0; i<nht*nwd; i++)
+	//	double sim = SimilarityOfImage(pbuffer, projBuffer, nht, nwd);
+	//	printf("hist: %lf  eigen: %lf \n", simHist, sim);
 
-		//
-		for(int m=0; m<nht; m++)
-			for(int n=0; n<nwd; n++)
-			{
-				//pbuffer[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
-				pNormalImage->imageData[m*nwd+n] = projBuffer[m*nwd+n];
-			}	
-		free(pbuffer);
-		free(projBuffer);
-		
+	//	//
+	//	for(int m=0; m<nht; m++)
+	//		for(int n=0; n<nwd; n++)
+	//		{
+	//			//pbuffer[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
+	//			pNormalImage->imageData[m*nwd+n] = projBuffer[m*nwd+n];
+	//		}	
+	//	free(pbuffer);
+	//	free(projBuffer);
+	//	
 
-		//double sim = PCASim(pNormalImage, pEigenObj);
-		//printf("sim: %lf \n", sim);
+	//	//double sim = PCASim(pNormalImage, pEigenObj);
+	//	//printf("sim: %lf \n", sim);
 
-		cvNamedWindow("Projection");
-		cvShowImage("Projection", pNormalImage);
-		
-		cvReleaseImage(&pImage);
-		cvReleaseImage(&pNormalImage);
-	}
-	delete pEigenObj;
-	//printf("EigenObject Projection Finished! \n");
+	//	cvNamedWindow("Projection");
+	//	cvShowImage("Projection", pNormalImage);
+	//	
+	//	cvReleaseImage(&pImage);
+	//	cvReleaseImage(&pNormalImage);
+	//}
+	//delete pEigenObj;
+	////printf("EigenObject Projection Finished! \n");
 }
 
 
 void CProject_PGStationDlg::OnVehiclelogoPca()
 {
-	// TODO: Add your command handler code here
-	char* trainedDataPath = "d:\\pca.dat";
-	CEigenObjBase* pEigenObj = new CEigenLogo();
-	pEigenObj->Load(trainedDataPath);
+	//// TODO: Add your command handler code here
+	//char* trainedDataPath = "d:\\pca.dat";
+	//CEigenObjBase* pEigenObj = new CEigenLogo();
+	//pEigenObj->Load(trainedDataPath);
 
-	IplImage* pImage = CloneCurrentImage();
-	if(pImage!=NULL)
-	{
-		int nht = EIGEN_OBJ_HT;
-		int nwd = EIGEN_OBJ_WD;
-		int nstep = 2;
-		int nLevel = 10;
-		double scale = 1;
-		int ht = pImage->height;
-		int wd = pImage->width;
+	//IplImage* pImage = CloneCurrentImage();
+	//if(pImage!=NULL)
+	//{
+	//	int nht = EIGEN_OBJ_HT;
+	//	int nwd = EIGEN_OBJ_WD;
+	//	int nstep = 2;
+	//	int nLevel = 10;
+	//	double scale = 1;
+	//	int ht = pImage->height;
+	//	int wd = pImage->width;
 
-		IplImage* pNorm = cvCreateImage(cvSize(nwd, nht), 8, 1);
+	//	IplImage* pNorm = cvCreateImage(cvSize(nwd, nht), 8, 1);
 
-		for(int i=0; i<nLevel; i++)
-		{
-			printf("Level: %d \n", i);
+	//	for(int i=0; i<nLevel; i++)
+	//	{
+	//		printf("Level: %d \n", i);
 
-			scale = pow(1.1, i);
-			int sht = ht/scale;
-			int swd = wd/scale;
-			
-			IplImage* pScaleImage = cvCreateImage(cvSize(swd,sht), 8, 1);
-			cvResize(pImage, pScaleImage);
+	//		scale = pow(1.1, i);
+	//		int sht = ht/scale;
+	//		int swd = wd/scale;
+	//		
+	//		IplImage* pScaleImage = cvCreateImage(cvSize(swd,sht), 8, 1);
+	//		cvResize(pImage, pScaleImage);
 
-			for(int m=0; m<(sht-nht-1); m+=nstep)
-				for(int n=0; n<(swd-nwd-1); n+=nstep)
-				{
-					CvRect rect;
-					rect.x = n;
-					rect.y = m;
-					rect.height = nht;
-					rect.width  = nwd;
-					cvSetImageROI(pScaleImage, rect);
-					cvCopy(pScaleImage, pNorm);
-					cvResetImageROI(pScaleImage);
-					//cvSaveImage("d:\\patch.jpg", pNorm);
+	//		for(int m=0; m<(sht-nht-1); m+=nstep)
+	//			for(int n=0; n<(swd-nwd-1); n+=nstep)
+	//			{
+	//				CvRect rect;
+	//				rect.x = n;
+	//				rect.y = m;
+	//				rect.height = nht;
+	//				rect.width  = nwd;
+	//				cvSetImageROI(pScaleImage, rect);
+	//				cvCopy(pScaleImage, pNorm);
+	//				cvResetImageROI(pScaleImage);
+	//				//cvSaveImage("d:\\patch.jpg", pNorm);
 
-					//projection
-					double sim = PCASim(pNorm, pEigenObj);
+	//				//projection
+	//				double sim = PCASim(pNorm, pEigenObj);
 
 
 
-					if(sim>0.90)
-					{
-						printf("Similarity: %lf \n", sim);
-						CvRect orect;
-						orect.x = rect.x*scale;
-						orect.y = rect.y*scale;
-						orect.height = rect.height*scale;
-						orect.width  = rect.width*scale;
-						CvPoint p1,p2;
-						p1.x = orect.x;
-						p1.y = orect.y;
-						p2.x = p1.x + orect.width;
-						p2.y = p1.y + orect.height;
-						cvDrawRect(pImage, p1, p2, CV_RGB(255,255,255));
-					}
-				}
+	//				if(sim>0.90)
+	//				{
+	//					printf("Similarity: %lf \n", sim);
+	//					CvRect orect;
+	//					orect.x = rect.x*scale;
+	//					orect.y = rect.y*scale;
+	//					orect.height = rect.height*scale;
+	//					orect.width  = rect.width*scale;
+	//					CvPoint p1,p2;
+	//					p1.x = orect.x;
+	//					p1.y = orect.y;
+	//					p2.x = p1.x + orect.width;
+	//					p2.y = p1.y + orect.height;
+	//					cvDrawRect(pImage, p1, p2, CV_RGB(255,255,255));
+	//				}
+	//			}
 
-			cvNamedWindow("LogoDetect");
-			cvShowImage("LogoDetect", pImage);
+	//		cvNamedWindow("LogoDetect");
+	//		cvShowImage("LogoDetect", pImage);
 
-			cvReleaseImage(&pScaleImage);
-		}
-	}
+	//		cvReleaseImage(&pScaleImage);
+	//	}
+	//}
 }
 
 void CProject_PGStationDlg::OnSimulatedataSingleview()
@@ -11653,98 +11620,98 @@ void CProject_PGStationDlg::OnEigenobjectSimilarity()
 {
 	// TODO: Add your command handler code here
 
-	char* trainedDataPath = "d:\\pca.dat";
-	//char* benchPath = "D:\\Data\\Logo\\bench"; 
-	CEigenObjBase* pEigenObj = new CEigenLogo();
-	pEigenObj->Load(trainedDataPath);
+	//char* trainedDataPath = "d:\\pca.dat";
+	////char* benchPath = "D:\\Data\\Logo\\bench"; 
+	//CEigenObjBase* pEigenObj = new CEigenLogo();
+	//pEigenObj->Load(trainedDataPath);
 
-	//image directory
+	////image directory
+	////char* imagepath = "D:\\Data\\Logo\\train\\vw1";
 	//char* imagepath = "D:\\Data\\Logo\\train\\vw1";
-	char* imagepath = "D:\\Data\\Logo\\train\\vw1";
-	char** filenames = NULL;
-	int n,nfile;
-	n = 0;
-	nfile = 0;
-	GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 0);
-	filenames = f2c(nfile, 256);
-	GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 1);
+	//char** filenames = NULL;
+	//int n,nfile;
+	//n = 0;
+	//nfile = 0;
+	//GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 0);
+	//filenames = f2c(nfile, 256);
+	//GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 1);
 
-	int nht = EIGEN_OBJ_HT;
-	int nwd = EIGEN_OBJ_WD;
-	IplImage* pNormalImage = cvCreateImage( cvSize(nwd, nht), 8, 1);
-
-
-	int nPos = 0;
-	for(int i=0; i<nfile; i++)
-	{
-		printf("%s ", filenames[i]);
-
-		IplImage* pImage = cvLoadImage(filenames[i], 0); //CloneCurrentImage();
-		
-		if(pImage!=NULL)
-		{			
-			cvResize(pImage, pNormalImage);
-
-			//
-			//cvTransform()
+	//int nht = EIGEN_OBJ_HT;
+	//int nwd = EIGEN_OBJ_WD;
+	//IplImage* pNormalImage = cvCreateImage( cvSize(nwd, nht), 8, 1);
 
 
-			/*
-			double* pbuffer = (double*)malloc(nht*nwd*sizeof(double));
-			for(int m=0; m<nht; m++)
-				for(int n=0; n<nwd; n++)
-				{
-					pbuffer[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
-				}	
+	//int nPos = 0;
+	//for(int i=0; i<nfile; i++)
+	//{
+	//	printf("%s ", filenames[i]);
 
-			//image normalization
-			ImageNorm(pbuffer, nht, nwd, IMAGE_MEAN_VALUE, IMAGE_STD);
+	//	IplImage* pImage = cvLoadImage(filenames[i], 0); //CloneCurrentImage();
+	//	
+	//	if(pImage!=NULL)
+	//	{			
+	//		cvResize(pImage, pNormalImage);
 
-			//similarity based on histogram 
-			double simHist = 0;
-			double* pAverageImage;
-			int     nDim;
-			pEigenObj->GetAverage(&pAverageImage, &nDim);
-			double hist1[256];
-			double hist2[256];
-			memset(hist1, 0, sizeof(double)*256);
-			memset(hist2, 0, sizeof(double)*256);
-			GenerateHist(pAverageImage, nDim, hist1);
-			GenerateHist(pbuffer, nDim, hist2);
-			simHist = HistSimilar(hist1, hist2, 256);
-
-			//projection
-			double* projBuffer = (double*)malloc(nht*nwd*sizeof(double));
-			memcpy(projBuffer, pbuffer, nht*nwd*sizeof(double));
-			pEigenObj->Projection(projBuffer, nht*nwd);
-			//SaveBmp("d:\\norm.bmp", projBuffer, nht, nwd);
-
-			//similarity
-			//double dif = 0;
-			//for(int i=0; i<nht*nwd; i++)
-			double sim = SimilarityOfImage(pbuffer, projBuffer, nht, nwd);
-			printf("hist: %lf  eigen: %lf \n", simHist, sim);
-		
-			free(pAverageImage);
-			free(pbuffer);
-			free(projBuffer);
-			*/
-
-			double sim = PCASim(pNormalImage, pEigenObj);
-			if(sim>0.85)
-				nPos++;
-
-			printf("%lf \n", sim);
-			cvReleaseImage(&pImage);
-		}
-	}
+	//		//
+	//		//cvTransform()
 
 
-	double pr = double(nPos) / double(nfile);
-	printf("ratio: %lf \n", pr);
+	//		/*
+	//		double* pbuffer = (double*)malloc(nht*nwd*sizeof(double));
+	//		for(int m=0; m<nht; m++)
+	//			for(int n=0; n<nwd; n++)
+	//			{
+	//				pbuffer[m*nwd+n] = (unsigned char)( pNormalImage->imageData[m*nwd+n]);
+	//			}	
 
-	cvReleaseImage(&pNormalImage);
-	delete pEigenObj;
+	//		//image normalization
+	//		ImageNorm(pbuffer, nht, nwd, IMAGE_MEAN_VALUE, IMAGE_STD);
+
+	//		//similarity based on histogram 
+	//		double simHist = 0;
+	//		double* pAverageImage;
+	//		int     nDim;
+	//		pEigenObj->GetAverage(&pAverageImage, &nDim);
+	//		double hist1[256];
+	//		double hist2[256];
+	//		memset(hist1, 0, sizeof(double)*256);
+	//		memset(hist2, 0, sizeof(double)*256);
+	//		GenerateHist(pAverageImage, nDim, hist1);
+	//		GenerateHist(pbuffer, nDim, hist2);
+	//		simHist = HistSimilar(hist1, hist2, 256);
+
+	//		//projection
+	//		double* projBuffer = (double*)malloc(nht*nwd*sizeof(double));
+	//		memcpy(projBuffer, pbuffer, nht*nwd*sizeof(double));
+	//		pEigenObj->Projection(projBuffer, nht*nwd);
+	//		//SaveBmp("d:\\norm.bmp", projBuffer, nht, nwd);
+
+	//		//similarity
+	//		//double dif = 0;
+	//		//for(int i=0; i<nht*nwd; i++)
+	//		double sim = SimilarityOfImage(pbuffer, projBuffer, nht, nwd);
+	//		printf("hist: %lf  eigen: %lf \n", simHist, sim);
+	//	
+	//		free(pAverageImage);
+	//		free(pbuffer);
+	//		free(projBuffer);
+	//		*/
+
+	//		double sim = PCASim(pNormalImage, pEigenObj);
+	//		if(sim>0.85)
+	//			nPos++;
+
+	//		printf("%lf \n", sim);
+	//		cvReleaseImage(&pImage);
+	//	}
+	//}
+
+
+	//double pr = double(nPos) / double(nfile);
+	//printf("ratio: %lf \n", pr);
+
+	//cvReleaseImage(&pNormalImage);
+	//delete pEigenObj;
 }
 
 void CProject_PGStationDlg::OnHjAngleinterpolation()
@@ -17116,219 +17083,219 @@ void CProject_PGStationDlg::OnPlyRead()
 {
 	// TODO: Add your command handler code here
 
-	//ascii format
-	char* filename = "D:\\Data\\UAV\\2014-06-13-1\\sparse.ply";
-	//char* filename = "D:\\Data\\UAV\\2014-05-08\\half\\res.ply";
-	//char* filename = "D:\\Data\\3D\\bunny\\reconstruction\\bun_zipper.ply";
+	////ascii format
+	//char* filename = "D:\\Data\\UAV\\2014-06-13-1\\sparse.ply";
+	////char* filename = "D:\\Data\\UAV\\2014-05-08\\half\\res.ply";
+	////char* filename = "D:\\Data\\3D\\bunny\\reconstruction\\bun_zipper.ply";
 
-	//binary format
-	//char* filename = "D:\\Data\\UAV\\2014-05-08\\half\\111.0.ply";
+	////binary format
+	////char* filename = "D:\\Data\\UAV\\2014-05-08\\half\\111.0.ply";
 
-	double* x;
-	double* y;
-	double* z;
-	unsigned char* red;
-	unsigned char* green;
-	unsigned char* blue;
-	int npt;
+	//double* x;
+	//double* y;
+	//double* z;
+	//unsigned char* red;
+	//unsigned char* green;
+	//unsigned char* blue;
+	//int npt;
 
-	GetPlyVertex(filename, &x, &y, &z, &red, &green, &blue, &npt);
+	//GetPlyVertex(filename, &x, &y, &z, &red, &green, &blue, &npt);
 
-	//generate triangles;
-	int* p1;
-	int* p2;
-	int* p3;
-	
-	//int nTri = GenerateTrianglesUsingTinLib(x, y, z, npt, &p1, &p2, &p3);
-	int nTri = GenerateTrianglesCMU(x, y, z, npt, &p1, &p2, &p3);
+	////generate triangles;
+	//int* p1;
+	//int* p2;
+	//int* p3;
+	//
+	////int nTri = GenerateTrianglesUsingTinLib(x, y, z, npt, &p1, &p2, &p3);
+	////int nTri = GenerateTrianglesCMU(x, y, z, npt, &p1, &p2, &p3);
 
-	//printf("%d \n", nTri);
+	////printf("%d \n", nTri);
 
-	WritePly("d:\\mesh-tri.ply", x, y, z, red, green, blue, npt, p1, p2, p3, nTri);
-	
+	////WritePly("d:\\mesh-tri.ply", x, y, z, red, green, blue, npt, p1, p2, p3, nTri);
+	//
 
-	free(x);
-	free(y);
-	free(z);
-	free(red);
-	free(green);
-	free(blue);
-	free(p1);
-	free(p2);
-	free(p3);
+	//free(x);
+	//free(y);
+	//free(z);
+	//free(red);
+	//free(green);
+	//free(blue);
+	//free(p1);
+	//free(p2);
+	//free(p3);
 
-	printf("Generating Triangle Finished !\n");
+	//printf("Generating Triangle Finished !\n");
 }
 
 void CProject_PGStationDlg::OnTriangulateFitplane()
 {
-	// TODO: Add your command handler code here
-
-	//read *.out file
-	//char* outfile = "D:\\Data\\UAV\\2014-06-13-1\\sparse.out";
-	char* outfile = "D:\\NetDisk\\Program\\Assemble\\release\\bundle\\bundle_011.out";
-
-	vector<stPOS> camParas;
-	vector<stTrack> tracks;
-
-	ReadBundlerOutFile(outfile, camParas, tracks);
-
-	/*
-	for(int i=0; i<tracks.size(); i++)
-	{
-		double gx,gy,gz;
-		double ix,iy;
-		
-		gx = tracks[i].x;
-		gy = tracks[i].y;
-		gz = tracks[i].z;
-
-		for(int j=0; j<tracks[i].imgpt.size(); j++)
-		{
-			int imgId = tracks[i].imgid[j];
-
-			GrdToImg1( camParas[imgId].R, camParas[imgId].T, 
-				camParas[imgId].f, camParas[imgId].k1, camParas[imgId].k2, 
-				gx, gy, gz, &ix, &iy, 0, 0);
-
-			printf("%lf %lf  %lf %lf \n", tracks[i].imgpt[j].x, tracks[i].imgpt[j].y, ix, iy);
-		}
-	}
-	*/
-
-	//test plane fitting
-	double R[9];
-	int np = tracks.size();
-	int nall = np + camParas.size();
-	double* px = (double*)malloc( nall*sizeof(double) );
-	double* py = (double*)malloc( nall*sizeof(double) );
-	double* pz = (double*)malloc( nall*sizeof(double) );
-    unsigned char* red = (unsigned char*)malloc(nall);
-	unsigned char* green = (unsigned char*)malloc(nall);
-	unsigned char* blue = (unsigned char*)malloc(nall);
-
-	for(int i=0; i<tracks.size(); i++)
-	{
-		px[i] = tracks[i].x;
-		py[i] = tracks[i].y;
-		pz[i] = tracks[i].z;
-		red[i]   = tracks[i].r;
-		green[i] = tracks[i].g;
-		blue[i]  = tracks[i].b;
-	}	
-
-	FitPlane1(px, py, pz, np, R);
-    
-	//convert form RX+T to R( X - (-inv(R)*T) )
-	for(int i=0; i<camParas.size(); i++)
-	{
-		double t1[3];
-		double R1[9];
-        
-		memcpy(R1, camParas[i].R, 9*sizeof(double) );
-		invers_matrix(R1, 3);
-		mult(R1, camParas[i].T, t1, 3, 3, 1);
-		
-		px[i+np] = -t1[0];
-		py[i+np] = -t1[1];
-		pz[i+np] = -t1[2];
-
-		camParas[i].xs = -t1[0]; 
-		camParas[i].ys = -t1[1]; 
-		camParas[i].zs = -t1[2];
-
-		red[i+np]   = 255;
-		green[i+np] = 0;
-		blue[i+np]  = 0;
-	}
-
-	//transform
-	for(int i=0; i<nall; i++)
-	{
-		double gP[3];
-		double tp[3];
-		gP[0] = px[i]; 
-		gP[1] = py[i]; 
-		gP[2] = pz[i];
-		mult(R,gP,tp,3,3,1);
-		px[i] = tp[0]; 
-		py[i] = tp[1]; 
-		pz[i] = tp[2];
-	}
-
-	//save camera position
-	for(int i=0; i<camParas.size(); i++)
-	{
-		double gP[3];
-		double tp[3];
-		gP[0] = camParas[i].xs; 
-		gP[1] = camParas[i].ys; 
-		gP[2] = camParas[i].zs;
-		mult(R,gP,tp,3,3,1);
-		camParas[i].xs = tp[0]; 
-		camParas[i].ys = tp[1]; 
-		camParas[i].zs = tp[2];
-	}
-
-	//calculate the average height
-	double dHeight = 0;
-	double minx = 100000000;
-	double maxx = 0;
-	double miny = 100000000;
-	double maxy = 0;
-	for(int i=0; i<np; i++)
-	{
-		dHeight += pz[i];
-		minx = min(minx, px[i]);
-		maxx = max(maxx, px[i]);
-		miny = min(miny, py[i]);
-		maxy = max(maxy, py[i]);
-	}
-	dHeight /= np;
-	printf("height: %lf \n", dHeight);
-	printf("range: %lf %lf %lf %lf \n", minx, maxx, miny, maxy);
-
-	//calculate the area of each camera and resolution
-	int ht = 3744;
-	int wd = 5616;
-	double sInterval = 0;	
-	for(int i=0; i<camParas.size(); i++)
-	{
-		double height = fabs(dHeight-camParas[i].zs);
-		double grdWd = (double)(wd)/camParas[i].f * height;
-		double interval = grdWd/(double)(wd);
-		printf(" %lf ", interval);
-		sInterval += interval;
-	}
-	sInterval /= (double)( camParas.size() );
-	printf("interval: %lf \n", sInterval);
-
-	FILE* fp = fopen("d:\\flyInfo.txt", "w");
-	fprintf(fp, "%s %lf \n", "resolution", sInterval);
-	fclose(fp);
-	
-	int mht = (maxy-miny)/sInterval;
-	int mwd = (maxx-minx)/sInterval;
-	printf("mht: %d mwd:%d \n", mht, mwd);
-
-	//save as ply
-	WritePly("d:\\mesh-rotate.ply", px, py, pz, red, green, blue, np, NULL, NULL, NULL, 0);
-
-
-	//generate triangles
-	int* p1;
-	int* p2;
-	int* p3;
-	int nTri = GenerateTrianglesCMU(px, py, pz, np, &p1, &p2, &p3);
-	WritePly("d:\\mesh-tri.ply", px, py, pz, red, green, blue, np, p1, p2, p3, nTri);
-
-
-	//interpolation
-
-
-	//get the minimal distance of all edges
-	//double minInterval = GetMinInterval(px,py,pz,np,p1,p2,p3,nTri);
-	//printf("minimal interval: %lf \n", minInterval);
+//	// TODO: Add your command handler code here
+//
+//	//read *.out file
+//	//char* outfile = "D:\\Data\\UAV\\2014-06-13-1\\sparse.out";
+//	char* outfile = "D:\\NetDisk\\Program\\Assemble\\release\\bundle\\bundle_011.out";
+//
+//	vector<stPOS> camParas;
+//	vector<stTrack> tracks;
+//
+//	ReadBundlerOutFile(outfile, camParas, tracks);
+//
+//	/*
+//	for(int i=0; i<tracks.size(); i++)
+//	{
+//		double gx,gy,gz;
+//		double ix,iy;
+//		
+//		gx = tracks[i].x;
+//		gy = tracks[i].y;
+//		gz = tracks[i].z;
+//
+//		for(int j=0; j<tracks[i].imgpt.size(); j++)
+//		{
+//			int imgId = tracks[i].imgid[j];
+//
+//			GrdToImg1( camParas[imgId].R, camParas[imgId].T, 
+//				camParas[imgId].f, camParas[imgId].k1, camParas[imgId].k2, 
+//				gx, gy, gz, &ix, &iy, 0, 0);
+//
+//			printf("%lf %lf  %lf %lf \n", tracks[i].imgpt[j].x, tracks[i].imgpt[j].y, ix, iy);
+//		}
+//	}
+//	*/
+//
+//	//test plane fitting
+//	double R[9];
+//	int np = tracks.size();
+//	int nall = np + camParas.size();
+//	double* px = (double*)malloc( nall*sizeof(double) );
+//	double* py = (double*)malloc( nall*sizeof(double) );
+//	double* pz = (double*)malloc( nall*sizeof(double) );
+//    unsigned char* red = (unsigned char*)malloc(nall);
+//	unsigned char* green = (unsigned char*)malloc(nall);
+//	unsigned char* blue = (unsigned char*)malloc(nall);
+//
+//	for(int i=0; i<tracks.size(); i++)
+//	{
+//		px[i] = tracks[i].x;
+//		py[i] = tracks[i].y;
+//		pz[i] = tracks[i].z;
+//		red[i]   = tracks[i].r;
+//		green[i] = tracks[i].g;
+//		blue[i]  = tracks[i].b;
+//	}	
+//
+//	FitPlane1(px, py, pz, np, R);
+//    
+//	//convert form RX+T to R( X - (-inv(R)*T) )
+//	for(int i=0; i<camParas.size(); i++)
+//	{
+//		double t1[3];
+//		double R1[9];
+//        
+//		memcpy(R1, camParas[i].R, 9*sizeof(double) );
+//		invers_matrix(R1, 3);
+//		mult(R1, camParas[i].T, t1, 3, 3, 1);
+//		
+//		px[i+np] = -t1[0];
+//		py[i+np] = -t1[1];
+//		pz[i+np] = -t1[2];
+//
+//		camParas[i].xs = -t1[0]; 
+//		camParas[i].ys = -t1[1]; 
+//		camParas[i].zs = -t1[2];
+//
+//		red[i+np]   = 255;
+//		green[i+np] = 0;
+//		blue[i+np]  = 0;
+//	}
+//
+//	//transform
+//	for(int i=0; i<nall; i++)
+//	{
+//		double gP[3];
+//		double tp[3];
+//		gP[0] = px[i]; 
+//		gP[1] = py[i]; 
+//		gP[2] = pz[i];
+//		mult(R,gP,tp,3,3,1);
+//		px[i] = tp[0]; 
+//		py[i] = tp[1]; 
+//		pz[i] = tp[2];
+//	}
+//
+//	//save camera position
+//	for(int i=0; i<camParas.size(); i++)
+//	{
+//		double gP[3];
+//		double tp[3];
+//		gP[0] = camParas[i].xs; 
+//		gP[1] = camParas[i].ys; 
+//		gP[2] = camParas[i].zs;
+//		mult(R,gP,tp,3,3,1);
+//		camParas[i].xs = tp[0]; 
+//		camParas[i].ys = tp[1]; 
+//		camParas[i].zs = tp[2];
+//	}
+//
+//	//calculate the average height
+//	double dHeight = 0;
+//	double minx = 100000000;
+//	double maxx = 0;
+//	double miny = 100000000;
+//	double maxy = 0;
+//	for(int i=0; i<np; i++)
+//	{
+//		dHeight += pz[i];
+//		minx = min(minx, px[i]);
+//		maxx = max(maxx, px[i]);
+//		miny = min(miny, py[i]);
+//		maxy = max(maxy, py[i]);
+//	}
+//	dHeight /= np;
+//	printf("height: %lf \n", dHeight);
+//	printf("range: %lf %lf %lf %lf \n", minx, maxx, miny, maxy);
+//
+//	//calculate the area of each camera and resolution
+//	int ht = 3744;
+//	int wd = 5616;
+//	double sInterval = 0;	
+//	for(int i=0; i<camParas.size(); i++)
+//	{
+//		double height = fabs(dHeight-camParas[i].zs);
+//		double grdWd = (double)(wd)/camParas[i].f * height;
+//		double interval = grdWd/(double)(wd);
+//		printf(" %lf ", interval);
+//		sInterval += interval;
+//	}
+//	sInterval /= (double)( camParas.size() );
+//	printf("interval: %lf \n", sInterval);
+//
+//	FILE* fp = fopen("d:\\flyInfo.txt", "w");
+//	fprintf(fp, "%s %lf \n", "resolution", sInterval);
+//	fclose(fp);
+//	
+//	int mht = (maxy-miny)/sInterval;
+//	int mwd = (maxx-minx)/sInterval;
+//	printf("mht: %d mwd:%d \n", mht, mwd);
+//
+//	//save as ply
+//	WritePly("d:\\mesh-rotate.ply", px, py, pz, red, green, blue, np, NULL, NULL, NULL, 0);
+//
+//
+//	//generate triangles
+//	int* p1;
+//	int* p2;
+//	int* p3;
+//	int nTri = GenerateTrianglesCMU(px, py, pz, np, &p1, &p2, &p3);
+//	WritePly("d:\\mesh-tri.ply", px, py, pz, red, green, blue, np, p1, p2, p3, nTri);
+//
+//
+//	//interpolation
+//
+//
+//	//get the minimal distance of all edges
+//	//double minInterval = GetMinInterval(px,py,pz,np,p1,p2,p3,nTri);
+//	//printf("minimal interval: %lf \n", minInterval);
 
 	printf("Finished ! \n");
 }
@@ -17345,29 +17312,29 @@ void CProject_PGStationDlg::OnDemMba()
 {
 	// TODO: Add your command handler code here
 
-	//multilevel b-spline interpolation
-	char* filename = "d:\\mesh-rotate.ply";
+	////multilevel b-spline interpolation
+	//char* filename = "d:\\mesh-rotate.ply";
 
-	//read scattered 3D points from *.ply file
-	double* x;
-	double* y;
-	double* z;
-	unsigned char* red;
-	unsigned char* green;
-	unsigned char* blue;
-	int npt;
+	////read scattered 3D points from *.ply file
+	//double* x;
+	//double* y;
+	//double* z;
+	//unsigned char* red;
+	//unsigned char* green;
+	//unsigned char* blue;
+	//int npt;
 
-	GetPlyVertex(filename, &x, &y, &z, &red, &green, &blue, &npt);
-   
-	double resolution;
-	char tc[256];
-	FILE* fp = fopen("d:\\flyInfo.txt", "r");
-	fscanf(fp, "%s %lf \n", tc, &resolution);
-	fclose(fp);
+	//GetPlyVertex(filename, &x, &y, &z, &red, &green, &blue, &npt);
+ //  
+	//double resolution;
+	//char tc[256];
+	//FILE* fp = fopen("d:\\flyInfo.txt", "r");
+	//fscanf(fp, "%s %lf \n", tc, &resolution);
+	//fclose(fp);
 
-	float* iz = NULL;
-	int desHt, desWd;
-	MBAInterpolation(x, y, z, npt, 50, resolution, desHt, desWd, &iz);
+	//float* iz = NULL;
+	//int desHt, desWd;
+	//MBAInterpolation(x, y, z, npt, 50, resolution, desHt, desWd, &iz);
 	
 	printf("Finished! \n");
 }
@@ -19535,134 +19502,134 @@ void CProject_PGStationDlg::OnMosaicBundler33231()
 void CProject_PGStationDlg::OnPbaCpu()
 {
 	// TODO: Add your command handler code here
-
-	int argc = 3;
-	char** argv = f2c(3,256);
-	strcpy(argv[0], "pba.exe");
-	
-	//////////////////////////////////////////////////////
-	char* input_filename  = "F:\\data" ; //argv[1];            //first argument must be filename
-	char* driver_argument = "--float" ; //argv[argc - 1];    //last argument  for the driver
-
-	strcpy(argv[1], input_filename);
-	strcpy(argv[2], driver_argument);
-
-	/////////////////////////////////////////////////////////////////
-	//CameraT, Point3D, POINT2 are defined in src/pba/DataInterface.h
-	vector<CameraT>        camera_data;    //camera (input/ouput)
-	vector<Point3D>        point_data;     //3D point(iput/output)
-	vector<Point2D>        measurements;   //measurment/projection vector
-	vector<int>            camidx, ptidx;  //index of camera/point for each projection
-
-	/////////////////////////////////////
-	vector<string>         photo_names;        //from NVM file, not used in bundle adjustment
-	vector<int>            point_color;        //from NVM file, not used in bundle adjustment
-
-	/////////////////////////////////////////////////////////////
-	///load the data. You will need to replace the loader for your own data
-	
-	if(argc < 2 || ! LoadModelFile(input_filename, camera_data, point_data, measurements,
-		ptidx, camidx, photo_names, point_color))
-	{
-		std::cout << "==== Multicore Bundle Adjustment ---- Demo Driver Syntax ====\n"
-#ifdef WIN32
-			"driver(_x64)(_debug) "
-#else
-			"driver "
-#endif
-			"input [pba parameters][-out output_nvm][driver argument]\n"
-			"	input:            file must be NVM or bundler format\n"
-			"[driver argument] must be the last one. It can be one of the following\n"
-			"	--noise:          add 5% random noise to all parameters\n"
-			"	--float:          use CPU-float implementation instead of GPU\n"
-			"	--double:         use CPU-double implementation instead of GPU\n"
-			"[pba parameters]: -lmi <#>, -cgi <#>, -cgn <f>, -budget <#>...\n"
-			"	-lmi <#>:         specify the number of LM iterations\n"
-			"	-profile:         run profiling experiments and see the speeds\n"
-			"	                  check documentation for more details.\n";
-		//return 0;
-	}else
-	{
-		//if(strstr(driver_argument, "--checkv")) ExamineVisiblity(input_filename);
-
-		//remove file extension for conversion/saving purpose
-		char* dotpos = strrchr(input_filename, '.');
-		if(dotpos && strchr(dotpos, '/') == NULL && strchr(dotpos, '\\') == NULL) *dotpos = 0;
-
-		//////////////////////////////////////////////////////////
-		//use the last parameter for special purpose.
-		string surfix = "-converted";
-		if(strstr(driver_argument, "--fix_visibility"))
-		{
-			if(RemoveInvisiblePoints(camera_data, point_data, ptidx, camidx, measurements, photo_names, point_color))
-				surfix = "-fixed";
-		}else
-		{
-			if(strstr(driver_argument, "--noise") != NULL)     //add noise for experimentation
-			{
-				//AddNoise(camera_data, point_data, 0.05f);    //add 5% noise for experiments
-				AddStableNoise(camera_data, point_data, ptidx, camidx, 0.05f);
-				surfix = "-noised";
-			}
-		}
-
-		//file format conversion for experimentation
-		if(strstr(driver_argument, "--convert_to_nvm"))
-			SaveNVM(    (string(input_filename) + surfix + ".nvm").c_str(), camera_data, 
-			point_data, measurements, ptidx, camidx, photo_names, point_color); 
-		if(strstr(driver_argument, "--convert_to_bm"))
-			SaveBundlerModel(    (string(input_filename) + surfix + ".txt").c_str(), 
-			camera_data, point_data, measurements, ptidx, camidx);
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////
-	ParallelBA::DeviceT device = ParallelBA::PBA_CUDA_DEVICE_DEFAULT;
-	if(strstr(driver_argument, "--float"))          device = ParallelBA::PBA_CPU_FLOAT;
-	else if(strstr(driver_argument, "--double"))    device = ParallelBA::PBA_CPU_DOUBLE;
-
-	/////////////////////////////////////////////////////////////////////
-	ParallelBA pba(device);          //You should reusing the same object for all new data
-
-	/////////////////////////////////////////////////////////
-	//Parameters can be changed before every call of RunBundleAdjustment
-	//But do not change them from another thread when it is running BA.
-	pba.ParseParam(argc, argv);      //indirect parameter tuning from commandline
-	//pba.SetFixedIntrinsics(true); //if your focal lengths are calibrated. 
-	//           equivalent to pba.GetInternalConfig()->__fixed_focallength = true;
-	//pba.EnableRadialDistortion(*); // if you want to enable radial distortion
-	//           equivalent to pba.GetInternalConfig()->__use_radial_distortion = *;
-	//check src/pba/ConfigBA.h for more details on the parameter system
-
-	////////////////////////////////////
-	//Tweaks before bundle adjustment
-	//1. For each camera, you can call CameraT::SetConstantCamera() to keep it unchanged.
-	//2. pba.SetNextBundleMode(ParallelBA::BUNDLE_ONLY_MOTION) //chose a truncated mode?
-
-	////////////////////////////////////////////////////////////////
-	pba.SetCameraData(camera_data.size(),  &camera_data[0]);                         //set camera parameters
-	pba.SetPointData(point_data.size(), &point_data[0]);                             //set 3D point data
-	pba.SetProjection(measurements.size(), &measurements[0], &ptidx[0], &camidx[0]); //set the projections
-
-	vector<int> cmask;
-	if(strstr(driver_argument, "--common"))
-	{
-		cmask.resize(camera_data.size(), 0);
-		pba.SetFocalMask(&cmask[0]);
-	}
-	//WARNING: measumrents must be stored in correct order
-	//all measutments (in different images) for a single 3D point must be stored continously, 
-	//Currently, there is no order verification internally.
-	//Basically, ptidx should be non-decreasing 
-
-	//////////////////////////////////////////////////////
-	//pba.SetTimeBudget(10);      //use at most 10 seconds?
-	pba.RunBundleAdjustment();    //run bundle adjustment, and camera_data/point_data will be modified
-
-
-	//Write the optimized system to file
-	const char*  outpath = pba.GetInternalConfig()->GetOutputParam();
-	SaveModelFile(outpath, camera_data, point_data, measurements, ptidx, camidx, photo_names, point_color);
-	//It is easy to visualize the camera/points yourself, 
+//
+//	int argc = 3;
+//	char** argv = f2c(3,256);
+//	strcpy(argv[0], "pba.exe");
+//	
+//	//////////////////////////////////////////////////////
+//	char* input_filename  = "F:\\data" ; //argv[1];            //first argument must be filename
+//	char* driver_argument = "--float" ; //argv[argc - 1];    //last argument  for the driver
+//
+//	strcpy(argv[1], input_filename);
+//	strcpy(argv[2], driver_argument);
+//
+//	/////////////////////////////////////////////////////////////////
+//	//CameraT, Point3D, POINT2 are defined in src/pba/DataInterface.h
+//	vector<CameraT>        camera_data;    //camera (input/ouput)
+//	vector<Point3D>        point_data;     //3D point(iput/output)
+//	vector<Point2D>        measurements;   //measurment/projection vector
+//	vector<int>            camidx, ptidx;  //index of camera/point for each projection
+//
+//	/////////////////////////////////////
+//	vector<string>         photo_names;        //from NVM file, not used in bundle adjustment
+//	vector<int>            point_color;        //from NVM file, not used in bundle adjustment
+//
+//	/////////////////////////////////////////////////////////////
+//	///load the data. You will need to replace the loader for your own data
+//	
+//	if(argc < 2 || ! LoadModelFile(input_filename, camera_data, point_data, measurements,
+//		ptidx, camidx, photo_names, point_color))
+//	{
+//		std::cout << "==== Multicore Bundle Adjustment ---- Demo Driver Syntax ====\n"
+//#ifdef WIN32
+//			"driver(_x64)(_debug) "
+//#else
+//			"driver "
+//#endif
+//			"input [pba parameters][-out output_nvm][driver argument]\n"
+//			"	input:            file must be NVM or bundler format\n"
+//			"[driver argument] must be the last one. It can be one of the following\n"
+//			"	--noise:          add 5% random noise to all parameters\n"
+//			"	--float:          use CPU-float implementation instead of GPU\n"
+//			"	--double:         use CPU-double implementation instead of GPU\n"
+//			"[pba parameters]: -lmi <#>, -cgi <#>, -cgn <f>, -budget <#>...\n"
+//			"	-lmi <#>:         specify the number of LM iterations\n"
+//			"	-profile:         run profiling experiments and see the speeds\n"
+//			"	                  check documentation for more details.\n";
+//		//return 0;
+//	}else
+//	{
+//		//if(strstr(driver_argument, "--checkv")) ExamineVisiblity(input_filename);
+//
+//		//remove file extension for conversion/saving purpose
+//		char* dotpos = strrchr(input_filename, '.');
+//		if(dotpos && strchr(dotpos, '/') == NULL && strchr(dotpos, '\\') == NULL) *dotpos = 0;
+//
+//		//////////////////////////////////////////////////////////
+//		//use the last parameter for special purpose.
+//		string surfix = "-converted";
+//		if(strstr(driver_argument, "--fix_visibility"))
+//		{
+//			if(RemoveInvisiblePoints(camera_data, point_data, ptidx, camidx, measurements, photo_names, point_color))
+//				surfix = "-fixed";
+//		}else
+//		{
+//			if(strstr(driver_argument, "--noise") != NULL)     //add noise for experimentation
+//			{
+//				//AddNoise(camera_data, point_data, 0.05f);    //add 5% noise for experiments
+//				AddStableNoise(camera_data, point_data, ptidx, camidx, 0.05f);
+//				surfix = "-noised";
+//			}
+//		}
+//
+//		//file format conversion for experimentation
+//		if(strstr(driver_argument, "--convert_to_nvm"))
+//			SaveNVM(    (string(input_filename) + surfix + ".nvm").c_str(), camera_data, 
+//			point_data, measurements, ptidx, camidx, photo_names, point_color); 
+//		if(strstr(driver_argument, "--convert_to_bm"))
+//			SaveBundlerModel(    (string(input_filename) + surfix + ".txt").c_str(), 
+//			camera_data, point_data, measurements, ptidx, camidx);
+//	}
+//
+//	/////////////////////////////////////////////////////////////////////////////////////////
+//	ParallelBA::DeviceT device = ParallelBA::PBA_CUDA_DEVICE_DEFAULT;
+//	if(strstr(driver_argument, "--float"))          device = ParallelBA::PBA_CPU_FLOAT;
+//	else if(strstr(driver_argument, "--double"))    device = ParallelBA::PBA_CPU_DOUBLE;
+//
+//	/////////////////////////////////////////////////////////////////////
+//	ParallelBA pba(device);          //You should reusing the same object for all new data
+//
+//	/////////////////////////////////////////////////////////
+//	//Parameters can be changed before every call of RunBundleAdjustment
+//	//But do not change them from another thread when it is running BA.
+//	pba.ParseParam(argc, argv);      //indirect parameter tuning from commandline
+//	//pba.SetFixedIntrinsics(true); //if your focal lengths are calibrated. 
+//	//           equivalent to pba.GetInternalConfig()->__fixed_focallength = true;
+//	//pba.EnableRadialDistortion(*); // if you want to enable radial distortion
+//	//           equivalent to pba.GetInternalConfig()->__use_radial_distortion = *;
+//	//check src/pba/ConfigBA.h for more details on the parameter system
+//
+//	////////////////////////////////////
+//	//Tweaks before bundle adjustment
+//	//1. For each camera, you can call CameraT::SetConstantCamera() to keep it unchanged.
+//	//2. pba.SetNextBundleMode(ParallelBA::BUNDLE_ONLY_MOTION) //chose a truncated mode?
+//
+//	////////////////////////////////////////////////////////////////
+//	pba.SetCameraData(camera_data.size(),  &camera_data[0]);                         //set camera parameters
+//	pba.SetPointData(point_data.size(), &point_data[0]);                             //set 3D point data
+//	pba.SetProjection(measurements.size(), &measurements[0], &ptidx[0], &camidx[0]); //set the projections
+//
+//	vector<int> cmask;
+//	if(strstr(driver_argument, "--common"))
+//	{
+//		cmask.resize(camera_data.size(), 0);
+//		pba.SetFocalMask(&cmask[0]);
+//	}
+//	//WARNING: measumrents must be stored in correct order
+//	//all measutments (in different images) for a single 3D point must be stored continously, 
+//	//Currently, there is no order verification internally.
+//	//Basically, ptidx should be non-decreasing 
+//
+//	//////////////////////////////////////////////////////
+//	//pba.SetTimeBudget(10);      //use at most 10 seconds?
+//	pba.RunBundleAdjustment();    //run bundle adjustment, and camera_data/point_data will be modified
+//
+//
+//	//Write the optimized system to file
+//	const char*  outpath = pba.GetInternalConfig()->GetOutputParam();
+//	SaveModelFile(outpath, camera_data, point_data, measurements, ptidx, camidx, photo_names, point_color);
+//	//It is easy to visualize the camera/points yourself, 
 }
 
 void CProject_PGStationDlg::OnMatchingSimpleflow()
