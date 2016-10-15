@@ -14,6 +14,9 @@
 #include "DlgInput.h"
 #include "DlgHJAC.h"
 
+//eigen
+
+
 //boost
 //#include <boost/lexical_cast.hpp>     
 //#include <iostream>   
@@ -208,7 +211,7 @@ public:
 // Dialog Data
 	enum { IDD = IDD_ABOUTBOX };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 // Implementation
@@ -651,6 +654,8 @@ BEGIN_MESSAGE_MAP(CProject_PGStationDlg, CDialog)
 	ON_COMMAND(ID_FORMAT_AUV, &CProject_PGStationDlg::OnFormatAuv)
 	ON_COMMAND(ID_PLY_MOSAIC, &CProject_PGStationDlg::OnPlyMosaic)
 	ON_COMMAND(ID_TEMPLATE_FUNCTION, &CProject_PGStationDlg::OnTemplateFunction)
+	//ON_COMMAND(ID_EIGEN_TEST, &CProject_PGStationDlg::OnEigenTest)
+	ON_COMMAND(ID_EIGEN_TEST, &CProject_PGStationDlg::OnEigenTest)
 	END_MESSAGE_MAP()
 
 
@@ -703,7 +708,7 @@ void on_image_mouse( int event, int x, int y, int flags, void* param)
 		{
 			IplImage* pImage = pWnd->CloneCurrentImage();
 			cvSetImageROI(pImage, rect);
-			cvSaveImage("d:\\template.jpg", pImage);
+			cvSaveImage("c:\\temp\\template.jpg", pImage);
 			cvResetImageROI(pImage);
 			cvReleaseImage(&pImage);
 		}
@@ -840,7 +845,7 @@ void PairMatch(IplImage* pLeft, IplImage* pRight, MatchPairVector& matchPair)
 	for(i=0; i<m_ncp; i++)
 	{
 		IplImage* pPatch = extractPatch(mp1[i], pLeft, 0);
-		cvSaveImage("d:\\patch1.jpg", pPatch);
+		cvSaveImage("c:\\temp\\patch1.jpg", pPatch);
 		unsigned char* pbuffer = NULL;
 		int ht,wd;
 		IplImageToGrayImage(pPatch, &pbuffer, &ht, &wd);
@@ -851,7 +856,7 @@ void PairMatch(IplImage* pLeft, IplImage* pRight, MatchPairVector& matchPair)
 
 		double relativeAngle = mp2[i].ori - mp1[i].ori;
 		pPatch = extractPatch(mp2[i], pRight, -relativeAngle);
-		cvSaveImage("d:\\patch2.jpg", pPatch);
+		cvSaveImage("c:\\temp\\patch2.jpg", pPatch);
 		IplImageToGrayImage(pPatch, &pbuffer, &ht, &wd);
 		double lbpHist2[256];
 		GenerateLBP(pbuffer, ht, wd, lbpHist2);
@@ -866,8 +871,8 @@ void PairMatch(IplImage* pLeft, IplImage* pRight, MatchPairVector& matchPair)
 	*/
 
 	//save the matched result
-	writeSift(mp1, m_ncp, "d:\\lpt.txt");
-	writeSift(mp2, m_ncp, "d:\\rpt.txt");
+	writeSift(mp1, m_ncp, "c:\\temp\\lpt.txt");
+	writeSift(mp2, m_ncp, "c:\\temp\\rpt.txt");
 
 	//insert into match pair
 	CvFont font;	
@@ -949,8 +954,8 @@ void PairMatch(IplImage* pLeft, IplImage* pRight, MatchPairVector& matchPair)
 
 
 #ifdef _DEBUG
-	cvSaveImage("d:\\left.bmp", pDispLeft);
-	cvSaveImage("d:\\right.bmp", pDispRight);
+	cvSaveImage("c:\\temp\\left.bmp", pDispLeft);
+	cvSaveImage("c:\\temp\\right.bmp", pDispRight);
 #endif // _DEBUG
 
 	cvNamedWindow("Left");
@@ -1217,7 +1222,7 @@ void CProject_PGStationDlg::OnPaint()
 		dc.DrawIcon(x, y, m_hIcon);
 		
 		//AfxMessageBox("Paint 1");
-		//FILE* fp = fopen("d:\\message2.txt", "w");
+		//FILE* fp = fopen("c:\\temp\\message2.txt", "w");
 		//fprintf(fp, "%d \n", rand());
 		//fclose(fp);		
 	}
@@ -1225,7 +1230,7 @@ void CProject_PGStationDlg::OnPaint()
 	{
 		CDialog::OnPaint();
 		//AfxMessageBox("Paint 2");
-		//FILE* fp = fopen("d:\\message1.txt", "w");
+		//FILE* fp = fopen("c:\\temp\\message1.txt", "w");
 		//fprintf(fp, "%d \n", rand());
 		//fclose(fp);
 
@@ -1305,7 +1310,7 @@ void CProject_PGStationDlg::OnFileOpen32771()
 			pImage->Load(cFilePath);
 			m_imagePointerVector.push_back(pImage);
 
-			printf("ht: %d  wd:%d \n", pImage->GetHt(), pImage->GetWd());
+			printf("ht: %d  wc:\\temp%d \n", pImage->GetHt(), pImage->GetWd());
 		}
 
 		//display
@@ -1638,7 +1643,7 @@ void CProject_PGStationDlg::OnFeatureHarris()
 		cvShowImage("Harris", pDisp);
 
 #ifdef _DEBUG
-		cvSaveImage("d:\\harris.png", pDisp);
+		cvSaveImage("c:\\temp\\harris.png", pDisp);
 #endif // _DEBUG
 
 		cvReleaseImage(&pImage);
@@ -1784,8 +1789,8 @@ void CProject_PGStationDlg::OnFeatureSift()
 		draw_features(pColor, pFeat, nFeat);
 
 		//save into image
-		printf("save into the file: d:\sift_byte.bmp \n");
-		cvSaveImage("d:\\sift_byte.bmp", pColor);
+		printf("save into the file: c:\\temp\sift_byte.bmp \n");
+		cvSaveImage("c:\\temp\\sift_byte.bmp", pColor);
 
 		cvNamedWindow("SIFT");
 		cvMoveWindow("SIFT", 100, 100);
@@ -2047,7 +2052,7 @@ void CProject_PGStationDlg::OnGeometryTriangle()
 		cvSetMouseCallback("Triangle", on_triangle_mouse, this);
 		cvShowImage("Triangle", pImage);
 
-		cvSaveImage("d:\\triangle.png", pImage);
+		cvSaveImage("c:\\temp\\triangle.png", pImage);
 
 		cvReleaseImage(&pImage);    
 		free(px);
@@ -2097,7 +2102,7 @@ void CProject_PGStationDlg::OnSimulationTranslation()
 						pSimImage->imageData[j*scanwd+i] = 0;
 				}    
 			
-			cvSaveImage("d:\\simulateImage.jpg", pSimImage);
+			cvSaveImage("c:\\temp\\simulateImage.jpg", pSimImage);
 			cvReleaseImage(&pSimImage);
 		}
 
@@ -2141,12 +2146,12 @@ void CProject_PGStationDlg::OnSimulationTranslation()
 
 
 					
-			cvSaveImage("d:\\simulateImage.jpg", pSimImage);
+			cvSaveImage("c:\\temp\\simulateImage.jpg", pSimImage);
 			cvReleaseImage(&pSimImage);
 		}
 		
 		cvReleaseImage(&pImage);
-		AfxMessageBox("Simulated Image is saved in 'd:\\simulateImage.jpg' ");		
+		AfxMessageBox("Simulated Image is saved in 'c:\\temp\\simulateImage.jpg' ");		
 	}
 }
 
@@ -2843,13 +2848,13 @@ int CropDeal(MyRect rect, IplImage* pImage, int ri)
 	free(pbuffer);
 	
 	//char cropfile[256];
-	//sprintf(cropfile, "d:\\crop_%d.jpg", ri);
+	//sprintf(cropfile, "c:\\temp\\crop_%d.jpg", ri);
 	//cvSaveImage(cropfile, pCrop);	
 	IplImage* pI1 = cvCloneImage(pCrop);
 	IplImage* pI2 = cvCloneImage(pCrop);
 	cvThreshold(pCrop, pI1, threshold, 255, CV_THRESH_BINARY);
 	cvThreshold(pCrop, pI1, threshold, 255, CV_THRESH_BINARY_INV);
-	//sprintf(cropfile, "d:\\cropseg_%d.jpg", ri);
+	//sprintf(cropfile, "c:\\temp\\cropseg_%d.jpg", ri);
 	//cvSaveImage(cropfile, pCrop);	
    	
 	int r1 = CharacterSeg(pI1);
@@ -2865,7 +2870,7 @@ int CropDeal(MyRect rect, IplImage* pImage, int ri)
 
 int ProjectAnalysis(MyRect rect, IplImage* pImage)
 {
-	//cvSaveImage("d:\\edge.jpg", pImage);
+	//cvSaveImage("c:\\temp\\edge.jpg", pImage);
 
 	int ht = pImage->height;
 	int wd = pImage->width;
@@ -2964,9 +2969,9 @@ void CProject_PGStationDlg::OnDetectLicenseplate()
 		
 		//cvSmooth(pImage, pImage, CV_MEDIAN);
 		//VerticalHaarSeg(pImage, pImage);		
-		//cvSaveImage("d:\\seg1.jpg", pImage);
+		//cvSaveImage("c:\\temp\\seg1.jpg", pImage);
 		//cvSmooth(pImage, pImage, CV_MEDIAN, 1);
-		//cvSaveImage("d:\\seg2.jpg", pImage);		
+		//cvSaveImage("c:\\temp\\seg2.jpg", pImage);		
 	    
 		//2. Morphological filtering according to the characteristics of plate
 		IplConvKernel* element = NULL;
@@ -3139,7 +3144,7 @@ void CProject_PGStationDlg::OnSegmentAdaptive()
 		cvNamedWindow("AdaptiveThreshold");
 		cvShowImage("AdaptiveThreshold", pRes);
 		
-		cvSaveImage("d:\\binary.jpg", pRes);
+		cvSaveImage("c:\\temp\\binary.jpg", pRes);
 
 		SetImageBuffer(pRes);
 
@@ -3321,7 +3326,7 @@ void CProject_PGStationDlg::OnSegmentOtsu()
 		
 		//output the threshold in the output window
 		CString sout;
-		sout.Format(_T("Otsu threshold: %d \n"), threshold);
+		sout.Format(_T("Otsu thresholc:\\temp %d \n"), threshold);
 		m_editOutput.Clear();
 		m_editOutput.SetWindowText(sout);
 
@@ -3354,10 +3359,10 @@ void CProject_PGStationDlg::OnConvertRgb2YUV()
 		cvCvtPixToPlane( pYUVImage, y_plane, u_plane, v_plane, 0 );
 	
 #ifdef _DEBUG
-		cvSaveImage("d:\\color.jpg", pColor);
-		cvSaveImage("d:\\y.jpg", y_plane);
-		cvSaveImage("d:\\u.jpg", u_plane);
-		cvSaveImage("d:\\v.jpg", v_plane);
+		cvSaveImage("c:\\temp\\color.jpg", pColor);
+		cvSaveImage("c:\\temp\\y.jpg", y_plane);
+		cvSaveImage("c:\\temp\\u.jpg", u_plane);
+		cvSaveImage("c:\\temp\\v.jpg", v_plane);
 #endif
 
 		SetImageBuffer(v_plane);
@@ -3548,10 +3553,10 @@ void CProject_PGStationDlg::OnDetectLp()
 			free(pbuffer);
 			
 			char cropfile[256];
-			sprintf(cropfile, "d:\\crop_%d.jpg", i);
+			sprintf(cropfile, "c:\\temp\\crop_%d.jpg", i);
 			cvSaveImage(cropfile, pCrop);	
 			cvThreshold(pCrop, pCrop, threshold, 255, CV_THRESH_BINARY);
-			sprintf(cropfile, "d:\\cropseg_%d.jpg", i);
+			sprintf(cropfile, "c:\\temp\\cropseg_%d.jpg", i);
 			cvSaveImage(cropfile, pCrop);	
 			cvReleaseImage(&pCrop);
 			
@@ -3633,14 +3638,14 @@ void PlateBasedontexture(IplImage* pOri, char* filepath)
 
 		//1. sobel gradient
 		cvSmooth(pImage, pImage, CV_GAUSSIAN);
-		//cvSaveImage("d:\\image.jpg", pImage);
+		//cvSaveImage("c:\\temp\\image.jpg", pImage);
 		IplImage* pSobel = cvCloneImage(pImage);
 		cvSobel(pImage, pSobel, 1, 0);
 		//cvSmooth(pSobel, pSobel, CV_MEDIAN);
 
 		//2. vertical edge detection		
 		IplImage* pEdge = cvCloneImage(pSobel);
-		//cvSaveImage("d:\\sobel.jpg", pEdge);
+		//cvSaveImage("c:\\temp\\sobel.jpg", pEdge);
 		memset(pEdge->imageData, 0, ht*scanWd);
 		for(int j=0; j<ht; j++)
 			for(int i=2; i<wd-2; i++)
@@ -3665,14 +3670,14 @@ void PlateBasedontexture(IplImage* pOri, char* filepath)
 					pEdge->imageData[j*scanWd+i] = 0;
 				}
 			}
-			//cvSaveImage("d:\\edge.jpg", pEdge);
+			//cvSaveImage("c:\\temp\\edge.jpg", pEdge);
 
 			//3. delete too long and short edge
 			unsigned char* pBuffer;
 			int* pPixelLen = (int*)malloc(ht*wd*sizeof(int));
 			IplImageToGrayImage(pEdge, &pBuffer, &ht, &wd);
 			CalcPixelEdgeLen(pBuffer, ht, wd, pPixelLen);
-			//SaveBmp("d:\\pixelLen.bmp", pPixelLen, ht, wd);
+			//SaveBmp("c:\\temp\\pixelLen.bmp", pPixelLen, ht, wd);
 			RemoveEdge(pBuffer, ht, wd, 36, 5);
 			//CalcPixelEdgeLen(pBuffer, ht, wd, pPixelLen);
 			
@@ -3842,7 +3847,7 @@ void PlateBasedontexture(IplImage* pOri, char* filepath)
 							cvPoint(x+slideWd,y+slideHt), CV_RGB(255,255,255), 1 );
 						
 						
-						//cvSaveImage("d:\\image.jpg", pImage);
+						//cvSaveImage("c:\\temp\\image.jpg", pImage);
 						//double h1 = RectVariance( (unsigned char*)(pImage->imageData), ht, scanWd, x, y, slideWd*0.5, slideHt );
 						//double h2 = RectVariance( (unsigned char*)(pImage->imageData), ht, scanWd, x+slideWd*0.5, y, slideWd*0.5, slideHt );
 						double hv1,hv2;
@@ -3887,7 +3892,7 @@ void PlateBasedontexture(IplImage* pOri, char* filepath)
 						*/
 						/*
 						//histogram similarity
-						FILE* fp = fopen("d:\\hist.txt", "w");
+						FILE* fp = fopen("c:\\temp\\hist.txt", "w");
 						double wholeHist[64];
 						double hist[3][64];  //0.0-0.4, 0.4-0.7, 0.7-1.0
 						memset(wholeHist,0,sizeof(double)*64);
@@ -4250,7 +4255,7 @@ void CProject_PGStationDlg::OnPlateHybrid()
 		cvThreshold(pSobel, pSobel, 50, 255, CV_THRESH_BINARY);
 		cvNamedWindow("SobelBinary");
 		cvShowImage("SobelBinary", pSobel);
-		cvSaveImage("d:\\sobel.jpg", pSobel);
+		cvSaveImage("c:\\temp\\sobel.jpg", pSobel);
 
 		//4. remove the neighbor of pixel whose length greater than threshold
 		for(int j=2; j<ht-2; j++)
@@ -4347,7 +4352,7 @@ void CProject_PGStationDlg::OnPlateBatch()
 		IplImage* pOri = cvCloneImage( m_imagePointerVector[i]->GetCvArr() );
         char filepath[256];
 
-		//sprintf(filepath, "D:\\Data\\Plate\\res\\%.4d.jpg", i+1);
+		//sprintf(filepath, "c:\\temp\\Data\\Plate\\res\\%.4d.jpg", i+1);
 		sprintf(filepath, "%s_res.png", m_imagePointerVector[i]->GetFilePath());
 
 		PlateBasedontexture(pOri, filepath);
@@ -4646,7 +4651,7 @@ void CProject_PGStationDlg::OnDecomposeAod()
 void CProject_PGStationDlg::OnXmlRw()
 {		
 	char xmlFile[512] = 
-		"D:\\Data\\HJ\\2011\\05\\13\\HJ1A-CCD2-457-68-20110513-L20000536606.XML";
+		"c:\\temp\\Data\\HJ\\2011\\05\\13\\HJ1A-CCD2-457-68-20110513-L20000536606.XML";
 
 	/*xml reading based on Opencv
 	CvFileNode *fileNode;//文件结点   
@@ -4685,7 +4690,7 @@ void CProject_PGStationDlg::OnXmlRw()
 		pNode = pRoot->FirstChildElement("data")->FirstChildElement("satelliteId"); 
 		pText = pNode->GetText();
 		//double upLeftX = atof(pText);
-		printf("satelliteID: %s \n", pText);
+		printf("satelliteIc:\\temp %s \n", pText);
 
 		
 		pNode = pRoot->FirstChildElement("data")->FirstChildElement("dataUpperLeftX"); 
@@ -4716,7 +4721,7 @@ void CProject_PGStationDlg::OnXmlWrite()
 	double c[]={4.5,6.7,8.9};  
 
 	printf("write xml file ... \n");
-	CvFileStorage *fs=cvOpenFileStorage("d:\\test.xml",0,CV_STORAGE_WRITE);  
+	CvFileStorage *fs=cvOpenFileStorage("c:\\temp\\test.xml",0,CV_STORAGE_WRITE);  
 	cvWriteComment(fs,"my data",1);  		
 
 	//开始写数据   
@@ -4743,7 +4748,7 @@ void CProject_PGStationDlg::OnXmlWrite()
 	//写入单位矩阵mat   
 	CvMat *mat=cvCreateMat(3,3,CV_32SC1);  
 	cvSetIdentity(mat);//初始化这个矩阵   
-	cvSave("d:\\mat.xml",mat);
+	cvSave("c:\\temp\\mat.xml",mat);
 	cvReleaseMat(&mat);  
 	printf("Write xml finished! \n");
 	*/
@@ -4772,7 +4777,7 @@ void CProject_PGStationDlg::OnXmlWrite()
 	pText = doc->NewText("101.0");
 	pNode->InsertFirstChild(pText);
 	
-	doc->SaveFile("d:\\output\\test.xml");
+	doc->SaveFile("c:\\temp\\output\\test.xml");
 	delete doc;
 }
 
@@ -4800,7 +4805,7 @@ void CProject_PGStationDlg::OnSimulatePlaneFitting()
 		for(x=-50; x<50; x+=5)
 		{			
 			z = (a*(x-x0)+b*(y-y0)) / (-c) + z0 + rand_double(-5,5);
-			printf("%d: %lf %lf %lf \n", index, x, y, z);
+			printf("%c:\\temp %lf %lf %lf \n", index, x, y, z);
 			
 			px[index] = x;
 			py[index] = y;
@@ -4842,7 +4847,7 @@ void CProject_PGStationDlg::OnHistogramMatching()
 
 		cvNamedWindow("HistMatch");
 		cvShowImage("HistMatch", pTargetImage);
-		cvSaveImage("d:\\histmatch.jpg", pTargetImage);
+		cvSaveImage("c:\\temp\\histmatch.jpg", pTargetImage);
 	}
 }
 
@@ -4850,8 +4855,8 @@ void CProject_PGStationDlg::OnHogGenerate()
 {
 	// TODO: Add your command handler code here
 
-	//char filepath[256] = "d:\\roi.jpg";
-	//char filepath[256] = "d:\\data\\testHog.jpg";
+	//char filepath[256] = "c:\\temp\\roi.jpg";
+	//char filepath[256] = "c:\\temp\\data\\testHog.jpg";
 
 	//IplImage* pImage = cvLoadImage(filepath, 0);
 	
@@ -4919,7 +4924,7 @@ void CProject_PGStationDlg::OnBeltBasedonedge()
 		//1. detect canny edge
 		IplImage* pEdge = cvCloneImage(pImage);
 		cvCanny(pImage, pEdge, 10, 50);
-		cvSaveImage("d:\\output\\cannyedge.jpg", pEdge);
+		cvSaveImage("c:\\temp\\output\\cannyedge.jpg", pEdge);
 
 		//2. find the belt top and bottom border
 		IplImage* pTopEdge = cvCloneImage(pEdge);
@@ -4958,10 +4963,10 @@ void CProject_PGStationDlg::OnBeltBasedonedge()
 		//fclose(fp);
 				
 		//3. hough transform
-		//cvSaveImage("d:\\output\\topEdge.jpg", pTopEdge);
-		//cvSaveImage("d:\\output\\bottomEdge.jpg", pBottomEdge);
-		//cvSaveImage("d:\\output\\topEdge.jpg", pColorImage);
-		//cvSaveImage("d:\\output\\bottomEdge.jpg", pBottomEdge);
+		//cvSaveImage("c:\\temp\\output\\topEdge.jpg", pTopEdge);
+		//cvSaveImage("c:\\temp\\output\\bottomEdge.jpg", pBottomEdge);
+		//cvSaveImage("c:\\temp\\output\\topEdge.jpg", pColorImage);
+		//cvSaveImage("c:\\temp\\output\\bottomEdge.jpg", pBottomEdge);
 		
 		CvMemStorage* storage = cvCreateMemStorage(0);
 		CvSeq* lines = 0;
@@ -4971,7 +4976,7 @@ void CProject_PGStationDlg::OnBeltBasedonedge()
 		cvClearMemStorage(storage);
 		lines = cvHoughLines2( pTopEdge, storage, CV_HOUGH_PROBABILISTIC, 0.5, CV_PI/180, 10, 0, 10);
 		//printf("top line number: %d \n", lines->total);
-		FILE* fp = fopen("d:\\output\\topline.txt", "w");
+		FILE* fp = fopen("c:\\temp\\output\\topline.txt", "w");
 		for(int i=0; i<lines->total; i++)
 		{
 			CvPoint* line = (CvPoint*)cvGetSeqElem(lines,i);
@@ -4995,7 +5000,7 @@ void CProject_PGStationDlg::OnBeltBasedonedge()
 		
 		cvClearMemStorage(storage);
 		lines = cvHoughLines2( pBottomEdge, storage, CV_HOUGH_PROBABILISTIC, 0.5, CV_PI/180, 10, 0, 10);
-		fp = fopen("d:\\output\\bottomline.txt", "w");
+		fp = fopen("c:\\temp\\output\\bottomline.txt", "w");
 		for(int i=0; i<lines->total; i++)
 		{
 			CvPoint* line = (CvPoint*)cvGetSeqElem(lines,i);
@@ -5044,7 +5049,7 @@ void CProject_PGStationDlg::OnBeltBasedonedge()
 			p2.y = bottomLines[i].v2.y;
 			//cvLine( pColorImage, p1, p2, CV_RGB(0,255,0), 1, CV_AA, 0 );
 		}
-		cvSaveImage("d:\\output\\colorEdge1.bmp", pColorImage);
+		cvSaveImage("c:\\temp\\output\\colorEdge1.bmp", pColorImage);
 				
 		//4. constraints
 		vector<MyPoint> pair;
@@ -5129,8 +5134,8 @@ void CProject_PGStationDlg::OnBeltBasedonedge()
 			cvLine( pDisp, p1, p2, CV_RGB(0,255,0), 2, CV_AA, 0 );
 		}
 
-		//cvSaveImage("d:\\output\\beltBinary.jpg", pEdge);
-		cvSaveImage("d:\\output\\colorEdge2.bmp", pDisp);
+		//cvSaveImage("c:\\temp\\output\\beltBinary.jpg", pEdge);
+		cvSaveImage("c:\\temp\\output\\colorEdge2.bmp", pDisp);
 			
 		cvNamedWindow("Edge");
 		cvShowImage("Edge", pEdge);
@@ -5160,7 +5165,7 @@ void CProject_PGStationDlg::OnDetectEclipse()
 		IplImage* pEdge = cvCloneImage(pImage);
 		cvSmooth(pImage, pImage);
 		cvCanny(pImage, pEdge, 8, 36);
-		//cvSaveImage("d:\\edge.jpg", pEdge);
+		//cvSaveImage("c:\\temp\\edge.jpg", pEdge);
 
 		//2.
 		CvMemStorage* stor = cvCreateMemStorage(0);
@@ -5378,7 +5383,7 @@ void CProject_PGStationDlg::OnSharpLaplace()
 		cvNamedWindow("Sharp");
 		cvShowImage("Sharp", pImage);
 
-		cvSaveImage("d:\\sharp.jpg", pImage);
+		cvSaveImage("c:\\temp\\sharp.jpg", pImage);
 		cvReleaseImage(&pImage);
 		//cvReleaseImage(&pColorImage);
 	}
@@ -5397,7 +5402,7 @@ void CProject_PGStationDlg::OnSharpGaussian()
 		cvNamedWindow("Sharp");
 		cvShowImage("Sharp", pImage);
 
-		cvSaveImage("d:\\sharp.jpg", pImage);
+		cvSaveImage("c:\\temp\\sharp.jpg", pImage);
 
 		cvReleaseImage(&pImage);
 		//cvReleaseImage(&pColorImage);
@@ -5469,8 +5474,8 @@ void CProject_PGStationDlg::OnGpuSift()
 	if(sift->CreateContextGL() != SiftGPU::SIFTGPU_FULL_SUPPORTED) 
 		return ;
 
-	char lfile[256] = "D:\\Data\\Registration\\zy3-sp-pan-1.jpg";
-	char rfile[256] = "D:\\Data\\Registration\\spot-summerpalace-pan.jpg";
+	char lfile[256] = "c:\\temp\\Data\\Registration\\zy3-sp-pan-1.jpg";
+	char rfile[256] = "c:\\temp\\Data\\Registration\\spot-summerpalace-pan.jpg";
 
 	//use opendialog to select the filepath
 
@@ -5479,7 +5484,7 @@ void CProject_PGStationDlg::OnGpuSift()
 	{
 		//Call SaveSIFT to save result to file, the format is the same as Lowe's
 		printf("save feature points \n");
-		sift->SaveSIFT("d:\\sift.txt"); //Note that saving ASCII format is slow
+		sift->SaveSIFT("c:\\temp\\sift.txt"); //Note that saving ASCII format is slow
 		printf("Save finished !\n");
 		
 		//get feature count
@@ -5504,7 +5509,7 @@ void CProject_PGStationDlg::OnGpuSift()
 			cvLine( pColor, cvPoint( x,y-3), cvPoint( x,y+3),CV_RGB(255,0,255),1,8,0);
 			//cvDrawCircle(pImage, );
 		}
-		cvSaveImage("d:\\siftpt.jpg", pColor);
+		cvSaveImage("c:\\temp\\siftpt.jpg", pColor);
 		cvReleaseImage(&pColor);
 	}
 	*/
@@ -5562,8 +5567,8 @@ void CProject_PGStationDlg::OnGpuSift()
 		cvLine( pRight, cvPoint( x,y-5), cvPoint( x,y+5),CV_RGB(255,0,255),1,8,0);
 	}
 	
-	cvSaveImage("d:\\left.jpg", pLeft);
-	cvSaveImage("d:\\right.jpg", pRight);
+	cvSaveImage("c:\\temp\\left.jpg", pLeft);
+	cvSaveImage("c:\\temp\\right.jpg", pRight);
 
 	cvReleaseImage(&pLeft);
 	cvReleaseImage(&pRight);
@@ -5657,7 +5662,7 @@ void CProject_PGStationDlg::OnWriteBinaryfile()
 {
 	// TODO: Add your command handler code here
 	int count = 1;
-	FILE* fp = fopen("d:\\version.dat", "wb");
+	FILE* fp = fopen("c:\\temp\\version.dat", "wb");
 	fwrite(&count, sizeof(int), 1, fp);
 	fclose(fp);
 }
@@ -5680,17 +5685,17 @@ void CProject_PGStationDlg::OnSobelThin()
 		IplImageToGrayImage( pImage, &pbuffer, &ht, &wd );
 		pImageBuffer = (unsigned char*)malloc(ht*wd);
 		memcpy(pImageBuffer, pbuffer, ht*wd);
-		SaveBmp("d:\\image.bmp", pImageBuffer, ht, wd);
+		SaveBmp("c:\\temp\\image.bmp", pImageBuffer, ht, wd);
 
 		//sobel filter
 		SobelEdge(pbuffer, ht, wd);
-		SaveBmp("d:\\sobel.bmp", pbuffer, ht, wd);
+		SaveBmp("c:\\temp\\sobel.bmp", pbuffer, ht, wd);
 
 		//nonmax filter
 		unsigned char* pEdge = (unsigned char*)malloc(ht*wd);
 		memset(pEdge, 0, ht*wd);
 		NonMaxEdgeDetect(pbuffer, ht, wd, pEdge);
-		SaveBmp("d:\\sobelEdge.bmp", pEdge, ht, wd);
+		SaveBmp("c:\\temp\\sobelEdge.bmp", pEdge, ht, wd);
 
 		//gradient direction
 		for(int j=0; j<ht; j++)
@@ -5722,7 +5727,7 @@ void CProject_PGStationDlg::OnSobelThin()
 				}		
 			}
 		}
-		SaveBmp("d:\\sobelEdgeBelt.bmp", pEdge, ht, wd);
+		SaveBmp("c:\\temp\\sobelEdgeBelt.bmp", pEdge, ht, wd);
 
 		//
 		IplImage* pCvEdge = cvCreateImage(cvSize(wd,ht), 8, 1);
@@ -5872,7 +5877,7 @@ void CProject_PGStationDlg::OnModelGeneratemodelfor6sv()
 	
 	double mr = 1.5;
 	double mi = 0.0095;
-	FILE* fp = fopen("d:\\6sv_aerosolinput.txt", "w");
+	FILE* fp = fopen("c:\\temp\\6sv_aerosolinput.txt", "w");
 	for(int i=0; i<20; i++)
 	{
 		fprintf(fp, "%6.4lf ", mr);
@@ -5909,7 +5914,7 @@ void CProject_PGStationDlg::OnModelGeneratemodelfor6sv()
 	pc = 0.04272;
 	pd = -0.00989;
 
-	FILE* fp = fopen("d:\\6sv_aerosolinput.txt", "w");
+	FILE* fp = fopen("c:\\temp\\6sv_aerosolinput.txt", "w");
 	for(int i=0; i<20; i++)
 	{
 		double mr = a*exp(-wavelen[i]/t1) + y0;
@@ -5941,10 +5946,10 @@ void CProject_PGStationDlg::OnFeatureContour()
 	if(pImage!=NULL)
 	{
 		cvSmooth(pImage, pImage);
-		//cvSaveImage("d:\\smooth.jpg", pImage);
+		//cvSaveImage("c:\\temp\\smooth.jpg", pImage);
 
 		cvCanny(pImage, pImage, 10, 80);
-		//cvSaveImage("d:\\canny.jpg", pImage);
+		//cvSaveImage("c:\\temp\\canny.jpg", pImage);
 		
 		int Nc = cvFindContours(pImage, storage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL);
         
@@ -5966,7 +5971,7 @@ void CProject_PGStationDlg::OnFeatureContour()
 
 
 		int n=0; 
-		printf("Total Contours Detected: %d \n", Nc ); 
+		printf("Total Contours Detectec:\\temp %d \n", Nc ); 
 		for( CvSeq* c=contours; c!=NULL; c=c->h_next ) 
 		{ 
 			int r = (double)( rand() ) / (double)(RAND_MAX) * 255;
@@ -5976,7 +5981,7 @@ void CProject_PGStationDlg::OnFeatureContour()
 			cvDrawContours( pColor, c, CV_RGB(r,g,b), CV_RGB(r,g,b),0,1,8);
 		}
 
-		//cvSaveImage("d:\\contour.jpg", pColor);
+		//cvSaveImage("c:\\temp\\contour.jpg", pColor);
 
 		cvNamedWindow("Contours");
 		cvShowImage("Contours", pColor);
@@ -5999,7 +6004,7 @@ void CProject_PGStationDlg::OnStdVector()
 	complex<double> x(1, -1);
 	cout<<(m+x)<<endl;
 
-	cout<<"conj: "<<std::conj(x)<<endl;
+	cout<<"conj: "<<stc:\\temp:conj(x)<<endl;
 
     //
 	complex<double> t(10,0);
@@ -6139,8 +6144,8 @@ void CProject_PGStationDlg::OnAerosolMie()
 	MIE( wavelen, msphere, minr, maxr, numIntegPoints, maxLegen, sizeDistribution, 
 		 extinction, scatter, albedo, nLegen, coef1, coef2, coef3, coef4);	
 
-	printf("Legendre parameters are written into 'd:\\mieLegendre.txt': \n");
-	FILE* fp = fopen("d:\\mieLegendre.txt", "w");
+	printf("Legendre parameters are written into 'c:\\temp\\mieLegendre.txt': \n");
+	FILE* fp = fopen("c:\\temp\\mieLegendre.txt", "w");
 	fprintf(fp, "%lf \n", scatter);
 	fprintf(fp, "%lf \n", extinction);
 	fprintf(fp, "%lf %d \n", albedo, nLegen);
@@ -6161,7 +6166,7 @@ void CProject_PGStationDlg::OnAerosolMie()
 	memset(f12, 0, sizeof(double)*181);
 	LegendreToPhase(f12, coef2+1, nLegen);
 	
-	fp = fopen("d:\\miePhase.txt", "w");
+	fp = fopen("c:\\temp\\miePhase.txt", "w");
 	for( i=0; i<181; i++)
 	{
 		fprintf(fp, "%8.4lf  %8.4lf\n", f11[i], -f12[i]/f11[i]);
@@ -6169,8 +6174,8 @@ void CProject_PGStationDlg::OnAerosolMie()
 	}
 	fclose(fp);
 
-    printf("Legendre coefficients are written into 'd:\\mieLegendre.txt': \n");
-	printf("Phase function is written into 'd:\\miePhase.txt': \n");
+    printf("Legendre coefficients are written into 'c:\\temp\\mieLegendre.txt': \n");
+	printf("Phase function is written into 'c:\\temp\\miePhase.txt': \n");
 
 	free(coef1);
 	free(coef2);
@@ -6231,7 +6236,7 @@ void CProject_PGStationDlg::OnBeltJudgedirection()
 
 		IplImage* pEdge = cvCloneImage(pImage);
 		VerticalEdgeDetect(pEdge, 16);
-		cvSaveImage("d:\\verticalEdge.jpg", pEdge);
+		cvSaveImage("c:\\temp\\verticalEdge.jpg", pEdge);
 
 		//contour detection
 		CvMemStorage* storage = cvCreateMemStorage(0);
@@ -6241,7 +6246,7 @@ void CProject_PGStationDlg::OnBeltJudgedirection()
 		int nMaxCountourPt = Nc*max( pImage->height, pImage->width );
 		CvPoint* pContourPts = (CvPoint*)malloc( nMaxCountourPt*sizeof(CvPoint) );
 		int nCount = 0;
-		printf("Total Contours Detected: %d \n", Nc ); 
+		printf("Total Contours Detectec:\\temp %d \n", Nc ); 
 		for( CvSeq* c=contours; c!=NULL; c=c->h_next ) 
 		{ 
 			if( c->total<8 )
@@ -6311,7 +6316,7 @@ void CProject_PGStationDlg::OnBeltJudgedirection()
 		
 
 		
-		cvSaveImage("d:\\contour.jpg", pColor);
+		cvSaveImage("c:\\temp\\contour.jpg", pColor);
 		cvNamedWindow("Contours");
 		cvShowImage("Contours", pColor);    		
    
@@ -6479,9 +6484,9 @@ void CProject_PGStationDlg::OnTransmittanceExperimental()
 void CProject_PGStationDlg::OnTransmittanceBasedonluts()
 {
 	// TODO: Add your command handler code here    
-	char clut0[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_0.dat";
-	char clut1[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_10.dat";
-	char clut2[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_25.dat";
+	char clut0[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_0.dat";
+	char clut1[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_10.dat";
+	char clut2[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_25.dat";
 
 	double* pLut0 = (double*)malloc(sizeof(double)*LUT_DIM);
 	double* pLut1 = (double*)malloc(sizeof(double)*LUT_DIM);
@@ -6526,9 +6531,9 @@ void CProject_PGStationDlg::OnAtmospherecorrectionRt3()
 
 
 	// TODO: Add your command handler code here    
-	char clut0[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_0.dat";
-	char clut1[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_10.dat";
-	char clut2[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_25.dat";
+	char clut0[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_0.dat";
+	char clut1[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_10.dat";
+	char clut2[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_25.dat";
 
 	
 	//input geometry conditions
@@ -6597,19 +6602,19 @@ void CProject_PGStationDlg::OnSimulationUsingrt3()
 	// TODO: Add your command handler code here    
 	
 	//for 865nm
-	//char clut0[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_0.dat";
-	//char clut1[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_10.dat";
-	//char clut2[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_25.dat";
+	//char clut0[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_0.dat";
+	//char clut1[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_10.dat";
+	//char clut2[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_25.dat";
 
 	//for 670nm
-	//char clut0[256] = "D:\\Data\\LUTEastAsia\\Double_670_176_517_73_2768_623_117_1559_12_0.dat";
-	//char clut1[256] = "D:\\Data\\LUTEastAsia\\Double_670_176_517_73_2768_623_117_1559_12_10.dat";
-	//char clut2[256] = "D:\\Data\\LUTEastAsia\\Double_670_176_517_73_2768_623_117_1559_12_25.dat";
+	//char clut0[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_670_176_517_73_2768_623_117_1559_12_0.dat";
+	//char clut1[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_670_176_517_73_2768_623_117_1559_12_10.dat";
+	//char clut2[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_670_176_517_73_2768_623_117_1559_12_25.dat";
 
 	//for 490nm
-	char clut0[256] = "D:\\Data\\LUTEastAsia\\Double_490_176_517_73_2768_623_117_1572_14_0.dat";
-	char clut1[256] = "D:\\Data\\LUTEastAsia\\Double_490_176_517_73_2768_623_117_1572_14_10.dat";
-	char clut2[256] = "D:\\Data\\LUTEastAsia\\Double_490_176_517_73_2768_623_117_1572_14_25.dat";
+	char clut0[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_490_176_517_73_2768_623_117_1572_14_0.dat";
+	char clut1[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_490_176_517_73_2768_623_117_1572_14_10.dat";
+	char clut2[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_490_176_517_73_2768_623_117_1572_14_25.dat";
 
 	double* pLut0 = (double*)malloc(sizeof(double)*LUT_DIM);
 	double* pLut1 = (double*)malloc(sizeof(double)*LUT_DIM);
@@ -6634,7 +6639,7 @@ void CProject_PGStationDlg::OnSimulationUsingrt3()
 	double aod865 = 0.318;
 	
 	//read geometry file
-	char geofile[512] = "D:\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\multiViewData.txt";
+	char geofile[512] = "c:\\temp\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\multiViewData.txt";
     stMultiView mdata;
 
 	mdata.nView = GetFileRows(geofile);
@@ -6664,7 +6669,7 @@ void CProject_PGStationDlg::OnSimulationUsingrt3()
 	double k1 = 0.001;
 	double k2 = 0.247;
 
-	fp = fopen("d:\\simulate.txt", "w");
+	fp = fopen("c:\\temp\\simulate.txt", "w");
 	for(int i=0; i<mdata.nView; i++)
 	{
 		//searching LUT
@@ -6729,9 +6734,9 @@ void CProject_PGStationDlg::OnSimulateUsing6sv()
 void CProject_PGStationDlg::OnAerosolLegendretophase()
 {
 	// TODO: Add your command handler code here
-    //char miefile[512] = "D:\\Data\\LUTEastAsia\\mie_Double_865_176_517_73_2768_623_117_1558_10_0.sca"; 
-	//char tmfile[512] = "d:\\legendre1.txt";
-	char tmfile[512] = "D:\\Work\\IRSA\\Programs\\Fortran\\myTMatrix\\Project_TMatrix\\tmatr.write"; // result from T-Matrix 
+    //char miefile[512] = "c:\\temp\\Data\\LUTEastAsia\\mie_Double_865_176_517_73_2768_623_117_1558_10_0.sca"; 
+	//char tmfile[512] = "c:\\temp\\legendre1.txt";
+	char tmfile[512] = "c:\\temp\\Work\\IRSA\\Programs\\Fortran\\myTMatrix\\Project_TMatrix\\tmatr.write"; // result from T-Matrix 
 	int i;
 	int    index;
 	double ssa;
@@ -6764,7 +6769,7 @@ void CProject_PGStationDlg::OnAerosolLegendretophase()
 
 	double phase[180];
 	LegendreToPhase(phase, F1, nLegen);
-	char output[256] = "d:\\tmPhase.txt";
+	char output[256] = "c:\\temp\\tmPhase.txt";
 	fp = fopen(output, "w");
 	for(i=0; i<180; i++)
 	{
@@ -6803,9 +6808,9 @@ void CProject_PGStationDlg::OnSuperresolutionPocs()
 	}
 	fclose(fp);
     
-	POCS(x, y, r, npt, "d:\\r.bmp");
-	POCS(x, y, g, npt, "d:\\g.bmp");
-	POCS(x, y, b, npt, "d:\\b.bmp");
+	POCS(x, y, r, npt, "c:\\temp\\r.bmp");
+	POCS(x, y, g, npt, "c:\\temp\\g.bmp");
+	POCS(x, y, b, npt, "c:\\temp\\b.bmp");
      
 
 	free(x);
@@ -6835,7 +6840,7 @@ void CProject_PGStationDlg::OnFilterCustom()
 		unsigned char* pBuffer = NULL;
 		int ht,wd;
 		IplImageToGrayImage(pImage, &pBuffer, &ht, &wd);
-		SaveBmp("d:\\src.bmp", pBuffer,  ht, wd);
+		SaveBmp("c:\\temp\\src.bmp", pBuffer,  ht, wd);
 
 		Filter2D(pBuffer, ht, wd, kernel, kht, kwd);
 	}
@@ -6852,8 +6857,8 @@ void CProject_PGStationDlg::OnHjAerosolinvert()
 {
 
 	// TODO: Add your command handler code here
-	char xmlpath[512] = "D:\\Data\\HJ\\Beijing\\HJ1A-CCD1-457-66-20100402-L20000277541\\277541\\HJ1A-CCD1-457-66-20100402-L20000277541.XML";
-	char outpath[512] = "d:\\Data\\aod.tif";
+	char xmlpath[512] = "c:\\temp\\Data\\HJ\\Beijing\\HJ1A-CCD1-457-66-20100402-L20000277541\\277541\\HJ1A-CCD1-457-66-20100402-L20000277541.XML";
+	char outpath[512] = "c:\\temp\\Data\\aod.tif";
 	
 	//opendialog
 	//read parameters from file
@@ -6920,8 +6925,8 @@ void CProject_PGStationDlg::OnSobelGradient()
 				pbuffer[index] = min( 255, sqrt(dx[index]*dx[index]+dy[index]*dy[index]) );
 			}
 
-		printf("Image is saved into:  d:\\gradientImage.bmp \n");
-		SaveBmp("d:\\gradientImage.bmp", pbuffer, ht, wd);	
+		printf("Image is saved into:  c:\\temp\\gradientImage.bmp \n");
+		SaveBmp("c:\\temp\\gradientImage.bmp", pbuffer, ht, wd);	
 		
 		cvReleaseImage(&pImage);
 		free(pbuffer);
@@ -6948,8 +6953,8 @@ void CProject_PGStationDlg::OnVehiclelogoLbp()
 	//cvNamedWindow("Image");
 
 	int  i,j;
-	char imagepath[256] = "D:\\Data\\Logo\\classification\\vw";
-	//char imagepath[256] = "D:\\Data\\Logo\\all1";
+	char imagepath[256] = "c:\\temp\\Data\\Logo\\classification\\vw";
+	//char imagepath[256] = "c:\\temp\\Data\\Logo\\all1";
 	char** filenames = NULL;
 	int n,nfile;
 	n = nfile = 0;
@@ -6967,7 +6972,7 @@ void CProject_PGStationDlg::OnVehiclelogoLbp()
 	}
 
 	//pair match
-	FILE* fp = fopen("d:\\sim.txt", "w");
+	FILE* fp = fopen("c:\\temp\\sim.txt", "w");
 	for(j=0; j<nfile; j++)
 	{		
 		double s = 0;
@@ -6997,7 +7002,7 @@ void CProject_PGStationDlg::OnVehiclelogoLbp()
 
 			/*
 			char output[256];
-			sprintf(output, "d:\\%d_%d.txt", j,i);
+			sprintf(output, "c:\\temp\\%d_%d.txt", j,i);
 			FILE* fout = fopen(output, "w");
 			for(int mi=0; mi<256; mi++)
 			{
@@ -7036,7 +7041,7 @@ void CProject_PGStationDlg::OnLpbHistgram()
 
 		//resize
 		cvResize(pPatch, pStdImage);
-		cvSaveImage("d:\\lLogo.jpg", pStdImage);
+		cvSaveImage("c:\\temp\\lLogo.jpg", pStdImage);
 		//cvShowImage("Image", pStdImage);
 		unsigned char* pbuffer = NULL;
 		int ht,wd;
@@ -7052,7 +7057,7 @@ void CProject_PGStationDlg::OnLpbHistgram()
 		pPatch = m_imagePointerVector[1]->GetCvArr();
 		//resize
 		cvResize(pPatch, pStdImage);
-		cvSaveImage("d:\\rLogo.jpg", pStdImage);
+		cvSaveImage("c:\\temp\\rLogo.jpg", pStdImage);
 		IplImageToGrayImage(pStdImage, &pbuffer, &ht, &wd);
 		double lbpHist2[256];
 		GenerateLBP(pbuffer, ht, wd, lbpHist2);
@@ -7062,8 +7067,8 @@ void CProject_PGStationDlg::OnLpbHistgram()
 		//cvNamedWindow("Right");
 		//cvShowImage("Right", pStdImage);
 		
-		char output[256] = "d:\\lbpHist.txt";
-		//sprintf(output, "d:\\%d_%d.txt", j,i);
+		char output[256] = "c:\\temp\\lbpHist.txt";
+		//sprintf(output, "c:\\temp\\%d_%d.txt", j,i);
 		FILE* fout = fopen(output, "w");
 		for(int mi=0; mi<256; mi++)
 		{
@@ -7089,8 +7094,8 @@ void CProject_PGStationDlg::OnVehiclelogoTemplatematching()
 	int  hist[500];
 	memset(hist, 0, 500*sizeof(int));
 
-	char templatepath[512] = "D:\\Data\\Logo\\All";
-	char testPath[512] = "D:\\Data\\Logo\\classification\\vw";
+	char templatepath[512] = "c:\\temp\\Data\\Logo\\All";
+	char testPath[512] = "c:\\temp\\Data\\Logo\\classification\\vw";
 
 	char** templateFiles = NULL;
 	int n1,nfile1;
@@ -7160,12 +7165,12 @@ void CProject_PGStationDlg::OnLpbTemplatematching()
 		//resize
 		IplImage* pPatch = m_imagePointerVector[0]->GetCvArr();
 		cvResize(pPatch, pStdImage1);
-		cvSaveImage("d:\\lLogo.jpg", pStdImage1);
+		cvSaveImage("c:\\temp\\lLogo.jpg", pStdImage1);
 
 		//resize
 		pPatch = m_imagePointerVector[1]->GetCvArr();
 		cvResize(pPatch, pStdImage2);
-		cvSaveImage("d:\\lLogo.jpg", pStdImage2);
+		cvSaveImage("c:\\temp\\lLogo.jpg", pStdImage2);
 
 		double dif = ImageSimilarity(pStdImage1, pStdImage2);
 		//double dif = LBPSimilarity(pStdImage1, pStdImage2);
@@ -7208,7 +7213,7 @@ void CProject_PGStationDlg::OnLpbImage()
 		memset(lbphist, 0, sizeof(double)*256);
 		GenerateLBP(pbuffer, ht, wd, lbphist);
 	
-		FILE* fp = fopen("d:\\lbphist.txt", "w");   
+		FILE* fp = fopen("c:\\temp\\lbphist.txt", "w");   
 		for(int i=0; i<256; i++)
 		{
 			printf("%d %lf \n", i, lbphist[i]);
@@ -7237,12 +7242,12 @@ void CProject_PGStationDlg::OnTemplatematchingVehiclelogo()
 		//resize
 		IplImage* pPatch = m_imagePointerVector[0]->GetCvArr();
 		cvResize(pPatch, pStdImage1);
-		cvSaveImage("d:\\lLogo.jpg", pStdImage1);
+		cvSaveImage("c:\\temp\\lLogo.jpg", pStdImage1);
 
 		//resize
 		pPatch = m_imagePointerVector[1]->GetCvArr();
 		cvResize(pPatch, pStdImage2);
-		cvSaveImage("d:\\lLogo.jpg", pStdImage2);
+		cvSaveImage("c:\\temp\\lLogo.jpg", pStdImage2);
 
 		double dif = ImageSimilarity(pStdImage1, pStdImage2);
 		printf("\n dif: %lf \n", dif);
@@ -7305,7 +7310,7 @@ void CProject_PGStationDlg::OnSizedistributionGenerate()
 	double pdf[22];
 	BimodalLogDistribution(pd, radius, pdf, 22);
 
-	FILE* fp = fopen("d:\\aerosol_size.txt", "w");
+	FILE* fp = fopen("c:\\temp\\aerosol_size.txt", "w");
 	for(int i=0; i<22; i++)
 	{
 		fprintf(fp, "%lf %lf \n", radius[i], pdf[i]);
@@ -7333,7 +7338,7 @@ void CProject_PGStationDlg::OnParasolSinglepointinversion()
 
 
 	//load single point multiple-angle data
-	char mfile[256] = "D:\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\simulate_multiViewData.txt";
+	char mfile[256] = "c:\\temp\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\simulate_multiViewData.txt";
 	
 	//using open dialog to select file
 	char filepath[256];
@@ -7385,7 +7390,7 @@ void CProject_PGStationDlg::OnBrdfRossLi()
 	int nstep = 5;
 
 	//principle plane
-	FILE* fp = fopen("d:\\rossli-brdf.txt", "w");
+	FILE* fp = fopen("c:\\temp\\rossli-brdf.txt", "w");
 	for(i=60; i>0; i-=nstep)
 	{	
 		vza = i;				
@@ -7423,7 +7428,7 @@ void CProject_PGStationDlg::OnBpdfNadal()
 	int nstep = 5;
 
 	//principle plane
-	FILE* fp = fopen("d:\\Nadal_bpdf.txt", "w");
+	FILE* fp = fopen("c:\\temp\\Nadal_bpdf.txt", "w");
 	for(i=60; i>0; i-=nstep)
 	{	
 		vza = i;				
@@ -7457,20 +7462,20 @@ void CProject_PGStationDlg::OnLutRetrieve()
 	int nRazMode = NUMAZIMUTHS;   
 
 	//load lut
-	//char lutfile[256] = "D:\\Data\\LUTDouble\\type\\1\\4.dat";
-	//char lutfile[256] = "D:\\Data\\LUTEastAsia\\Double_670_176_517_73_2768_623_117_1559_12_0.dat";
-	char lutfile[256] = "D:\\Data\\LUTEastAsia\\Double_690_176_517_73_2768_623_117_1559_12_0.dat";
+	//char lutfile[256] = "c:\\temp\\Data\\LUTDouble\\type\\1\\4.dat";
+	//char lutfile[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_670_176_517_73_2768_623_117_1559_12_0.dat";
+	char lutfile[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_690_176_517_73_2768_623_117_1559_12_0.dat";
 	int nLutDim = AOD_NUM*SZA_NUM*NUMMU*NUMAZIMUTHS*2;
 	double * pLut = (double*)malloc(sizeof(double)*nLutDim);
 	LoadSingleLUT(lutfile, pLut, nLutDim);
 
 	//load single point multiple-angle data
-	char mfile[256] = "D:\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\simulate_multiViewData.txt";
+	char mfile[256] = "c:\\temp\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\simulate_multiViewData.txt";
 	stMultiView m_multiData;
 	LoadParasolMultiDataSingle(mfile, m_multiData);
 
 
-	FILE* fp = fopen("d:\\aerosol690.txt", "w");
+	FILE* fp = fopen("c:\\temp\\aerosol690.txt", "w");
 	double fr,frp;
 	double aod = 0.4;	
 	for(int i=0; i<m_multiData.nView; i++)
@@ -7513,7 +7518,7 @@ void CProject_PGStationDlg::OnLutRetrieve()
 	
 
 	/*
-	FILE* fp = fopen("d:\\invert_out_490.txt", "w");
+	FILE* fp = fopen("c:\\temp\\invert_out_490.txt", "w");
 	double fr,frp;
 	double aod = 0.72;
 	double angstrom = 1.3;
@@ -7552,7 +7557,7 @@ void CProject_PGStationDlg::OnLutRetrivemoculeandaerosol()
 	int nRazMode = NUMAZIMUTHS;   
 
 	//load lut
-	char lutfile[256] = "D:\\Data\\LUTDouble\\type\\2\\4.dat";
+	char lutfile[256] = "c:\\temp\\Data\\LUTDouble\\type\\2\\4.dat";
 	int nLutDim = AOD_NUM*SZA_NUM*NUMMU*NUMAZIMUTHS*2;
 	double * pLut = (double*)malloc(sizeof(double)*nLutDim);
 	LoadSingleLUT(lutfile, pLut, nLutDim);
@@ -7562,7 +7567,7 @@ void CProject_PGStationDlg::OnLutRetrivemoculeandaerosol()
 	int nstep = 5;
 	double sca, sza, vza, azi;
 	//principle plane
-	FILE* fp = fopen("d:\\lut_retrieve.txt", "w");
+	FILE* fp = fopen("c:\\temp\\lut_retrieve.txt", "w");
 
     sza = 45;
 	azi = 180;
@@ -7715,7 +7720,7 @@ void CProject_PGStationDlg::OnPointSiftfloat()
 		cvNamedWindow("Sift");
 		cvShowImage("Sift", pColor);
 
-		cvSaveImage("d:\\sift_float.bmp", pColor);
+		cvSaveImage("c:\\temp\\sift_float.bmp", pColor);
 
 		//cvWaitKey(0);
 
@@ -7793,7 +7798,7 @@ void CProject_PGStationDlg::OnTriangleDelaunay()
 		cvSetMouseCallback("Triangle", on_triangle_mouse, this);
 		cvShowImage("Triangle", pImage);
 
-		cvSaveImage("d:\\triangle.png", pImage);
+		cvSaveImage("c:\\temp\\triangle.png", pImage);
 
 		cvReleaseImage(&pImage);    
 		free(px);
@@ -7924,7 +7929,7 @@ void CProject_PGStationDlg::OnSobelMem()
 		///sobel edge using CUDA
 		SobelImage(pbuffer, ht, wd, pDst, ht, wd);
 
-		SaveBmp("d:\\sobel.bmp", pDst, ht, wd);		
+		SaveBmp("c:\\temp\\sobel.bmp", pDst, ht, wd);		
 
 		printf("Finished !\n");
 	}
@@ -7940,7 +7945,7 @@ void CProject_PGStationDlg::OnAtmospherecorrectionGui()
 void CProject_PGStationDlg::OnKltLostobj()
 {
 	// TODO: Add your command handler code here
-	char imagepath[256] = "D:\\Data\\video\\lost";
+	char imagepath[256] = "c:\\temp\\Data\\video\\lost";
 
 	char** filenames = NULL;
 	int n,nfile;
@@ -8093,7 +8098,7 @@ void CProject_PGStationDlg::OnKltFramediff()
 
 		printf("current frame: %d \n", i);
 
-		sprintf(filename, "D:\\Data\\video\\bridge\\%.4d.jpg", i);
+		sprintf(filename, "c:\\temp\\Data\\video\\bridge\\%.4d.jpg", i);
 		IplImage* pImage = cvLoadImage(filename, 0);
 
 		//1. detect features	
@@ -8154,16 +8159,16 @@ void CProject_PGStationDlg::OnKltTwoframes()
 
 	cvNamedWindow("Left");
 
-	char imagepath[256] = "D:\\Data\\video\\bridge\\";
+	char imagepath[256] = "c:\\temp\\Data\\video\\bridge\\";
 
 	//optical of two frames
 	for(k=150; k<700; k++)
 	{
-		char leftFile[256];//  = "D:\\Data\\video\\bridge\\0048.jpg";
-		char rightFile[256];// = "D:\\Data\\video\\bridge\\0049.jpg";
+		char leftFile[256];//  = "c:\\temp\\Data\\video\\bridge\\0048.jpg";
+		char rightFile[256];// = "c:\\temp\\Data\\video\\bridge\\0049.jpg";
 
-		sprintf(leftFile,  "D:\\Data\\video\\bridge\\%.4d.jpg", k);
-		sprintf(rightFile, "D:\\Data\\video\\bridge\\%.4d.jpg", k+1);
+		sprintf(leftFile,  "c:\\temp\\Data\\video\\bridge\\%.4d.jpg", k);
+		sprintf(rightFile, "c:\\temp\\Data\\video\\bridge\\%.4d.jpg", k+1);
 
 		printf("%d %d \n", k, k+1);
 
@@ -8309,11 +8314,11 @@ void CProject_PGStationDlg::OnKltSinglept()
 	double patchA[512];
 	double patchB[512];
 
-	char leftFile[256] = "d:\\IMG_9856.jpg";
-	char rightFile[256] = "d:\\IMG_9857.jpg";
+	char leftFile[256] = "c:\\temp\\IMG_9856.jpg";
+	char rightFile[256] = "c:\\temp\\IMG_9857.jpg";
 
-	//sprintf(leftFile, "D:\\Data\\video\\bridge\\%.4d.jpg", k);
-	//sprintf(rightFile, "D:\\Data\\video\\bridge\\%.4d.jpg", k+1);
+	//sprintf(leftFile, "c:\\temp\\Data\\video\\bridge\\%.4d.jpg", k);
+	//sprintf(rightFile, "c:\\temp\\Data\\video\\bridge\\%.4d.jpg", k+1);
 	//printf("%d %d \n", k, k+1);
 
 	IplImage* pImage   = cvLoadImage(leftFile, 0);	
@@ -8435,8 +8440,8 @@ void CProject_PGStationDlg::OnKltSinglept()
 
 
 
-	cvSaveImage("d:\\L.jpg", pImage);
-	cvSaveImage("d:\\R.jpg", pCurrent);
+	cvSaveImage("c:\\temp\\L.jpg", pImage);
+	cvSaveImage("c:\\temp\\R.jpg", pCurrent);
 
 	cvNamedWindow("Left", 0);
 	cvShowImage("Left", pImage);
@@ -8487,11 +8492,11 @@ void CProject_PGStationDlg::OnBlockmatchingTwoframes()
 {
 	// TODO: Add your command handler code here
 	int i,j;
-	char leftFile[256] = "D:\\Data\\video\\bridge\\0053.jpg";
-	char rightFile[256] = "D:\\Data\\video\\bridge\\0054.jpg";
+	char leftFile[256] = "c:\\temp\\Data\\video\\bridge\\0053.jpg";
+	char rightFile[256] = "c:\\temp\\Data\\video\\bridge\\0054.jpg";
 
-	//sprintf(leftFile, "D:\\Data\\video\\bridge\\%.4d.jpg", k);
-	//sprintf(rightFile, "D:\\Data\\video\\bridge\\%.4d.jpg", k+1);
+	//sprintf(leftFile, "c:\\temp\\Data\\video\\bridge\\%.4d.jpg", k);
+	//sprintf(rightFile, "c:\\temp\\Data\\video\\bridge\\%.4d.jpg", k+1);
 	//printf("%d %d \n", k, k+1);
 
 	IplImage* grayA = cvLoadImage(leftFile, 0);	
@@ -8523,14 +8528,14 @@ void CProject_PGStationDlg::OnBlockmatchingTwoframes()
 	cvNamedWindow("VerFlowBM", CV_WINDOW_AUTOSIZE);
 	cvShowImage("VerFlowBM", vely);
 	
-	FILE* fp = fopen("d:\\blockMatch.txt", "w");
+	FILE* fp = fopen("c:\\temp\\blockMatch.txt", "w");
 	for (i=0; i<size.height; i+=2) 
 	{
 		for (int j=0; j<size.width; j+=2) 
 		{
 			int dx = (int)cvGetReal2D(velx, i, j);
 			int dy = (int)cvGetReal2D(vely, i, j);
-			fprintf(fp, "%d %d: %d %d   \n",i,j, dx, dy);
+			fprintf(fp, "%d %c:\\temp %d %d   \n",i,j, dx, dy);
 			cvLine(result, cvPoint(j, i), cvPoint(j+dx, i+dy), CV_RGB(0,0,0), 1, 8, 0);
 		}
 	}
@@ -8621,13 +8626,13 @@ void CProject_PGStationDlg::OnDistributionGaussian()
 	// TODO: Add your command handler code here
 
 	//load single point multiple-angle data
-	char mfile[256] = "D:\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\simulate_multiViewData.txt";
+	char mfile[256] = "c:\\temp\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\simulate_multiViewData.txt";
 	stMultiView mdata;
 	LoadParasolMultiDataSingle(mfile, mdata);
 
 
 	//slope distribution
-	FILE* fp = fopen("d:\\slopeDistribution.txt", "w");
+	FILE* fp = fopen("c:\\temp\\slopeDistribution.txt", "w");
 	double sigma = 0.3;
 	for(int i=0; i<20; i++)
 	{
@@ -8784,7 +8789,7 @@ void CProject_PGStationDlg::OnParasolSinglepointinversion33004()
 	stMultiView mdata;
 	
 	//load single point multiple-angle data
-	char mfile[256] = "D:\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\simulate_multiViewData.txt";
+	char mfile[256] = "c:\\temp\\NetDisk\\doc\\papers\\Aerosol\\revise4\\data\\simulate_multiViewData.txt";
 	LoadParasolMultiDataSingle(mfile, mdata);
 	
 	//invert using 490nm reflectance
@@ -8830,7 +8835,7 @@ void CProject_PGStationDlg::OnWaveletTest()
 		//int x = 285;
 		//int y = 8;
 
-		FILE* fp = fopen("d:\\wavelet_image.txt", "w");
+		FILE* fp = fopen("c:\\temp\\wavelet_image.txt", "w");
 		for(j=0; j<ht*0.5; j++)
 		{
 			for(i=0; i<wd*0.5; i++)
@@ -9042,10 +9047,10 @@ void CProject_PGStationDlg::OnSurfaceExtractarea()
 	printf("x: %lf  y:%lf \n", x, y);
 
 	//retrieve the geo-information from the image 
-	//char filename[256] = "D:\\Data\\DEM\\strm_60_04\\slope_60_04.img";
-	//char filename[256] = "D:\\Data\\DEM\\strm_60_04\\utm_srtm_60_04.img";
-	//char filename[256] = "D:\\Data\\DEM\\60-04-05-meters.tif";
-	char filename[256] = "D:\\Data\\DEM\\slope-bj.tif";
+	//char filename[256] = "c:\\temp\\Data\\DEM\\strm_60_04\\slope_60_04.img";
+	//char filename[256] = "c:\\temp\\Data\\DEM\\strm_60_04\\utm_srtm_60_04.img";
+	//char filename[256] = "c:\\temp\\Data\\DEM\\60-04-05-meters.tif";
+	char filename[256] = "c:\\temp\\Data\\DEM\\slope-bj.tif";
     stGeoInfo geoInfo;
 	GetGeoInformation(filename, geoInfo);
 	double left = geoInfo.left; //329067.051146776;
@@ -9061,9 +9066,9 @@ void CProject_PGStationDlg::OnSurfaceExtractarea()
 	printf("%d %d \n", ht, wd);
 
 	//extract surface information( such as slope, et ac.) of special area from the DEM data
-	FILE* fp = fopen("d:\\extractSlope.txt", "w");
-	//FILE* fp = fopen("d:\\extractDEM.txt", "w");
-	//FILE* fp1 = fopen("d:\\slopeDistribution1D.txt", "w");
+	FILE* fp = fopen("c:\\temp\\extractSlope.txt", "w");
+	//FILE* fp = fopen("c:\\temp\\extractDEM.txt", "w");
+	//FILE* fp1 = fopen("c:\\temp\\slopeDistribution1D.txt", "w");
 	for(j=-48; j<49; j++)
 	{
 		for(i=-41; i<42; i++)
@@ -9114,13 +9119,13 @@ void CProject_PGStationDlg::OnSmokeWavelet()
 
 	//cvNamedWindow("Image");
 
-	char imagepath[256] = "D:\\Data\\video\\smoke-seq1";
+	char imagepath[256] = "c:\\temp\\Data\\video\\smoke-seq1";
 
-	FILE* fp = fopen("d:\\seq_wavelet.txt", "w");
+	FILE* fp = fopen("c:\\temp\\seq_wavelet.txt", "w");
 	//optical of two frames
 	for(k=0; k<400; k++)
 	{
-		char fileName[256];//  = "D:\\Data\\video\\bridge\\0048.jpg";
+		char fileName[256];//  = "c:\\temp\\Data\\video\\bridge\\0048.jpg";
 		sprintf(fileName, "%s\\%.4d.jpg", imagepath, k);
 		//printf("%s \n", fileName);
 		//printf("%d %d \n", k, k+1);
@@ -9174,9 +9179,9 @@ void CProject_PGStationDlg::OnKalmanfilterWavelet()
 	double* wavelet = (double*)malloc(1000*sizeof(double));
     int index;
 
-	//FILE* fp = fopen("D:\\Work\\DFHH\\Doc\\Research\\data\\seq1\\seq_wavelet-280-11.txt", "r");
-	//FILE* fp = fopen("D:\\Work\\DFHH\\Doc\\Research\\data\\seq1\\seq_wavelet-192-157.txt", "r");
-	FILE* fp = fopen("D:\\Work\\DFHH\\Doc\\Research\\data\\seq1\\seq_wavelet-255-207.txt", "r");
+	//FILE* fp = fopen("c:\\temp\\Work\\DFHH\\Doc\\Research\\data\\seq1\\seq_wavelet-280-11.txt", "r");
+	//FILE* fp = fopen("c:\\temp\\Work\\DFHH\\Doc\\Research\\data\\seq1\\seq_wavelet-192-157.txt", "r");
+	FILE* fp = fopen("c:\\temp\\Work\\DFHH\\Doc\\Research\\data\\seq1\\seq_wavelet-255-207.txt", "r");
 	for( i=0; i<400; i++)
 	{
 		fscanf(fp, "%d %lf", &index, &wavelet[i]);
@@ -9187,7 +9192,7 @@ void CProject_PGStationDlg::OnKalmanfilterWavelet()
 	CPointWaveletAnalyse waveAnalyse;
 	//kalman filter
 	double* filterData = (double*)malloc(1000*sizeof(double));
-	fp = fopen("d:\\wavelet_kalman.txt", "w");
+	fp = fopen("c:\\temp\\wavelet_kalman.txt", "w");
 	CKalManFilter kalmanFilter;
 	for(i=1; i<300; i++)
 	{
@@ -9252,13 +9257,13 @@ void CProject_PGStationDlg::OnSmokeSobel()
 
 	//cvNamedWindow("Image");
 
-	char imagepath[256] = "D:\\Data\\video\\smoke-seq1";
+	char imagepath[256] = "c:\\temp\\Data\\video\\smoke-seq1";
 
-	FILE* fp = fopen("d:\\seq_wavelet_sobel.txt", "w");
+	FILE* fp = fopen("c:\\temp\\seq_wavelet_sobel.txt", "w");
 	//optical of two frames
 	for(k=100; k<400; k++)
 	{
-		char fileName[256];//  = "D:\\Data\\video\\bridge\\0048.jpg";
+		char fileName[256];//  = "c:\\temp\\Data\\video\\bridge\\0048.jpg";
 		sprintf(fileName, "%s\\%.4d.jpg", imagepath, k);
 		printf("%s \n", fileName);
 		//printf("%d %d \n", k, k+1);
@@ -9333,7 +9338,7 @@ void CProject_PGStationDlg::OnKltWithkalman()
 {
 	// TODO: Add your command handler code here
 
-	char imagepath[256] = "D:\\Data\\video\\bridge";
+	char imagepath[256] = "c:\\temp\\Data\\video\\bridge";
 
 	char** filenames = NULL;
 	int n,nfile;
@@ -9456,7 +9461,7 @@ void CProject_PGStationDlg::OnKltSingleptwithkalman()
 	// TODO: Add your command handler code here
 
 	int  k,m,n;
-	char imagepath[256] = "D:\\Data\\video\\bridge\\";
+	char imagepath[256] = "c:\\temp\\Data\\video\\bridge\\";
     char filename[256];
 
 	CKLTTrack kltTrack; 
@@ -9477,7 +9482,7 @@ void CProject_PGStationDlg::OnKltSingleptwithkalman()
 	//optical of two frames
 	for(k=150; k<700; k++)
 	{
-		sprintf(filename, "D:\\Data\\video\\bridge\\%.4d.jpg", k);
+		sprintf(filename, "c:\\temp\\Data\\video\\bridge\\%.4d.jpg", k);
 		IplImage* pImage = cvLoadImage(filename, 0);
 		
 		CvPoint2D32f cpts[1];
@@ -9562,8 +9567,8 @@ void CProject_PGStationDlg::OnParasolPointsatellite()
 	stMultiView mdata;
 	double lon = 116.381;
 	double lat = 39.977;
-	//char parasolFile[256] = "D:\\Data\\Parasol\\2005\\03\\07\\P3L1TBG1006178JL";
-	//char parasolFile[256] = "D:\\Data\\Parasol\\2005\\05\\24\\P3L1TBG1011149JL";
+	//char parasolFile[256] = "c:\\temp\\Data\\Parasol\\2005\\03\\07\\P3L1TBG1006178JL";
+	//char parasolFile[256] = "c:\\temp\\Data\\Parasol\\2005\\05\\24\\P3L1TBG1011149JL";
 	CReasParasolLevel1File readParasol;
 
 	printf("reading parasol data ... \n");
@@ -9602,7 +9607,7 @@ void CProject_PGStationDlg::OnSurfaceMosaic()
 	printf("x: %lf  y:%lf \n", x, y);
 
 
-	char filename[256] = "D:\\Data\\DEM\\strm_60_04\\utm_srtm_60_04.img";
+	char filename[256] = "c:\\temp\\Data\\DEM\\strm_60_04\\utm_srtm_60_04.img";
 	stGeoInfo geoInfo;
 	GetGeoInformation(filename, geoInfo);
 	double left = geoInfo.left; //329067.051146776;
@@ -9620,8 +9625,8 @@ void CProject_PGStationDlg::OnSurfaceMosaic()
 	*/
 
 	//
-	char file1[256] = "D:\\Data\\DEM\\strm_60_04\\utm_srtm_60_04.img";
-	char file2[256] = "D:\\Data\\DEM\\strm_60_05\\utm_srtm_60_05.img";
+	char file1[256] = "c:\\temp\\Data\\DEM\\strm_60_04\\utm_srtm_60_04.img";
+	char file2[256] = "c:\\temp\\Data\\DEM\\strm_60_05\\utm_srtm_60_05.img";
 	char **files = f2c(2, 256);
 	strcpy(files[0], file1);
 	strcpy(files[1], file2);
@@ -9637,14 +9642,14 @@ void CProject_PGStationDlg::OnDodgingMask()
 
 	if(pColor!=NULL)
 	{
-		cvSaveImage("d:\\original.jpg", pColor);
+		cvSaveImage("c:\\temp\\original.jpg", pColor);
 		IplImage* pDst = cvCloneImage(pColor);
 		MaskDodging(pColor, pDst);
 
 		cvNamedWindow("Dodging");
 		cvShowImage("Dodging", pDst);
 
-		cvSaveImage("d:\\dodge.jpg", pDst);
+		cvSaveImage("c:\\temp\\dodge.jpg", pDst);
 
 		cvReleaseImage(&pDst);
 	}
@@ -9654,7 +9659,7 @@ void CProject_PGStationDlg::OnDemMedianfilter()
 {
 	// TODO: Add your command handler code here
 
-	char demfile[256] = "D:\\Data\\DEM\\60-04-05-meters.tif";
+	char demfile[256] = "c:\\temp\\Data\\DEM\\60-04-05-meters.tif";
 
 
 	//remove the wrong data after mosaic
@@ -9715,7 +9720,7 @@ void CProject_PGStationDlg::OnPointSurf()
 
 		CSURFKeyPoint surf;
 		//CSURF surf;		
-		//surf.Detect(filePath, "d:\\surf.dat");
+		//surf.Detect(filePath, "c:\\temp\\surf.dat");
 	
 		/*
 		vector<double> px;
@@ -9866,16 +9871,16 @@ void CProject_PGStationDlg::OnGeomosaicHistmatching()
 {
 	// TODO: Add your command handler code here
 	char** filesPath = f2c(10, 256);
-	//strcpy(filesPath[0], "D:\\Data\\GF\\20130821GF-8m\\GF1_PMS1_E127.0_N53.8_20130818_L1A0000071047.tif");
-	//strcpy(filesPath[1], "D:\\Data\\GF\\20130821GF-8m\\GF1_PMS1_E127.1_N54.0_20130818_L1A0000071046.tif");
+	//strcpy(filesPath[0], "c:\\temp\\Data\\GF\\20130821GF-8m\\GF1_PMS1_E127.0_N53.8_20130818_L1A0000071047.tif");
+	//strcpy(filesPath[1], "c:\\temp\\Data\\GF\\20130821GF-8m\\GF1_PMS1_E127.1_N54.0_20130818_L1A0000071046.tif");
 	
-	//strcpy(filesPath[0], "D:\\Data\\YG2\\abh\\YG2-4_CCD-1_000063303_004_042_004_L2\\YG2-4_CCD-1_000063303_004_042_004_L2.tiff");
-	//strcpy(filesPath[1], "D:\\Data\\YG2\\abh\\YG2-4_CCD-2_000063303_003_042_004_L2\\YG2-4_CCD-2_000063303_003_042_004_L2.tiff");
+	//strcpy(filesPath[0], "c:\\temp\\Data\\YG2\\abh\\YG2-4_CCD-1_000063303_004_042_004_L2\\YG2-4_CCD-1_000063303_004_042_004_L2.tiff");
+	//strcpy(filesPath[1], "c:\\temp\\Data\\YG2\\abh\\YG2-4_CCD-2_000063303_003_042_004_L2\\YG2-4_CCD-2_000063303_003_042_004_L2.tiff");
 
 
-	strcpy(filesPath[0], "D:\\Data\\YG2\\klmy\\YG2-2_CCD-1_000061314_002_018_003_L2\\YG2-2_CCD-1_000061314_002_018_003_L2.tiff");
-	strcpy(filesPath[1], "D:\\Data\\YG2\\klmy\\YG2-2_CCD-1_000061524_006_002_002_L2\\YG2-2_CCD-1_000061524_006_002_002_L2.tiff");
-	strcpy(filesPath[2], "D:\\Data\\YG2\\klmy\\YG2-3_CCD-2_000062055_010_019_002_L2\\YG2-3_CCD-2_000062055_010_019_002_L2.tiff");
+	strcpy(filesPath[0], "c:\\temp\\Data\\YG2\\klmy\\YG2-2_CCD-1_000061314_002_018_003_L2\\YG2-2_CCD-1_000061314_002_018_003_L2.tiff");
+	strcpy(filesPath[1], "c:\\temp\\Data\\YG2\\klmy\\YG2-2_CCD-1_000061524_006_002_002_L2\\YG2-2_CCD-1_000061524_006_002_002_L2.tiff");
+	strcpy(filesPath[2], "c:\\temp\\Data\\YG2\\klmy\\YG2-3_CCD-2_000062055_010_019_002_L2\\YG2-3_CCD-2_000062055_010_019_002_L2.tiff");
 
 	//GeoMosaicWithBalance(filesPath, 3);	
 }
@@ -9892,7 +9897,7 @@ void CProject_PGStationDlg::OnSfmDetectfeatures()
 		CFeatureBase* pFeatDetect = new CSURF();		
 		ImgFeature imageFeats;
 		pFeatDetect->Detect(file, imageFeats);
-		printf("ht:%d wd:%d Feature Number: %d dimension:%d \n", 
+		printf("ht:%d wc:\\temp%d Feature Number: %d dimension:%d \n", 
 			imageFeats.ht, imageFeats.wd, imageFeats.featPts.size(),
 			imageFeats.featPts[0].feat.size());
 		
@@ -10099,7 +10104,7 @@ void CProject_PGStationDlg::OnSfmGeneratetracks()
 	
 	/*
 	pRP->EstimatePose( vecMatch[matchIdx], imgFeatures[li], imgFeatures[ri], cam1, cam2 );
-    FILE* fp = fopen("d:\\myRelativePose.txt", "w");
+    FILE* fp = fopen("c:\\temp\\myRelativePose.txt", "w");
 	fprintf(fp, "%lf %lf \n", cam1.focus, cam2.focus);
 	fprintf(fp, "Rotation: \n");
 	for(int j=0; j<3; j++)
@@ -10155,7 +10160,7 @@ void CProject_PGStationDlg::OnSfmGeneratetracks()
 	for(int i=0; i<fileVector.size(); i++)
 	{
 		char file[256];
-		sprintf(file, "d:\\match_%d.jpg", i);
+		sprintf(file, "c:\\temp\\match_%d.jpg", i);
 		cvSaveImage(file, vecIplImagePointer[i]);
 		cvReleaseImage(&vecIplImagePointer[i]);
 	}
@@ -10198,7 +10203,7 @@ void CProject_PGStationDlg::OnSfmRelativepose()
 	printf("Relative Pose Estimation ... \n");
     
 	//read simulated file
-	//FILE* fp = fopen("d:\\pair1.txt", "r");
+	//FILE* fp = fopen("c:\\temp\\pair1.txt", "r");
 	FILE* fp = fopen("F:\\data\\sfm\\simulatePair.txt", "r");
 	int numPt;
     fscanf(fp, "%d", &numPt);
@@ -10343,7 +10348,7 @@ void CProject_PGStationDlg::OnRelativeposeSimulate()
 
 	
 	//read simulated file
-	//FILE* fp = fopen("d:\\pair1.txt", "r");
+	//FILE* fp = fopen("c:\\temp\\pair1.txt", "r");
 	FILE* fp = fopen("F:\\data\\sfm\\simulatePair.txt", "r");
 	int numPt;
 	fscanf(fp, "%d", &numPt);
@@ -10453,13 +10458,13 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 {
 	// TODO: Add your command handler code here
     
-	//char* leftImage  = "D:\\Data\\Registration\\kermit\\kermit000.jpg";
-	//char* rightImage = "D:\\Data\\Registration\\kermit\\kermit001.jpg";
-	//char* leftImage  = "D:\\Data\\Registration\\kermit\\kermit000.jpg";
-	//char* rightImage = "D:\\Data\\Registration\\kermit\\kermit001.jpg";
+	//char* leftImage  = "c:\\temp\\Data\\Registration\\kermit\\kermit000.jpg";
+	//char* rightImage = "c:\\temp\\Data\\Registration\\kermit\\kermit001.jpg";
+	//char* leftImage  = "c:\\temp\\Data\\Registration\\kermit\\kermit000.jpg";
+	//char* rightImage = "c:\\temp\\Data\\Registration\\kermit\\kermit001.jpg";
 
-	//char* leftImage  = "D:\\kermit001.jpg";
-	//char* rightImage = "D:\\kermit000.jpg";
+	//char* leftImage  = "c:\\temp\\kermit001.jpg";
+	//char* rightImage = "c:\\temp\\kermit000.jpg";
 
 	//char* leftImage  = "F:\\Data\\sfm\\image\\IMG_0235.jpg";
 	//char* rightImage = "F:\\Data\\sfm\\image\\IMG_0236.jpg";
@@ -10511,8 +10516,8 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 		cvDrawCircle(pLeft, pl, 2, CV_RGB(r,g,b),2);
 		cvDrawCircle(pRight, pr, 2, CV_RGB(r,g,b),2);
 	}
-	cvSaveImage("d:\\left.jpg", pLeft);
-	cvSaveImage("d:\\right.jpg", pRight);
+	cvSaveImage("c:\\temp\\left.jpg", pLeft);
+	cvSaveImage("c:\\temp\\right.jpg", pRight);
 
 	//3. relative pose 
 	vector<Point2DDouble> lpts,rpts;
@@ -10586,7 +10591,7 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 	colors.push_back(c);
 	colors.push_back(c);
 
-	pOutput->Save("d:\\model.ply", gpts,colors);
+	pOutput->Save("c:\\temp\\model.ply", gpts,colors);
 
 	printf("Finished ! \n");
 }
@@ -10649,7 +10654,7 @@ void CProject_PGStationDlg::OnObsoluteposeSimulate()
 	vector<Point2DDouble> p2;
 	
 	/*
-	FILE* fp = fopen("d:\\imagept.txt", "r");
+	FILE* fp = fopen("c:\\temp\\imagept.txt", "r");
 	int numPt;
 	fscanf(fp, "%d", &numPt);
 	for(int i=0; i<numPt; i++)
@@ -10665,7 +10670,7 @@ void CProject_PGStationDlg::OnObsoluteposeSimulate()
 	*/
 
 	//read projection point coordinates
-	char ptfile[256] = "D:\\Data\\SFM\\imagept2.txt";
+	char ptfile[256] = "c:\\temp\\Data\\SFM\\imagept2.txt";
 	ReadProjections(ptfile, p2);
 
 	double K[9],R[9],t[3];
@@ -10678,8 +10683,8 @@ void CProject_PGStationDlg::OnEigenobjectTrainging()
 {
 	// TODO: Add your command handler code here
 
-	/*char samplesPath[256] = "D:\\Data\\Logo\\classification\\vw";
-	char dataPath[256] = "d:\\pca.dat";
+	/*char samplesPath[256] = "c:\\temp\\Data\\Logo\\classification\\vw";
+	char dataPath[256] = "c:\\temp\\pca.dat";
 
 	CEigenObjBase* pEigenObj = new CEigenLogo();
 	pEigenObj->Train(samplesPath, dataPath);*/
@@ -10690,8 +10695,8 @@ void CProject_PGStationDlg::OnEigenobjectRecognition()
 {
 	// TODO: Add your command handler code here
 	//
-	//char* trainedDataPath = "d:\\pca.dat";
-	//char* benchPath = "D:\\Data\\Logo\\bench"; 
+	//char* trainedDataPath = "c:\\temp\\pca.dat";
+	//char* benchPath = "c:\\temp\\Data\\Logo\\bench"; 
 	//CEigenObjBase* pEigenObj = new CEigenLogo();
 	//pEigenObj->Load(trainedDataPath);
 
@@ -10707,7 +10712,7 @@ void CProject_PGStationDlg::OnEigenobjectRecognition()
 	//float* pFeat = (float*)malloc(nht*nwd*sizeof(float)); 
 
 	////calculate the projection parameters of bench images
-	//char samplesPath[256] = "D:\\Data\\Logo\\test\\vw";
+	//char samplesPath[256] = "c:\\temp\\Data\\Logo\\test\\vw";
 	////get the number of images(samples)
 	//char** filenames = NULL;
 	//int n,nfile;
@@ -10751,7 +10756,7 @@ void CProject_PGStationDlg::OnToolNormalize()
 		//ProIlluminationImage(pBuffer, ht, wd);
 		ImageNorm(pBuffer, ht, wd, 128, 36);
 
-		SaveBmp("d:\\normImage.bmp", pBuffer, ht, wd);
+		SaveBmp("c:\\temp\\normImage.bmp", pBuffer, ht, wd);
 		
 		printf("Finished! \n");
 
@@ -10780,7 +10785,7 @@ void CProject_PGStationDlg::OnToolNormalize()
 //	float* projBuffer = (float*)malloc(nht*nwd*sizeof(float));
 //	memcpy(projBuffer, pbuffer, nht*nwd*sizeof(float));
 //	pEigenObj->Projection(projBuffer, nht*nwd);
-//	//SaveBmp("d:\\norm.bmp", projBuffer, nht, nwd);
+//	//SaveBmp("c:\\temp\\norm.bmp", projBuffer, nht, nwd);
 //
 //	//similarity
 //	//double dif = 0;
@@ -10797,12 +10802,12 @@ void CProject_PGStationDlg::OnToolNormalize()
 void CProject_PGStationDlg::OnEigenobjectProjection()
 {
 	// TODO: Add your command handler code here
-	//char testfile[256] = "D:\\Data\\Logo\\test\\vw\\t0.jpg";
-	//char testfile[256] = "D:\\Data\\Logo\\test\\benz1.jpg";
+	//char testfile[256] = "c:\\temp\\Data\\Logo\\test\\vw\\t0.jpg";
+	//char testfile[256] = "c:\\temp\\Data\\Logo\\test\\benz1.jpg";
 	//IplImage* pImage = cvLoadImage(testfile, 0);
 
-	//char* trainedDataPath = "d:\\pca.dat";
-	////char* benchPath = "D:\\Data\\Logo\\bench"; 
+	//char* trainedDataPath = "c:\\temp\\pca.dat";
+	////char* benchPath = "c:\\temp\\Data\\Logo\\bench"; 
 	//CEigenObjBase* pEigenObj = new CEigenLogo();
 	//pEigenObj->Load(trainedDataPath);
 
@@ -10824,7 +10829,7 @@ void CProject_PGStationDlg::OnEigenobjectProjection()
 
 	//	//image normalization
 	//	ImageNorm(pbuffer, nht, nwd, IMAGE_MEAN_VALUE, IMAGE_STD);
-	//	SaveBmp("d:\\norm.bmp", pbuffer, nht, nwd);
+	//	SaveBmp("c:\\temp\\norm.bmp", pbuffer, nht, nwd);
 
 	//	//similarity based on histogram 
 	//	double simHist = 0;
@@ -10844,7 +10849,7 @@ void CProject_PGStationDlg::OnEigenobjectProjection()
 	//	double* projBuffer = (double*)malloc(nht*nwd*sizeof(double));
 	//	memcpy(projBuffer, pbuffer, nht*nwd*sizeof(double));
 	//	pEigenObj->Projection(projBuffer, nht*nwd);
-	//	SaveBmp("d:\\proj.bmp", projBuffer, nht, nwd);
+	//	SaveBmp("c:\\temp\\proj.bmp", projBuffer, nht, nwd);
 
 
 	//	//similarity
@@ -10881,7 +10886,7 @@ void CProject_PGStationDlg::OnEigenobjectProjection()
 void CProject_PGStationDlg::OnVehiclelogoPca()
 {
 	//// TODO: Add your command handler code here
-	//char* trainedDataPath = "d:\\pca.dat";
+	//char* trainedDataPath = "c:\\temp\\pca.dat";
 	//CEigenObjBase* pEigenObj = new CEigenLogo();
 	//pEigenObj->Load(trainedDataPath);
 
@@ -10920,7 +10925,7 @@ void CProject_PGStationDlg::OnVehiclelogoPca()
 	//				cvSetImageROI(pScaleImage, rect);
 	//				cvCopy(pScaleImage, pNorm);
 	//				cvResetImageROI(pScaleImage);
-	//				//cvSaveImage("d:\\patch.jpg", pNorm);
+	//				//cvSaveImage("c:\\temp\\patch.jpg", pNorm);
 
 	//				//projection
 	//				double sim = PCASim(pNorm, pEigenObj);
@@ -10998,7 +11003,7 @@ void CProject_PGStationDlg::OnSimulatedataSingleview()
 	phi    = 0;
 	kapa   = 0;	
 	t2[0] = 0; t2[1] = 0; t2[2] = 0;
-	strcpy(filename, "D:\\Data\\SFM\\imagept0.txt");
+	strcpy(filename, "c:\\temp\\Data\\SFM\\imagept0.txt");
 	
 	//image 1
 	focus = 240;
@@ -11007,7 +11012,7 @@ void CProject_PGStationDlg::OnSimulatedataSingleview()
 	phi    = -2;
 	kapa   = 1.5;
 	t2[0] = 20; t2[1] = 20; t2[2] = 10;	
-	strcpy(filename, "D:\\Data\\SFM\\imagept1.txt");
+	strcpy(filename, "c:\\temp\\Data\\SFM\\imagept1.txt");
 	
 	/*
 	//image 2
@@ -11017,7 +11022,7 @@ void CProject_PGStationDlg::OnSimulatedataSingleview()
 	phi    = 1;
 	kapa   = 3;
 	t2[0] = 10; t2[1] = -10; t2[2] = 5;
-	strcpy(filename, "D:\\Data\\SFM\\imagept2.txt");
+	strcpy(filename, "c:\\temp\\Data\\SFM\\imagept2.txt");
     */
 
 	printf("Output: %s \n", filename);
@@ -11064,7 +11069,7 @@ void CProject_PGStationDlg::OnHjAtmosphericcorrection()
 	// TODO: Add your command handler code here
 
 	//loading LUT data
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 
@@ -11074,16 +11079,16 @@ void CProject_PGStationDlg::OnHjAtmosphericcorrection()
 	LoadLutsForDDV(lutDir, aerosolTypeNumber, vecCorrectBlue, vecCorrectRed);
 
 
-	//char spath[256] = "D:\\Data\\HJ\\2013\\10\\17";
-	//char spath[256] = "D:\\Data\\HJ\\2013\\10\\04";
-	//char spath[256] = "D:\\Data\\HJ\\2013\\09\\28";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\10\\17";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\10\\04";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\09\\28";
 
-	//char spath[256] = "D:\\Data\\HJ\\2010\\9\\12";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\10\\29";
-	char spath[256] = "D:\\Data\\HJ\\2010\\09\\30";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\9\\28";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\6\\25";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\08\\16";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\9\\12";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\10\\29";
+	char spath[256] = "c:\\temp\\Data\\HJ\\2010\\09\\30";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\9\\28";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\6\\25";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\08\\16";
 
 
 	//wavelength for HJ bands (um)
@@ -11160,7 +11165,7 @@ void CProject_PGStationDlg::OnHjAtmosphericcorrection()
 	ReadGeoFileByte(sband4, 1, &pband4, ht, wd);
 
 	//loading aod file
-	char aodfile[256] = "d:\\aod-interpolation.tif";
+	char aodfile[256] = "c:\\temp\\aod-interpolation.tif";
     float* paod = NULL;
 	int aodht,aodwd;
 	ReadGeoFileFloat(aodfile, 1, &paod, aodht, aodwd);
@@ -11247,9 +11252,9 @@ void CProject_PGStationDlg::OnBaSimulate()
 	}
 
 	//read projection points
-	char filename0[256] = "D:\\Data\\SFM\\imagept0.txt";
-	char filename1[256] = "D:\\Data\\SFM\\imagept1.txt";
-	char filename2[256] = "D:\\Data\\SFM\\imagept2.txt";
+	char filename0[256] = "c:\\temp\\Data\\SFM\\imagept0.txt";
+	char filename1[256] = "c:\\temp\\Data\\SFM\\imagept1.txt";
+	char filename2[256] = "c:\\temp\\Data\\SFM\\imagept2.txt";
 	vector<Point2DDouble> vp1;
 	vector<Point2DDouble> vp2;
 	vector<Point2DDouble> vp3;
@@ -11451,7 +11456,7 @@ void CProject_PGStationDlg::OnBaRealimages()
 	CGenerateTracksBase* pGenerateTracks = new CMyGenerateTrack();
 	vector<TrackInfo> vecTrack;
 	pGenerateTracks->GenerateTracks(vecMatch, vecTrack);
-	PrintTracks(vecTrack, "d:\\tracks.txt");
+	PrintTracks(vecTrack, "c:\\temp\\tracks.txt");
 
 	
 	//display feaure points
@@ -11475,7 +11480,7 @@ void CProject_PGStationDlg::OnBaRealimages()
 	for(int i=0; i<pImages.size(); i++)
 	{
 		char imagefile[256];
-		sprintf(imagefile, "d:\\%d.jpg", i);
+		sprintf(imagefile, "c:\\temp\\%d.jpg", i);
 		cvSaveImage(imagefile, pImages[i]);
 	}
 	//////////////////////////////////////////////////////////////////////////
@@ -11494,8 +11499,8 @@ void CProject_PGStationDlg::OnMosaicSeamfinder()
 	// TODO: Add your command handler code here
 
 	/*
-	char* maskfile1 = "d:\\data\\mosaic\\mask.jpg";
-	char* maskfile2 = "d:\\data\\mosaic\\mask.jpg";
+	char* maskfile1 = "c:\\temp\\data\\mosaic\\mask.jpg";
+	char* maskfile2 = "c:\\temp\\data\\mosaic\\mask.jpg";
 
 	IplImage *pImage1 = cvLoadImage(maskfile1, 0);
 	IplImage *pImage2 = cvLoadImage(maskfile2, 0);
@@ -11533,17 +11538,17 @@ void CProject_PGStationDlg::OnMosaicSeamfinder()
 	//pSeamFinder->FindPair(pmask1, ht1, wd1, pmask2, ht2, wd2, corner1, corner2);
 	pSeamFinder->FindPair(mask1, mask2, corner1, corner2);
 
-	//SaveBmp("d:\\mask1.bmp", pmask1, ht1, wd1);
-	//SaveBmp("d:\\mask2.bmp", pmask2, ht2, wd2);
-	SaveBmp("d:\\mask1.bmp", mask1.pbuffer, mask1.ht, mask1.wd);
-	SaveBmp("d:\\mask2.bmp", mask2.pbuffer, mask2.ht, mask2.wd);
+	//SaveBmp("c:\\temp\\mask1.bmp", pmask1, ht1, wd1);
+	//SaveBmp("c:\\temp\\mask2.bmp", pmask2, ht2, wd2);
+	SaveBmp("c:\\temp\\mask1.bmp", mask1.pbuffer, mask1.ht, mask1.wd);
+	SaveBmp("c:\\temp\\mask2.bmp", mask2.pbuffer, mask2.ht, mask2.wd);
 	vector<MatrixByte> masks;
 	masks.push_back(mask1);
 	masks.push_back(mask2);
 
 	//blend
-	char* imgfile1 = "d:\\data\\mosaic\\lena1.jpg";
-	char* imgfile2 = "d:\\data\\mosaic\\lena2.jpg";
+	char* imgfile1 = "c:\\temp\\data\\mosaic\\lena1.jpg";
+	char* imgfile2 = "c:\\temp\\data\\mosaic\\lena2.jpg";
 	IplImage* pImg1 = cvLoadImage(imgfile1, 0);
 	IplImage* pImg2 = cvLoadImage(imgfile1, 0);
     MatrixByte image1,image2;
@@ -11600,13 +11605,13 @@ void CProject_PGStationDlg::OnGeomosaicWithblend()
 
 	char** filesPath = f2c(10, 256);
 
-	strcpy(filesPath[0], "D:\\Data\\YG2\\klmy\\YG2-2_CCD-1_000061314_002_018_003_L2\\YG2-2_CCD-1_000061314_002_018_003_L2.tiff");
-	strcpy(filesPath[1], "D:\\Data\\YG2\\klmy\\YG2-2_CCD-1_000061524_006_002_002_L2\\YG2-2_CCD-1_000061524_006_002_002_L2.tiff");
-	strcpy(filesPath[2], "D:\\Data\\YG2\\klmy\\YG2-3_CCD-2_000062055_010_019_002_L2\\YG2-3_CCD-2_000062055_010_019_002_L2.tiff");
+	strcpy(filesPath[0], "c:\\temp\\Data\\YG2\\klmy\\YG2-2_CCD-1_000061314_002_018_003_L2\\YG2-2_CCD-1_000061314_002_018_003_L2.tiff");
+	strcpy(filesPath[1], "c:\\temp\\Data\\YG2\\klmy\\YG2-2_CCD-1_000061524_006_002_002_L2\\YG2-2_CCD-1_000061524_006_002_002_L2.tiff");
+	strcpy(filesPath[2], "c:\\temp\\Data\\YG2\\klmy\\YG2-3_CCD-2_000062055_010_019_002_L2\\YG2-3_CCD-2_000062055_010_019_002_L2.tiff");
 
 
 	CBlenderBase* pBlend = new CMultiBandBlender();
-	pBlend->GeoBlend(filesPath, 3, "d:\\mosaicWithBlend.tif");
+	pBlend->GeoBlend(filesPath, 3, "c:\\temp\\mosaicWithBlend.tif");
 
 }
 
@@ -11620,14 +11625,14 @@ void CProject_PGStationDlg::OnEigenobjectSimilarity()
 {
 	// TODO: Add your command handler code here
 
-	//char* trainedDataPath = "d:\\pca.dat";
-	////char* benchPath = "D:\\Data\\Logo\\bench"; 
+	//char* trainedDataPath = "c:\\temp\\pca.dat";
+	////char* benchPath = "c:\\temp\\Data\\Logo\\bench"; 
 	//CEigenObjBase* pEigenObj = new CEigenLogo();
 	//pEigenObj->Load(trainedDataPath);
 
 	////image directory
-	////char* imagepath = "D:\\Data\\Logo\\train\\vw1";
-	//char* imagepath = "D:\\Data\\Logo\\train\\vw1";
+	////char* imagepath = "c:\\temp\\Data\\Logo\\train\\vw1";
+	//char* imagepath = "c:\\temp\\Data\\Logo\\train\\vw1";
 	//char** filenames = NULL;
 	//int n,nfile;
 	//n = 0;
@@ -11684,7 +11689,7 @@ void CProject_PGStationDlg::OnEigenobjectSimilarity()
 	//		double* projBuffer = (double*)malloc(nht*nwd*sizeof(double));
 	//		memcpy(projBuffer, pbuffer, nht*nwd*sizeof(double));
 	//		pEigenObj->Projection(projBuffer, nht*nwd);
-	//		//SaveBmp("d:\\norm.bmp", projBuffer, nht, nwd);
+	//		//SaveBmp("c:\\temp\\norm.bmp", projBuffer, nht, nwd);
 
 	//		//similarity
 	//		//double dif = 0;
@@ -11718,8 +11723,8 @@ void CProject_PGStationDlg::OnHjAngleinterpolation()
 {
 	// TODO: Add your command handler code here
 
-	char tifPath[256]   = "D:\\Data\\HJ\\Beijing\\HJ1A-CCD1-457-66-20100402-L20000277541\\277541\\HJ1A-CCD1-457-66-20100402-L20000277541-1.TIF";
-	char anglePath[256] = "D:\\Data\\HJ\\Beijing\\HJ1A-CCD1-457-66-20100402-L20000277541\\277541\\HJ1A-CCD1-457-66-20100402-L20000277541-SatAngle.txt";
+	char tifPath[256]   = "c:\\temp\\Data\\HJ\\Beijing\\HJ1A-CCD1-457-66-20100402-L20000277541\\277541\\HJ1A-CCD1-457-66-20100402-L20000277541-1.TIF";
+	char anglePath[256] = "c:\\temp\\Data\\HJ\\Beijing\\HJ1A-CCD1-457-66-20100402-L20000277541\\277541\\HJ1A-CCD1-457-66-20100402-L20000277541-SatAngle.txt";
 	char xmlPath[256];
 
 	//get the sun azimuth from the XML file
@@ -11770,8 +11775,8 @@ void CProject_PGStationDlg::OnHjAngleinterpolation()
 	fclose(fp);	
 
 
-	//HJAngleInterpolationForward(px, py, zenith, nrow, geoInfo, "d:\\zenith.tif");
-	//HJAngleInterpolationForward(px, py, azimuth, nrow, geoInfo, "d:\\azimuth.tif");
+	//HJAngleInterpolationForward(px, py, zenith, nrow, geoInfo, "c:\\temp\\zenith.tif");
+	//HJAngleInterpolationForward(px, py, azimuth, nrow, geoInfo, "c:\\temp\\azimuth.tif");
 
 	/*
 	//generate triangle 
@@ -11779,7 +11784,7 @@ void CProject_PGStationDlg::OnHjAngleinterpolation()
 	GenerateDelaunayTriangle(pTin, px, py, nrow);
 	IplImage* pImage = cvCreateImage( cvSize(wd, ht), 8, 1);
 	DrawDelaunayTriangle(pImage, pTin);
-	cvSaveImage("d:\\tri.jpg", pImage);
+	cvSaveImage("c:\\temp\\tri.jpg", pImage);
 	cvReleaseImage(&pImage);
 	*/
 	
@@ -11790,8 +11795,8 @@ void CProject_PGStationDlg::OnTemplatematchingFast()
 {
 	// TODO: Add your command handler code here
 
-	char* oriFile      = "D:\\Data\\TemplateMatching\\Template_Matching_Original_Image.jpg";
-	char* templateFile = "D:\\Data\\TemplateMatching\\Template_Matching_Template_Image.jpg";
+	char* oriFile      = "c:\\temp\\Data\\TemplateMatching\\Template_Matching_Original_Image.jpg";
+	char* templateFile = "c:\\temp\\Data\\TemplateMatching\\Template_Matching_Template_Image.jpg";
 
 	//char oriFile[256];
 	//char templateFile[256];
@@ -11800,7 +11805,7 @@ void CProject_PGStationDlg::OnTemplatematchingFast()
 	//if(pImage!=NULL)
 	{
 		//strcpy(oriFile, GetCurrentImageFilePath());
-		//strcpy(templateFile, "d:\\template.jpg");
+		//strcpy(templateFile, "c:\\temp\\template.jpg");
 
 		//CTemplateMatchBase* pTM   = new CBasicTM();	
 		CTemplateMatchBase* pTM = new CFastTM();
@@ -11833,11 +11838,11 @@ void CProject_PGStationDlg::OnHarrIntegralimage()
 void CProject_PGStationDlg::OnTemplatematchingHarr()
 {
 	// TODO: Add your command handler code here
-	//char* oriFile      = "D:\\Data\\TemplateMatching\\Template_Matching_Original_Image.jpg";
-	//char* templateFile = "D:\\Data\\TemplateMatching\\Template_Matching_Template_Image.jpg";
+	//char* oriFile      = "c:\\temp\\Data\\TemplateMatching\\Template_Matching_Original_Image.jpg";
+	//char* templateFile = "c:\\temp\\Data\\TemplateMatching\\Template_Matching_Template_Image.jpg";
 
-	char* oriFile      = "D:\\Data\\video\\bridge\\0050.jpg";
-	char* templateFile = "D:\\Data\\TemplateMatching\\car_template-small.jpg";
+	char* oriFile      = "c:\\temp\\Data\\video\\bridge\\0050.jpg";
+	char* templateFile = "c:\\temp\\Data\\TemplateMatching\\car_template-small.jpg";
 
 	//calculate the Harr feature of template image
 	IplImage* pImage = cvLoadImage(templateFile, 0);
@@ -11853,7 +11858,7 @@ void CProject_PGStationDlg::OnTemplatematchingHarr()
 		{
 			pIntegral[j*wd+i] = (unsigned char)(pImage->imageData[j*scanwd+i]);
 		}
-	SaveBmp("d:\\ori.bmp", pIntegral, ht, wd);
+	SaveBmp("c:\\temp\\ori.bmp", pIntegral, ht, wd);
 	CalculateIntegralImage1D(pIntegral, ht, wd);
 
 
@@ -11894,7 +11899,7 @@ void CProject_PGStationDlg::OnTemplatematchingHarr()
 		{
 			pSrcIntegral[j*swd+i] = (unsigned char)(pSrc->imageData[j*sscanwd+i]);
 		}
-	//SaveBmp("d:\\src.bmp", pSrcIntegral, sht, swd);
+	//SaveBmp("c:\\temp\\src.bmp", pSrcIntegral, sht, swd);
 	CalculateIntegralImage1D(pSrcIntegral, sht, swd);
 	
 	int    dx,dy;
@@ -11999,16 +12004,16 @@ void CProject_PGStationDlg::OnExternalformatHdf()
 	// TODO: Add your command handler code here
 	
 	//read HDF file
-	char hdfFile[256] = "D:\\Data\\MODIS\\2006-05-17\\MOD021KM.A2006137.0310.005.2010177125010.hdf";
-   	//char hdfFile[256] = "D:\\Data\\MODIS\\2013-1-11\\MOD04_L2.A2013011.0225.051.2013011173120.hdf";
-	//char hdfFile[256] = "D:\\Data\\MODIS\\2013-7-23\\MOD04_L2.A2013204.0310.051.2013204152815.hdf";
+	char hdfFile[256] = "c:\\temp\\Data\\MODIS\\2006-05-17\\MOD021KM.A2006137.0310.005.2010177125010.hdf";
+   	//char hdfFile[256] = "c:\\temp\\Data\\MODIS\\2013-1-11\\MOD04_L2.A2013011.0225.051.2013011173120.hdf";
+	//char hdfFile[256] = "c:\\temp\\Data\\MODIS\\2013-7-23\\MOD04_L2.A2013204.0310.051.2013204152815.hdf";
 
 	char** subDataDesc = f2c(1000, 256);
 
 	//read subdata information
 	int nSubData = ReadSubDataInfo(hdfFile, subDataDesc);
 
-	FILE* fp = fopen("d:\\subDataDesc.txt", "w");
+	FILE* fp = fopen("c:\\temp\\subDataDesc.txt", "w");
 	for(int i=0; i<nSubData; i++)
 	{
 		printf("%s \n", subDataDesc[i]);
@@ -12023,7 +12028,7 @@ void CProject_PGStationDlg::OnExternalformatHdf()
 	//read AOT 
 	ReadSubData(subDataDesc[7], &pBuffer, &ht, &wd);
 
-	fp = fopen("d:\\aot.txt", "w");
+	fp = fopen("c:\\temp\\aot.txt", "w");
 	for(int j=0; j<ht; j++)
 	{
 		for(int i=0; i<wd; i++)
@@ -12037,7 +12042,7 @@ void CProject_PGStationDlg::OnExternalformatHdf()
 	//read fmf
 	double* pFMF = NULL;
 	ReadSubData(subDataDesc[9], &pFMF, &ht, &wd);
-	fp = fopen("d:\\fmf.txt", "w");
+	fp = fopen("c:\\temp\\fmf.txt", "w");
 	for(int j=0; j<ht; j++)
 	{
 		for(int i=0; i<wd; i++)
@@ -12051,7 +12056,7 @@ void CProject_PGStationDlg::OnExternalformatHdf()
 	//read lon/lat
 	double* pLon = NULL;
 	ReadSubData(subDataDesc[69], &pLon, &ht, &wd);
-	fp = fopen("d:\\lon.txt", "w");
+	fp = fopen("c:\\temp\\lon.txt", "w");
 	for(int j=0; j<ht; j++)
 	{
 		for(int i=0; i<wd; i++)
@@ -12065,7 +12070,7 @@ void CProject_PGStationDlg::OnExternalformatHdf()
 
 	double* pLat = NULL;
 	ReadSubData(subDataDesc[70], &pLat, &ht, &wd);
-	fp = fopen("d:\\lat.txt", "w");
+	fp = fopen("c:\\temp\\lat.txt", "w");
 	for(int j=0; j<ht; j++)
 	{
 		for(int i=0; i<wd; i++)
@@ -12082,7 +12087,7 @@ void CProject_PGStationDlg::OnExternalformatHdf()
 	double minlon = 102;
 	double maxlon = 125;
     
-	fp = fopen("d:\\modiAotScatter.txt", "w");
+	fp = fopen("c:\\temp\\modiAotScatter.txt", "w");
 	for(int j=0; j<ht; j++)
 	{
 		for(int i=0; i<wd; i++)
@@ -12141,7 +12146,7 @@ void CProject_PGStationDlg::OnExternalformatHdf()
 		}
 	}
 	
-	fp = fopen("d:\\modis-aot.txt", "w");
+	fp = fopen("c:\\temp\\modis-aot.txt", "w");
 	for(int j=sht-1; j>=0; j--)
 	{
 		for(int i=0; i<swd; i++)
@@ -12185,7 +12190,7 @@ void CProject_PGStationDlg::OnExternalformatHdf()
 		}
 	}
 
-	fp = fopen("d:\\modis-fmf.txt", "w");
+	fp = fopen("c:\\temp\\modis-fmf.txt", "w");
 	for(int j=sht-1; j>=0; j--)
 	{
 		for(int i=0; i<swd; i++)
@@ -12214,7 +12219,7 @@ void CProject_PGStationDlg::OnFillScanfill()
 
 	GetInnerRegionMask(pMask, wd, ht, px, py, 3, 256, 220, 1);
 
-	FILE* fp = fopen("d:\\mask.txt", "w");
+	FILE* fp = fopen("c:\\temp\\mask.txt", "w");
 	for(int j=0; j<ht; j++)
 		for(int i=0; i<wd; i++)
 		{
@@ -12222,7 +12227,7 @@ void CProject_PGStationDlg::OnFillScanfill()
 		}
 	fclose(fp);
 
-	SaveBmp("d:\\fillmask.bmp", pMask, ht, wd);
+	SaveBmp("c:\\temp\\fillmask.bmp", pMask, ht, wd);
 
 	printf("Finished! \n");
 }
@@ -12231,7 +12236,7 @@ void CProject_PGStationDlg::OnAtmospherecorrectionHj()
 {
 	// TODO: Add your command handler code here
 
-	char path[256] = "D:\\Data\\Lut\\2010_08_16\\660";
+	char path[256] = "c:\\temp\\Data\\Lut\\2010_08_16\\660";
 	char lut0[256];
 	char lut1[256];
 	char lut2[256];
@@ -12258,31 +12263,31 @@ void CProject_PGStationDlg::OnAtmospherecorrectionHj()
 	*/
 	
 	//load HJ data
-	char* tifFile = "D:\\Data\\HJ\\Beijing\\HJ1A-CCD2-1-68-20100816-L20000375929\\375929\\HJ1A-CCD2-1-68-20100816-L20000375929-3.TIF";
+	char* tifFile = "c:\\temp\\Data\\HJ\\Beijing\\HJ1A-CCD2-1-68-20100816-L20000375929\\375929\\HJ1A-CCD2-1-68-20100816-L20000375929-3.TIF";
     stGeoInfo geoInfo;
 	GetGeoInformation(tifFile, geoInfo);
 
-	//FILE* fp = fopen("d:\\projection_string.txt", "w");
+	//FILE* fp = fopen("c:\\temp\\projection_string.txt", "w");
 	//fprintf(fp, "%s\n", geoInfo.projectRef);
 	//fclose(fp);
 
-	char* subFile = "D:\\Data\\HJ\\Beijing\\HJ1A-CCD2-1-68-20100816-L20000375929\\375929\\2010-8-16-band3-crop.tif";
+	char* subFile = "c:\\temp\\Data\\HJ\\Beijing\\HJ1A-CCD2-1-68-20100816-L20000375929\\375929\\2010-8-16-band3-crop.tif";
 	stGeoInfo geoInfoSub;
 	GetGeoInformation(subFile, geoInfoSub);
 
 	int ht,wd;
 	unsigned char *pBuffer = NULL;
 	ReadGeoFileByte(subFile, 1, &pBuffer, ht, wd);
-	SaveBmp("d:\\bj.bmp", pBuffer, ht, wd);
+	SaveBmp("c:\\temp\\bj.bmp", pBuffer, ht, wd);
 
 	//load HJ XML data
-	char* xmlFile = "D:\\Data\\HJ\\Beijing\\HJ1A-CCD2-1-68-20100816-L20000375929\\375929\\HJ1A-CCD2-1-68-20100816-L20000375929.XML";
+	char* xmlFile = "c:\\temp\\Data\\HJ\\Beijing\\HJ1A-CCD2-1-68-20100816-L20000375929\\375929\\HJ1A-CCD2-1-68-20100816-L20000375929.XML";
 	HJDATA hjdata;
 	GetHJFilepaths(xmlFile, hjdata);
 	ReadXMLFile(hjdata);
 
 	//load angle data
-	char* angleFile = "D:\\Data\\HJ\\Beijing\\HJ1A-CCD2-1-68-20100816-L20000375929\\375929\\HJ1A-CCD2-1-68-20100816-L20000375929-SatAngle.txt";
+	char* angleFile = "c:\\temp\\Data\\HJ\\Beijing\\HJ1A-CCD2-1-68-20100816-L20000375929\\375929\\HJ1A-CCD2-1-68-20100816-L20000375929-SatAngle.txt";
     CReadAngleBase* pReadAngle = new CReadHJAngle();
 	pReadAngle->Read(angleFile);
 
@@ -12338,7 +12343,7 @@ void CProject_PGStationDlg::OnAtmospherecorrectionHj()
 	}
 
 	//save the result into the tif file
-	GdalWriteImageByte("d:\\ac.tif", pACBuffer, ht, wd);
+	GdalWriteImageByte("c:\\temp\\ac.tif", pACBuffer, ht, wd);
 	free(pACBuffer);
 
 	printf("Finished!\n");
@@ -12348,10 +12353,10 @@ void CProject_PGStationDlg::OnEpipolargeometryFundamentalmatrix()
 {
 	// TODO: Add your command handler code here
 
-	//char* leftImage  = "D:\\Data\\Registration\\kermit\\kermit000.jpg";
-	//char* rightImage = "D:\\Data\\Registration\\kermit\\kermit001.jpg";
-	//char* leftImage  = "D:\\Data\\Registration\\kermit\\kermit000.jpg";
-	//char* rightImage = "D:\\Data\\Registration\\kermit\\kermit001.jpg";
+	//char* leftImage  = "c:\\temp\\Data\\Registration\\kermit\\kermit000.jpg";
+	//char* rightImage = "c:\\temp\\Data\\Registration\\kermit\\kermit001.jpg";
+	//char* leftImage  = "c:\\temp\\Data\\Registration\\kermit\\kermit000.jpg";
+	//char* rightImage = "c:\\temp\\Data\\Registration\\kermit\\kermit001.jpg";
 
 	if( m_imagePointerVector.size()>0)
 	{
@@ -12425,8 +12430,8 @@ void CProject_PGStationDlg::OnEpipolargeometryFundamentalmatrix()
 		cvDrawCircle(pRight, pr, 2, CV_RGB(r,g,b),2);
 	}
 
-	cvSaveImage("d:\\left.jpg", pLeft);
-	cvSaveImage("d:\\right.jpg", pRight);
+	cvSaveImage("c:\\temp\\left.jpg", pLeft);
+	cvSaveImage("c:\\temp\\right.jpg", pRight);
 
 	cvNamedWindow("Left");
 	cvShowImage("Left", pLeft);
@@ -12451,8 +12456,8 @@ void CProject_PGStationDlg::OnNormalizeColor()
 {
 	// TODO: Add your command handler code here
 
-	//char* filepath = "d:\\GF1_WFV4_E115.9_N33.5_20131026_L1A0000105274-resize.tif";
-	//char* filepath = "d:\\GF1_WFV3_E113.8_N33.9_20131026_L1A0000105260-resize.tif";
+	//char* filepath = "c:\\temp\\GF1_WFV4_E115.9_N33.5_20131026_L1A0000105274-resize.tif";
+	//char* filepath = "c:\\temp\\GF1_WFV3_E113.8_N33.9_20131026_L1A0000105260-resize.tif";
 	
 	CFileDialog dlg(true,NULL,NULL,
 		OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_ALLOWMULTISELECT|OFN_EXPLORER,
@@ -12476,20 +12481,20 @@ void CProject_PGStationDlg::OnNormalizeColor()
 
 		ReadGeoFileByte(filepath, 1, &r, ht, wd);
 		ImageNorm(r, ht, wd, 127, 60);	
-		//GdalWriteJpgCopy("d:\\r.jpg", pbuffer, ht, wd);
+		//GdalWriteJpgCopy("c:\\temp\\r.jpg", pbuffer, ht, wd);
 		//free(pbuffer);
 
 		ReadGeoFileByte(filepath, 2, &g, ht, wd);
 		ImageNorm(g, ht, wd, 130, 60);	
-		//GdalWriteJpgCopy("d:\\g.jpg", pbuffer, ht, wd);
+		//GdalWriteJpgCopy("c:\\temp\\g.jpg", pbuffer, ht, wd);
 		//free(pbuffer);
 
 		ReadGeoFileByte(filepath, 3, &b, ht, wd);
 		ImageNorm(b, ht, wd, 124, 60);	
-		//GdalWriteJpgCopy("d:\\b.jpg", pbuffer, ht, wd);
+		//GdalWriteJpgCopy("c:\\temp\\b.jpg", pbuffer, ht, wd);
 		//free(pbuffer);
 
-		GdalWriteImageColor("d:\\color1.tif", r, g, b, ht, wd, geoInfo);
+		GdalWriteImageColor("c:\\temp\\color1.tif", r, g, b, ht, wd, geoInfo);
 
 		free(r);
 		free(g);
@@ -12503,8 +12508,8 @@ void CProject_PGStationDlg::OnAtmospherecorrectionParasol()
 	// TODO: Add your command handler code here
 
 	//input
-	char* lutpath  = "D:\\Data\\Aeronet\\2005-10-08\\beijing\\lut\\670";
-	char* filepath = "D:\\Data\\Parasol\\Beijing\\2005_10_08_05_116.381_ 39.977.txt";
+	char* lutpath  = "c:\\temp\\Data\\Aeronet\\2005-10-08\\beijing\\lut\\670";
+	char* filepath = "c:\\temp\\Data\\Parasol\\Beijing\\2005_10_08_05_116.381_ 39.977.txt";
 	double wavelen = 0.670;    //0.865
 	double aod     = 0.07;     //0.054567;
 
@@ -12563,8 +12568,8 @@ void CProject_PGStationDlg::OnConvertSds()
 {
 	// TODO: Add your command handler code here
 
-	char* hdfFile = "d:\\mod04.hdf";
-	char* outfile = "d:\\out.tif";
+	char* hdfFile = "c:\\temp\\mod04.hdf";
+	char* outfile = "c:\\temp\\out.tif";
 
 	
 	vector<string> subDataSets;
@@ -12632,8 +12637,8 @@ void CProject_PGStationDlg::OnOrthoimageUav()
 	camInfo.lat = lat;
 
 	COrthoBase* pOrtho = new COrthoUAV();
-	char* inputFile = "D:\\Data\\UAV\\dalian\\0720-afternoon\\100EOS5D\\IMG_0078.jpg";
-	char* outFile = "d:\\ortho-78.tif";
+	char* inputFile = "c:\\temp\\Data\\UAV\\dalian\\0720-afternoon\\100EOS5D\\IMG_0078.jpg";
+	char* outFile = "c:\\temp\\ortho-78.tif";
 	pOrtho->GenerateOrthoImage(camInfo, inputFile, outFile);
 
 
@@ -12672,7 +12677,7 @@ void CProject_PGStationDlg::OnBundlerReadtracks()
 {
 	// TODO: Add your command handler code here
 
-	char* tracksFile = "d:\\tracks.txt";
+	char* tracksFile = "c:\\temp\\tracks.txt";
 
 	vector<TrackInfo> tracks;
 	ReadTracks(tracksFile, tracks);
@@ -12688,7 +12693,7 @@ void CProject_PGStationDlg::OnBundlerReadtracks()
 void CProject_PGStationDlg::OnMosaicOpticalflow()
 {
 	// TODO: Add your command handler code here
-	char* path = "D:\\Data\\seavideo\\image6";
+	char* path = "c:\\temp\\Data\\seavideo\\image6";
 
 
 	char** filenames=NULL;
@@ -12711,7 +12716,7 @@ void CProject_PGStationDlg::OnMosaicOpticalflow()
 		printf("%s \n", filenames[i]);		
 	}
 
-	DirectMosaic(filenames, nfile, "d:\\sea.jpg");
+	DirectMosaic(filenames, nfile, "c:\\temp\\sea.jpg");
 
 	printf("Finished! \n");
 }
@@ -12719,12 +12724,12 @@ void CProject_PGStationDlg::OnMosaicOpticalflow()
 void CProject_PGStationDlg::OnParasolReadlevel2()
 {
 	// TODO: Add your command handler code here
-	//char parasolL2File[256] = "D:\\Data\\Parasol\\2013\\10\\5\\P3L2TLGC202181KL";
-	//char parasolL2File[256] = "D:\\Data\\Parasol\\2013\\1\\11\\P3L2TLGC186012KL";
-	//char parasolL2File[256] = "D:\\Data\\Parasol\\2013\\7\\23\\P3L2TLGC198033KL";
-	//char parasolL2File[256] = "D:\\Data\\Parasol\\2013\\10\\9\\P3L2TLGC203006KL";
-	//char parasolL2File[256] = "D:\\Data\\Parasol\\2013\\9\\17\\P3L2TLGC201151KL";
-	//char parasolL2File[256] = "D:\\Data\\Parasol\\2013\\10\\4\\l2\\P3L2TLGC202166KL";
+	//char parasolL2File[256] = "c:\\temp\\Data\\Parasol\\2013\\10\\5\\P3L2TLGC202181KL";
+	//char parasolL2File[256] = "c:\\temp\\Data\\Parasol\\2013\\1\\11\\P3L2TLGC186012KL";
+	//char parasolL2File[256] = "c:\\temp\\Data\\Parasol\\2013\\7\\23\\P3L2TLGC198033KL";
+	//char parasolL2File[256] = "c:\\temp\\Data\\Parasol\\2013\\10\\9\\P3L2TLGC203006KL";
+	//char parasolL2File[256] = "c:\\temp\\Data\\Parasol\\2013\\9\\17\\P3L2TLGC201151KL";
+	//char parasolL2File[256] = "c:\\temp\\Data\\Parasol\\2013\\10\\4\\l2\\P3L2TLGC202166KL";
 
 
 	char parasolL2File[256] = "F:\\Data\\PARASOL\\L2\\2005-10-08\\P3L2TLGA020047JL";
@@ -12739,7 +12744,7 @@ void CProject_PGStationDlg::OnParasolReadlevel2()
 	double lat = 39.9;
 	data = readParasolLevelTwo.GetPtMultiViewData(lon, lat);
 
-	//printf("aod: %lf \n", data.aod865);
+	//printf("aoc:\\temp %lf \n", data.aod865);
 	//double minlon=102, maxlon=125, minlat=32, maxlat=46;
 	double minlon=110, maxlon=130, minlat=20, maxlat=55;
     
@@ -12752,7 +12757,7 @@ void CProject_PGStationDlg::OnParasolReadlevel2()
 	memset(pAerosol, 0, ht*wd*sizeof(float));
 
 
-	FILE* fp = fopen("d:\\parasolAot20130917.txt", "w");
+	FILE* fp = fopen("c:\\temp\\parasolAot20130917.txt", "w");
 	int index = 0;
 	for(int j=ht-1; j>=0; j--)
 	{
@@ -12777,7 +12782,7 @@ void CProject_PGStationDlg::OnParasolReadlevel2()
 
 	printf("writing geotiff ... \n");
 	//GdalWriteFloatLL(aodTiffFile, pAOD, ht, wd, minlon, maxlon, minlat, maxlat);
-	GdalWriteFloatLL("d:\\parasol_fineaod.tif", pAerosol, ht, wd, minlon, maxlon, minlat, maxlat);
+	GdalWriteFloatLL("c:\\temp\\parasol_fineaod.tif", pAerosol, ht, wd, minlon, maxlon, minlat, maxlat);
 
 	free(pAerosol);
 	printf("Reading Finished ! \n");
@@ -12789,11 +12794,11 @@ void CProject_PGStationDlg::OnGf1Invert()
 {
 	// TODO: Add your command handler code here
 
-	char lutFile[256] = "D:\\Data\\LUTDouble\\type\\1\\4.dat";
+	char lutFile[256] = "c:\\temp\\Data\\LUTDouble\\type\\1\\4.dat";
 	CLutBase* pLut = new CLutBinCont();
 	pLut->Load(lutFile);
 
-	char path[256] = "D:\\Data\\GF\\L2\\GF1_PMS2_E116.3_N39.9_20130627_L1A0000068947\\GF1_PMS2_E116.3_N39.9_20130627_L1A0000068947-MSS2";
+	char path[256] = "c:\\temp\\Data\\GF\\L2\\GF1_PMS2_E116.3_N39.9_20130627_L1A0000068947\\GF1_PMS2_E116.3_N39.9_20130627_L1A0000068947-MSS2";
 	char band1_file[256];
 	char band3_file[256];
 	char band4_file[256];
@@ -12826,7 +12831,7 @@ void CProject_PGStationDlg::OnGf1Invert()
 	double flux3 = GetFlux(0.66)*cos(sza*DPI);
 	double flux4 = GetFlux(0.86)*cos(sza*DPI);
 
-	FILE* fp = fopen("d:\\gf-aot.txt", "w");
+	FILE* fp = fopen("c:\\temp\\gf-aot.txt", "w");
 	for(int j=0; j<ht; j+=3)
 	{
 		for(int i=0; i<wd; i+=3)
@@ -12882,7 +12887,7 @@ void CProject_PGStationDlg::OnImagecutMod02()
 
 	//read subdata information
 	int nSubData = ReadSubDataInfo(mod02File, subDataDesc);
-	FILE* fp = fopen("d:\\subDataDesc.txt", "w");
+	FILE* fp = fopen("c:\\temp\\subDataDesc.txt", "w");
 	for(int i=0; i<nSubData; i++)
 	{
 		printf("%s \n", subDataDesc[i]);
@@ -12944,7 +12949,7 @@ void CProject_PGStationDlg::OnImagecutMod02()
 
 			pImage[row*swd+col] = pBuffer[ (int)( j*wd+i ) ];
 		}
-	GdalWriteImageUShort("d:\\lonlat.tif", pImage, sht, swd);
+	GdalWriteImageUShort("c:\\temp\\lonlat.tif", pImage, sht, swd);
 
 	//generate the convex polygon of the sampled image
 	double px[100];
@@ -13028,14 +13033,14 @@ void CProject_PGStationDlg::OnImagecutMod02()
 		cvDrawCircle(pDisp, pt1, 2, CV_RGB(0,255,0), 3);
 		cvLine(pDisp, pt1, pt2, CV_RGB(255,0,0), 2);		
 	}
-	cvSaveImage("d:\\convex.jpg", pDisp);
+	cvSaveImage("c:\\temp\\convex.jpg", pDisp);
     cvReleaseImage(&pDisp);
 
 	/*
 	BYTE* mask = (BYTE*)malloc( sizeof(BYTE)*ht*wd );
 	memset(mask, 0, sizeof(BYTE)*ht*wd);
 	GetInnerRegionMask(mask, wd, ht, px, py, index, 100, 255, true);
-	SaveBmp("d:\\mask.bmp", mask, ht, wd);
+	SaveBmp("c:\\temp\\mask.bmp", mask, ht, wd);
 	*/
 
 	//interpolation
@@ -13110,9 +13115,9 @@ void CProject_PGStationDlg::OnImagecutMod02()
 			}
 		}
 	}
-	GdalWriteImageUShort("d:\\lonlat-ip.tif", pIpImage, sht, swd);
+	GdalWriteImageUShort("c:\\temp\\lonlat-ip.tif", pIpImage, sht, swd);
 
-	fp = fopen("d:\\llarea.txt", "w");
+	fp = fopen("c:\\temp\\llarea.txt", "w");
 	fprintf(fp, "%lf %lf %lf %lf \n", minlon, maxlon, minlat, maxlat);
 	fprintf(fp, "%lf \n", dstep);
 	fclose(fp);
@@ -13129,7 +13134,7 @@ void CProject_PGStationDlg::OnImagecutMod02()
 void CProject_PGStationDlg::OnImagecutCut()
 {
 	// TODO: Add your command handler code here
-	char filename[256] = "d:\\lonlat-ip.tif";
+	char filename[256] = "c:\\temp\\lonlat-ip.tif";
 
 	//100.896812 130.198105 21.356579 42.545757 
 	//0.021641 
@@ -13151,7 +13156,7 @@ void CProject_PGStationDlg::OnImagecutCut()
 	int b = int( (maxlat+90)/blocksize );
 	int oht = (b-t+1)*BLOCK_IMAGE_SIZE;   //(maxlat-minlat)/pixelsize;//采样后高度
 	int owd = (r-l+1)*BLOCK_IMAGE_SIZE;   //(maxlon-minlon)/pixelsize;//采样后宽度
-	printf("%d owd: %d \n", oht, owd);
+	printf("%d owc:\\temp %d \n", oht, owd);
 
 
 	/*
@@ -13240,7 +13245,7 @@ void CProject_PGStationDlg::OnBaNewapi()
 	CGenerateTracksBase* pGenerateTracks = new CMyGenerateTrack();
 	vector<TrackInfo> vecTrack;
 	pGenerateTracks->GenerateTracks(vecMatch, vecImageDataPointer, vecTrack);
-	PrintTracks(vecTrack, "d:\\tracks.txt");
+	PrintTracks(vecTrack, "c:\\temp\\tracks.txt");
 
 	if(vecTrack.size()<8)
 	{
@@ -13276,7 +13281,7 @@ void CProject_PGStationDlg::OnBaNewapi()
 	for(int i=0; i<pImages.size(); i++)
 	{
 		char imagefile[256];
-		sprintf(imagefile, "d:\\%d.jpg", i);
+		sprintf(imagefile, "c:\\temp\\%d.jpg", i);
 		cvSaveImage(imagefile, pImages[i]);
 	}*/
 	//////////////////////////////////////////////////////////////////////////
@@ -13319,11 +13324,11 @@ void CProject_PGStationDlg::OnIgbpSinoid()
 	
 	//for east asia, the limits are known 
 	//CReadIGBPBase* pReadIGBP = new CReadIGBP();
-	//char* igbpfile = "D:\\Data\\IGBP\\eastAsia.dat";
+	//char* igbpfile = "c:\\temp\\Data\\IGBP\\eastAsia.dat";
 	//pReadIGBP->Load(igbpfile, IGBP_RESOLUTION_INVERSE_QUAT);
 
 	//for all world, 
-	char* igbpfile = "D:\\Data\\IGBP\\IGBP-small";
+	char* igbpfile = "c:\\temp\\Data\\IGBP\\IGBP-small";
 	CReadIGBPBase* pReadIGBP = new CReadIGBPAll();
 	pReadIGBP->Load(igbpfile, IGBP_RESOLUTION_INVERSE_QUAT);
 
@@ -13339,7 +13344,7 @@ void CProject_PGStationDlg::OnHjAerosolinvertddv()
 	// TODO: Add your command handler code here
 
 	//loading LUT data
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 
@@ -13349,15 +13354,15 @@ void CProject_PGStationDlg::OnHjAerosolinvertddv()
 	LoadLutsForDDV(lutDir, aerosolTypeNumber, vecCorrectBlue, vecCorrectRed);
 
 	
-	//char spath[256] = "D:\\Data\\HJ\\2013\\10\\17";
-	char spath[256] = "D:\\Data\\HJ\\2013\\10\\04";
-	//char spath[256] = "D:\\Data\\HJ\\2013\\09\\28";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\9\\12";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\10\\29";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\09\\30";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\9\\28";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\6\\25";
-	//char spath[256] = "D:\\Data\\HJ\\2010\\08\\16";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\10\\17";
+	char spath[256] = "c:\\temp\\Data\\HJ\\2013\\10\\04";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\09\\28";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\9\\12";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\10\\29";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\09\\30";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\9\\28";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\6\\25";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\08\\16";
 
 
 	//wavelength for HJ bands (um)
@@ -13464,12 +13469,12 @@ void CProject_PGStationDlg::OnHjAerosolinvertddv()
 				pNDVI[j*wd+i] = ndvi*100;			
 			}			
 		}	
-	SaveBmp("d:\\ndvi.bmp", pNDVI, ht, wd);
+	SaveBmp("c:\\temp\\ndvi.bmp", pNDVI, ht, wd);
 	
 	
 	//load NDVI of clear day
-	//char ndviFile[256] = "D:\\Data\\HJ\\2010\\09\\ndvi.tif";
-	char ndviFile[256] = "D:\\Data\\MODIS\\500m\\2010273\\jjt\\modis-9.tif";
+	//char ndviFile[256] = "c:\\temp\\Data\\HJ\\2010\\09\\ndvi.tif";
+	char ndviFile[256] = "c:\\temp\\Data\\MODIS\\500m\\2010273\\jjt\\modis-9.tif";
 
 	stGeoInfo benchGeoInfo;
 	GetGeoInformation(ndviFile, benchGeoInfo);
@@ -13647,9 +13652,9 @@ void CProject_PGStationDlg::OnHjAerosolinvertddv()
 	DataSmoothMedian(pAodScatter, desHt, desWd);
 	//DataSmoothMedian(pAod, desHt, desWd);
 
-	GdalWriteFloat("d:\\aod.tif", pAod, desHt, desWd, subGeoInfo);   //for interpolation
-	GdalWriteFloat("d:\\aodScatter.tif", pAodScatter, desHt, desWd, subGeoInfo); //for display
-	GdalWriteByte("d:\\aodType.tif", pAerosolType, desHt, desWd, subGeoInfo);
+	GdalWriteFloat("c:\\temp\\aod.tif", pAod, desHt, desWd, subGeoInfo);   //for interpolation
+	GdalWriteFloat("c:\\temp\\aodScatter.tif", pAodScatter, desHt, desWd, subGeoInfo); //for display
+	GdalWriteByte("c:\\temp\\aodType.tif", pAerosolType, desHt, desWd, subGeoInfo);
     
 	free(pAod);
 	free(pAodScatter);
@@ -13663,7 +13668,7 @@ void CProject_PGStationDlg::OnInterpolation2d()
 	// TODO: Add your command handler code here
 	
 	//read the data into the buffer
-	char aodfile[256] = "d:\\aod.tif";
+	char aodfile[256] = "c:\\temp\\aod.tif";
 
 	stGeoInfo geoInfo;
 	GetGeoInformation(aodfile, geoInfo);
@@ -13751,8 +13756,8 @@ void CProject_PGStationDlg::OnInterpolation2d()
 	}
 	printf(" \n Finished!  \n");
 
-	//GdalWriteFloat("d:\\aod-interp.tif", pInterp, ht, wd, geoInfo);
-	GdalWriteFloat("d:\\aod-interp.tif", pAod, ht, wd, geoInfo);
+	//GdalWriteFloat("c:\\temp\\aod-interp.tif", pInterp, ht, wd, geoInfo);
+	GdalWriteFloat("c:\\temp\\aod-interp.tif", pAod, ht, wd, geoInfo);
 	
 	free(pAod);
 	free(pInterp);	
@@ -13766,7 +13771,7 @@ void CProject_PGStationDlg::OnSimulationDt()
 
 	//loading lut
 	//loading LUT data
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 
@@ -13846,14 +13851,14 @@ void CProject_PGStationDlg::OnSimulationDt()
 	double redExt  = vecCorrectRed[0]->GetExtinction();
 
 
-	FILE* fp = fopen("d:\\hj_simulate.txt", "w");
+	FILE* fp = fopen("c:\\temp\\hj_simulate.txt", "w");
 
 	for(int i=1; i<11; i++)
 	{
 		double aodBlue = 0.1*i;
 		double aodRed  = redExt/blueExt*aodBlue;
 
-		printf("aodBlue: %lf   aodRed:%lf \n", aodBlue, aodRed);
+		printf("aodBlue: %lf   aodRec:\\temp%lf \n", aodBlue, aodRed);
 
 		//blue
 		double T,S;
@@ -13888,7 +13893,7 @@ void CProject_PGStationDlg::OnHjInvertsinglept()
 	// TODO: Add your command handler code here
 
 	//loading luts
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectGreen;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
@@ -13927,7 +13932,7 @@ void CProject_PGStationDlg::OnHjInvertsinglept()
 	double invertAod = 0.0;
 	int    nInvertType = 0;
 
-	FILE* fp = fopen("d:\\invert_ac_aot_2.0.txt", "w");
+	FILE* fp = fopen("c:\\temp\\invert_ac_aot_2.0.txt", "w");
 
 	for(int k=0; k<=20; k++) //for blue channel
 	{
@@ -13988,7 +13993,7 @@ void CProject_PGStationDlg::OnHjInvertsinglept()
 	double t1,t2,s1,s2,pa1,pa2;
 	double aodBlue, aodRed;
 
-	FILE* fp = fopen("d:\\hj_simulate.txt", "r");
+	FILE* fp = fopen("c:\\temp\\hj_simulate.txt", "r");
     for(int i=0; i<10; i++)
 	{
 		fscanf(fp, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
@@ -14009,15 +14014,15 @@ void CProject_PGStationDlg::OnModisInvertaod()
 	// TODO: Add your command handler code here
 
 	//loading lut
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 	int nAerosolType = 1;
 	LoadLutsForDDV(lutDir, nAerosolType, vecCorrectBlue, vecCorrectRed);
 	
 	//loading MOD02
-	//char* filePath = "D:\\Data\\MODIS\\2014-1-1\\MOD021KM.A2014001.0255.005.2014001100611.hdf";
-	char* filePath = "D:\\Data\\MODIS\\MOD021KM.A2013336.0245.005.2013336103942.hdf";
+	//char* filePath = "c:\\temp\\Data\\MODIS\\2014-1-1\\MOD021KM.A2014001.0255.005.2014001100611.hdf";
+	char* filePath = "c:\\temp\\Data\\MODIS\\MOD021KM.A2013336.0245.005.2013336103942.hdf";
 	CReadDataBase* pReadMod02 = new CReadMOD02();
 	pReadMod02->Read(filePath);
 
@@ -14079,7 +14084,7 @@ void CProject_PGStationDlg::OnModisInvertaod()
             //pIR[j*wd+i]   = ir*100;
 			pIR21[j*wd+i] = c7*100;
 		}
-	SaveBmp("d:\\modis_ndvi.bmp", pNDVI, ht, wd);
+	SaveBmp("c:\\temp\\modis_ndvi.bmp", pNDVI, ht, wd);
 
 
 	//
@@ -14187,10 +14192,10 @@ void CProject_PGStationDlg::OnModisInvertaod()
 		}
 	}
 
-	//SaveBmp("d:\\darkMask.bmp", pDarkMask, ht, wd);
-	SaveBmp("d:\\modis_aod.bmp", pAod, ht, wd);
+	//SaveBmp("c:\\temp\\darkMask.bmp", pDarkMask, ht, wd);
+	SaveBmp("c:\\temp\\modis_aod.bmp", pAod, ht, wd);
 
-	GdalWriteFloatLL("d:\\modis_aod.tif", pScatteredAod, llHt, llWd, minlon, maxlon, minlat, maxlat);
+	GdalWriteFloatLL("c:\\temp\\modis_aod.tif", pScatteredAod, llHt, llWd, minlon, maxlon, minlat, maxlat);
 
 	free(pAod);
 	free(pScatteredAod);
@@ -14258,7 +14263,7 @@ void CProject_PGStationDlg::OnHjSimulatetoa()
 	// TODO: Add your command handler code here
 
 	//1. loading LUTs for specified aerosol type
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 	int aerosolTypeNumber = 1;
@@ -14275,7 +14280,7 @@ void CProject_PGStationDlg::OnHjSimulatetoa()
 	double blueExt = vecCorrectBlue[0]->GetExtinction();
 
 	//3. simulation
-	FILE* fp = fopen("d:\\toa.txt", "w");
+	FILE* fp = fopen("c:\\temp\\toa.txt", "w");
     //for(double ratio=0.4; ratio<=0.61; ratio+=0.02)
 	for(double ratio=0.46; ratio<=0.54; ratio+=0.01)
 	{	
@@ -14290,7 +14295,7 @@ void CProject_PGStationDlg::OnHjSimulatetoa()
 			double aodBlue = aod;
 			double aodRed  = redExt/blueExt*aodBlue;
 
-			//printf("aodBlue: %lf   aodRed:%lf \n", aodBlue, aodRed);
+			//printf("aodBlue: %lf   aodRec:\\temp%lf \n", aodBlue, aodRed);
 
 			//blue
 			double T,S;
@@ -14313,7 +14318,7 @@ void CProject_PGStationDlg::OnHjSimulatetoa()
 
 			//fprintf(fp, "   %lf %lf %lf %lf %lf \n", aodRed, T, S, pa, toa);
 
-			//fprintf(fp, " aod: %5.3lf  bt: %5.3lf  rt: %5.3lf ", aod, toaBlue, toaRed);
+			//fprintf(fp, " aoc:\\temp %5.3lf  bt: %5.3lf  rt: %5.3lf ", aod, toaBlue, toaRed);
 			fprintf(fp, "   %5.3lf %5.3lf %5.3lf", aod, toaBlue, toaRed);
 
 			//printf("\n");	
@@ -14331,7 +14336,7 @@ void CProject_PGStationDlg::OnHjSimulatetoa()
 void CProject_PGStationDlg::OnLutInterpolation()
 {
 	// TODO: Add your command handler code here
-	char lutfile[256] = "D:\\Data\\LUTEastAsia\\Double_690_176_517_73_2768_623_117_1559_12_0.dat";
+	char lutfile[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_690_176_517_73_2768_623_117_1559_12_0.dat";
 
 	CLutBase* pLut = new CLutBinCont();
 	pLut->Load(lutfile);
@@ -14417,7 +14422,7 @@ void CProject_PGStationDlg::OnEclipseRandom()
 		IplImage* pEdge = cvCloneImage(src);
 		cvSmooth(src, src, 2, 5);
 		cvCanny(src, pEdge, 4, 64);
-		cvSaveImage("d:\\canny.jpg", pEdge);
+		cvSaveImage("c:\\temp\\canny.jpg", pEdge);
 
 		vector<stEllipse> ellipseArray;
 		//DetectEllipse(pEdge, ellipseArray);
@@ -14459,7 +14464,7 @@ void CProject_PGStationDlg::OnHoughLinenew()
 
 		cvSmooth(src, src);
 		cvCanny(src, pEdge, 8, 36);
-		cvSaveImage("d:\\canny.jpg", pEdge);
+		cvSaveImage("c:\\temp\\canny.jpg", pEdge);
 
 		vector<stLINE> lineArray;
 		HoughLines(pEdge, lineArray, 
@@ -14505,8 +14510,8 @@ void CProject_PGStationDlg::OnHoughLinenew()
 void CProject_PGStationDlg::OnHjCalcddv()
 {
 	// TODO: Add your command handler code here
-	//char filepath[256] = "D:\\Data\\HJ\\2013\\09\\26";
-	//char filepath[256] = "D:\\Data\\HJ\\2010\\09\\28";
+	//char filepath[256] = "c:\\temp\\Data\\HJ\\2013\\09\\26";
+	//char filepath[256] = "c:\\temp\\Data\\HJ\\2010\\09\\28";
 	char filepath[256] = "F:\\Data\\MODIS\\500m\\2010273\\jjj";
 
 	double ndviThreshold = 0.35;
@@ -14527,11 +14532,11 @@ void CProject_PGStationDlg::OnHjCalcddv()
 	int ht,wd;
 	unsigned short* pRed;
 	ReadGeoFileUShort(redFile, 1, &pRed, ht, wd );
-	//SaveBmp("d:\\red.bmp", pRed, ht, wd);
+	//SaveBmp("c:\\temp\\red.bmp", pRed, ht, wd);
 
 	unsigned short* pIR;
 	ReadGeoFileUShort(irFile, 1, &pIR, ht, wd );
-	//SaveBmp("d:\\red.bmp", pRed, ht, wd);
+	//SaveBmp("c:\\temp\\red.bmp", pRed, ht, wd);
 
 	//calculate the NDVI
 	unsigned char* pNDVI = (unsigned char*)malloc( ht*wd );
@@ -14557,7 +14562,7 @@ void CProject_PGStationDlg::OnHjCalcddv()
 				*/
 		}
 
-	GdalWriteByte("d:\\modis-9.tif", pNDVI, ht, wd, geoInfo);
+	GdalWriteByte("c:\\temp\\modis-9.tif", pNDVI, ht, wd, geoInfo);
 
 	free(pRed);
 	free(pIR);
@@ -14572,7 +14577,7 @@ void CProject_PGStationDlg::OnHjSimulatefromaod()
 	
 	//loading LUTs
 	//1. loading LUTs for specified aerosol type
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 	int aerosolTypeNumber = 4;
@@ -14590,7 +14595,7 @@ void CProject_PGStationDlg::OnHjSimulatefromaod()
 	double  aodArray[14] = {0.0, 0.1, 0.2, 0.3, 0.5, 0.8, 1.0, 1.2, 1.5, 2.0, 2.4, 3.0, 4.0, 5.0};
 
 
-	FILE* fp = fopen("d:\\simulateDiffAOD.txt", "w");
+	FILE* fp = fopen("c:\\temp\\simulateDiffAOD.txt", "w");
 	for(int i=0; i<14; i++)
 	{
 		printf("%d \n", i);
@@ -14643,7 +14648,7 @@ void CProject_PGStationDlg::OnHjDatasmooth()
 	// TODO: Add your command handler code here
 
 	//
-	char aerosolFile[256] = "d:\\aodScatter.tif";
+	char aerosolFile[256] = "c:\\temp\\aodScatter.tif";
 
 	stGeoInfo geoinfo;
 	GetGeoInformation(aerosolFile, geoinfo);
@@ -14696,7 +14701,7 @@ void CProject_PGStationDlg::OnHjDatasmooth()
 			pOut[j*wd+i] = mean;
 		}
 
-	GdalWriteFloat("d:\\aodSmooth.tif", pOut, ht, wd, geoinfo);
+	GdalWriteFloat("c:\\temp\\aodSmooth.tif", pOut, ht, wd, geoinfo);
     free(pOut);
 	*/
 
@@ -14722,7 +14727,7 @@ void CProject_PGStationDlg::OnSnrEstimate()
 {
 	// TODO: Add your command handler code here
 
-	char file[256] = "D:\\Data\\HJ\\2013\\09\\26\\out-band1.jpg";
+	char file[256] = "c:\\temp\\Data\\HJ\\2013\\09\\26\\out-band1.jpg";
     
 	int nStep = 5;
 
@@ -14734,7 +14739,7 @@ void CProject_PGStationDlg::OnSnrEstimate()
 	IplImage* pEdge = cvCloneImage(pImage);
 	cvSmooth(pEdge, pEdge);
 	cvCanny(pEdge, pEdge, 6, 24);
-	cvSaveImage("d:\\edge.jpg", pEdge);
+	cvSaveImage("c:\\temp\\edge.jpg", pEdge);
 
 
 	/*
@@ -14811,7 +14816,7 @@ void CProject_PGStationDlg::OnHjInvertsingleptsat()
 	// TODO: Add your command handler code here
 	
 	//loading LUT data
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 
@@ -14861,9 +14866,9 @@ void CProject_PGStationDlg::OnHjInvertsingleptsat()
 			};
 
 	//batch processing
-	//char datapath[256] = "D:\\Data\\HJ\\2012\\09";
-	//char datapath[256] = "D:\\Data\\HJ\\2013\\09\\26";
-	char datapath[256] = "D:\\Data\\HJ\\2013\\07\\24";
+	//char datapath[256] = "c:\\temp\\Data\\HJ\\2012\\09";
+	//char datapath[256] = "c:\\temp\\Data\\HJ\\2013\\09\\26";
+	char datapath[256] = "c:\\temp\\Data\\HJ\\2013\\07\\24";
 
 	//locate the XML files
 	char** filenames = NULL;
@@ -15010,7 +15015,7 @@ void CProject_PGStationDlg::OnHjInvertsingleptsat()
 		if(relativeAzimuth>180) relativeAzimuth = 360 - relativeAzimuth;
 
 		printf("sza: %lf vza: %lf azi: %lf \n", sza, vza, relativeAzimuth);
-		printf("toa blue: %lf  red: %lf  \n", averageBlue, averageRed);
+		printf("toa blue: %lf  rec:\\temp %lf  \n", averageBlue, averageRed);
          
 		double invertAOD = DTSinglePtInvert(vecCorrectBlue, vecCorrectRed, sza, vza, relativeAzimuth, averageBlue, averageRed, 0.5);
 		//printf("%lf ", invertAOD);
@@ -15027,7 +15032,7 @@ void CProject_PGStationDlg::OnHjInvertsingleptsat()
 
 		printf("475nm:%lf  550nm:%lf  660nm:%lf \n", invertAOD, aod55, redAod);
 
-		FILE* fpOut = fopen("d:\\HJAod.txt", "a+");
+		FILE* fpOut = fopen("c:\\temp\\HJAod.txt", "a+");
 		fprintf(fpOut, "%s 475nm:%lf  550nm:%lf  660nm:%lf \n", fileTitle, invertAOD, aod55, redAod);
 		fclose(fpOut);
 
@@ -15052,7 +15057,7 @@ void CProject_PGStationDlg::OnHjUi()
 	// TODO: Add your command handler code here
 	
 	//loading LUTs
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 	int aerosolTypeNumber = 1;
@@ -15089,7 +15094,7 @@ void CProject_PGStationDlg::OnMosaicLaplacian()
 	// TODO: Add your command handler code here
 
 	char inputPath[256] = "F:\\Data\\Dodging\\rgb";
-	char outPath[256] = "d:\\blendmosaic.tif";
+	char outPath[256] = "c:\\temp\\blendmosaic.tif";
 
 	//search tif filesw
 	char** filesPath = f2c(1000, 256);
@@ -15139,9 +15144,9 @@ void CProject_PGStationDlg::OnMosaicBlendbyhand()
 	double blendWeight = max(1,dInput);
 
 	CBlenderBase* pBlend = new CMultiBandBlender();
-	pBlend->Blend(NULL, 0, blendWeight, "d:\\blend.jpg");
+	pBlend->Blend(NULL, 0, blendWeight, "c:\\temp\\blend.jpg");
 
-	IplImage* pImage = cvLoadImage("d:\\blend.jpg");
+	IplImage* pImage = cvLoadImage("c:\\temp\\blend.jpg");
 	cvNamedWindow("Blend");
 	cvShowImage("Blend", pImage);
 	cvReleaseImage(&pImage);
@@ -15152,7 +15157,7 @@ void CProject_PGStationDlg::OnHjAerosolinvertddvhigh()
 {
 	// TODO: Add your command handler code here
 	//loading LUT data
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectGreen;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
@@ -15174,30 +15179,30 @@ void CProject_PGStationDlg::OnHjAerosolinvertddvhigh()
 	double fluxIr    = GetFlux(irWaveLen);
 
 		
-	char spath[256] = "D:\\Data\\HJ\\2010\\08\\16";
+	char spath[256] = "c:\\temp\\Data\\HJ\\2010\\08\\16";
 	char xmlFileTitle[256] = "HJ1A-CCD2-1-68-20100816-L20000375929.XML";           //2010.08.16
 	
-	//char spath[256] = "D:\\Data\\HJ\\2010\\09\\30";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\09\\30";
 	//char xmlFileTitle[256] = "HJ1B-CCD2-2-67-20100930-L20000401266.XML";         //2010.09.30
 	
-	//char spath[256] = "D:\\Data\\HJ\\2010\\9\\12";	
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\9\\12";	
 	//char xmlFileTitle[256] = "HJ1A-CCD2-456-68-20100912-L20000391060.XML";       //2010.9.12
 
-	//char spath[256] = "D:\\Data\\HJ\\2010\\10\\29";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2010\\10\\29";
 	//char xmlFileTitle[256] = "HJ1A-CCD2-457-68-20101029-L20000417622.XML";       //2010.10.29
 
 	//char xmlFileTitle[256] = "HJ1B-CCD2-2-68-20131004-L20001064410.XML";          //2013.10.04
 	
-	//char spath[256] = "D:\\Data\\HJ\\2013\\10\\17";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\10\\17";
 	//char xmlFileTitle[256] = "HJ1A-CCD2-456-68-20131017-L20001068649.XML";     //2013.10.17
 	
-	//char spath[256] = "D:\\Data\\HJ\\2013\\10\\04";
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\10\\04";
 	//char xmlFileTitle[256] = "HJ1B-CCD2-2-68-20131004-L20001064410.XML";       //2013.10.04
 
-	//char spath[256] = "D:\\Data\\HJ\\2013\\09\\28";	
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\09\\28";	
 	//char xmlFileTitle[256] = "HJ1A-CCD2-1-68-20130928-L20001059100.XML";       //2013.09.28
 
-	//char spath[256] = "D:\\Data\\HJ\\2013\\07\\24";	
+	//char spath[256] = "c:\\temp\\Data\\HJ\\2013\\07\\24";	
 	//char xmlFileTitle[256] = "HJ1B-CCD1-4-64-20130724-L20001027056.XML";       //2013.07.24
 
 
@@ -15295,13 +15300,13 @@ void CProject_PGStationDlg::OnHjAerosolinvertddvhigh()
 				//if(ndvi>49)	pNDVIDisp[j*wd+i] = 255;
 			}			
 		}	
-		SaveBmp("d:\\ndvi.bmp", pNDVI, ht, wd);
-		//GdalWriteByte("d:\\ndvi.tif", pNDVIDisp, ht, wd, subGeoInfo);
+		SaveBmp("c:\\temp\\ndvi.bmp", pNDVI, ht, wd);
+		//GdalWriteByte("c:\\temp\\ndvi.tif", pNDVIDisp, ht, wd, subGeoInfo);
 		*/
 
 		//load NDVI of clear day
-		//char ndviFile[256] = "D:\\Data\\HJ\\2010\\09\\ndvi.tif";
-		char ndviFile[256] = "D:\\Data\\MODIS\\500m\\2010273\\jjt\\modis-9.tif";
+		//char ndviFile[256] = "c:\\temp\\Data\\HJ\\2010\\09\\ndvi.tif";
+		char ndviFile[256] = "c:\\temp\\Data\\MODIS\\500m\\2010273\\jjt\\modis-9.tif";
 
 		stGeoInfo benchGeoInfo;
 		GetGeoInformation(ndviFile, benchGeoInfo);
@@ -15480,15 +15485,15 @@ void CProject_PGStationDlg::OnHjAerosolinvertddvhigh()
 	stGeoInfo aodGeo = subGeoInfo;
 	aodGeo.dx *= nStep;
 	aodGeo.dy *= nStep;
-	GdalWriteFloat("d:\\aod.tif", pAod, desHt, desWd, aodGeo);   //for interpolation
-	GdalWriteFloat("d:\\aodScatter.tif", pAodScatter, desHt, desWd, aodGeo); //for display
-	GdalWriteByte("d:\\aodType.tif", pAerosolType, desHt, desWd, aodGeo);
+	GdalWriteFloat("c:\\temp\\aod.tif", pAod, desHt, desWd, aodGeo);   //for interpolation
+	GdalWriteFloat("c:\\temp\\aodScatter.tif", pAodScatter, desHt, desWd, aodGeo); //for display
+	GdalWriteByte("c:\\temp\\aodType.tif", pAerosolType, desHt, desWd, aodGeo);
 	
 	
 	//interpolation and then smooth again
 	AodInterpolation(pAod, desHt, desWd);
 	DataSmoothMedian(pAod, desHt, desWd);
-	GdalWriteFloat("d:\\aod-interpolation.tif", pAod, desHt, desWd, aodGeo);   //for interpolation
+	GdalWriteFloat("c:\\temp\\aod-interpolation.tif", pAod, desHt, desWd, aodGeo);   //for interpolation
 	
 
 
@@ -15505,7 +15510,7 @@ void CProject_PGStationDlg::OnHjAerosolinvertddvhigh()
 	stGeoInfo aodGeoSmall = subGeoInfo;
 	aodGeoSmall.dx *= nStep*nStep;
 	aodGeoSmall.dy *= nStep*nStep;
-	GdalWriteFloat("d:\\smallaod.tif", pAodSmall, nSmallHt, nSmallWd, aodGeoSmall);
+	GdalWriteFloat("c:\\temp\\smallaod.tif", pAodSmall, nSmallHt, nSmallWd, aodGeoSmall);
 		
 	double ratioX = (double)(nSmallWd) / (double)(wd);
 	double ratioY = (double)(nSmallHt) / (double)(ht);
@@ -15611,13 +15616,13 @@ void CProject_PGStationDlg::OnHjAerosolinvertddvhigh()
 		printf(".");
 	}
 	
-	GdalWriteByte("d:\\blueCr-radiance.tif", pband1, ht, wd, subGeoInfo);
-	GdalWriteByte("d:\\greenCr-radiance.tif", pband2, ht, wd, subGeoInfo);
-	GdalWriteByte("d:\\redCr-radiance.tif", pband3, ht, wd, subGeoInfo);	
+	GdalWriteByte("c:\\temp\\blueCr-radiance.tif", pband1, ht, wd, subGeoInfo);
+	GdalWriteByte("c:\\temp\\greenCr-radiance.tif", pband2, ht, wd, subGeoInfo);
+	GdalWriteByte("c:\\temp\\redCr-radiance.tif", pband3, ht, wd, subGeoInfo);	
 	
-	GdalWriteInt("d:\\blueCr-reflectance.tif", cBlue, ht, wd, subGeoInfo);
-	GdalWriteInt("d:\\greenCr-reflectance.tif", cGreen, ht, wd, subGeoInfo);
-	GdalWriteInt("d:\\redCr-reflectance.tif", cRed, ht, wd, subGeoInfo);
+	GdalWriteInt("c:\\temp\\blueCr-reflectance.tif", cBlue, ht, wd, subGeoInfo);
+	GdalWriteInt("c:\\temp\\greenCr-reflectance.tif", cGreen, ht, wd, subGeoInfo);
+	GdalWriteInt("c:\\temp\\redCr-reflectance.tif", cRed, ht, wd, subGeoInfo);
 	free(cBlue);
 	free(cGreen);
 	free(cRed);
@@ -15638,7 +15643,7 @@ void CProject_PGStationDlg::OnHjDownsample()
 	// TODO: Add your command handler code here
 
 	//read image
-	char filename[256] = "d:\\aodScatter.tif";
+	char filename[256] = "c:\\temp\\aodScatter.tif";
 
 	stGeoInfo geoinfo;
 	GetGeoInformation(filename, geoinfo);
@@ -15657,7 +15662,7 @@ void CProject_PGStationDlg::OnHjDownsample()
     
 	geoinfo.dx /= ratio;
 	geoinfo.dy /= ratio;
-	GdalWriteFloat("d:\\downsample.tif", pDst, dht, dwd, geoinfo);
+	GdalWriteFloat("c:\\temp\\downsample.tif", pDst, dht, dwd, geoinfo);
 
 	free(pAod);
 	free(pDst);
@@ -15671,7 +15676,7 @@ void CProject_PGStationDlg::OnHjInterpolation()
 	// TODO: Add your command handler code here
 
 	//read image
-	char filename[256] = "d:\\aod.tif";
+	char filename[256] = "c:\\temp\\aod.tif";
 
 	stGeoInfo geoinfo;
 	GetGeoInformation(filename, geoinfo);
@@ -15686,7 +15691,7 @@ void CProject_PGStationDlg::OnHjInterpolation()
 
 	DataSmoothMedian(pAod, ht, wd);
 
-	GdalWriteFloat("d:\\aod-interpolation.tif", pAod, ht, wd, geoinfo);
+	GdalWriteFloat("c:\\temp\\aod-interpolation.tif", pAod, ht, wd, geoinfo);
    
 	printf("Finished ! \n");
 }
@@ -15696,7 +15701,7 @@ void CProject_PGStationDlg::OnAngstromBatch()
 	// TODO: Add your command handler code here
 
 	//read data for AERONET file and calculate the AOD of 550nm based on Angstrom 
-	char filename[256] = "D:\\Data\\HJ\\aeronet-1.txt";
+	char filename[256] = "c:\\temp\\Data\\HJ\\aeronet-1.txt";
 
 	int row = GetFileRows(filename);
 
@@ -15708,7 +15713,7 @@ void CProject_PGStationDlg::OnAngstromBatch()
 	double juliaDay;
 	double aot_1020,aot_870,aot_675,aot_440;
 
-	FILE* fpOut = fopen("d:\\aeronet_550nm.txt", "w");
+	FILE* fpOut = fopen("c:\\temp\\aeronet_550nm.txt", "w");
 
 	FILE* fp = fopen(filename, "r");
 	for(int i=0; i<row; i++)
@@ -15747,7 +15752,7 @@ void CProject_PGStationDlg::OnAeronetSizedistribution()
 	// TODO: Add your command handler code here
 
 	//read .vol file
-	//char filename[256] = "D:\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
+	//char filename[256] = "c:\\temp\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
 	char filename[256] = "F:\\Data\\Aeronet\\130101_131231_XiangHe\\130101_131231_XiangHe-space.vol";
 
 	char cline[1024];
@@ -15803,8 +15808,8 @@ void CProject_PGStationDlg::OnAeronetSizedistribution()
 			&cc,&ceRadius,&cr,&cs, 
 			tempString);
 
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
         
 		
 		if( hour==2 )
@@ -15853,7 +15858,7 @@ void CProject_PGStationDlg::OnAeronetSizedistribution()
 	cs1 /= (double)(nSum);
 
 
-	FILE* fpout = fopen("d:\\beijingVolumeSize.txt", "w");
+	FILE* fpout = fopen("c:\\temp\\beijingVolumeSize.txt", "w");
 	fprintf(fpout, "%lf %lf %lf %lf %lf %lf \n", fc1, fr1, fs1, cc1, cr1, cs1);
     fclose(fpout);
 
@@ -15877,7 +15882,7 @@ void CProject_PGStationDlg::OnAeronetSizedistribution()
 	double pdf[22];
 	BimodalLogDistribution(pd, radius, pdf, 22);
 
-	fp = fopen("d:\\beijingSize.txt", "a+");
+	fp = fopen("c:\\temp\\beijingSize.txt", "a+");
 	for(int i=0; i<22; i++)
 	{
 		fprintf(fp, "%lf ", pdf[i]);
@@ -15930,12 +15935,12 @@ void CProject_PGStationDlg::OnAeronetSizedistributiondiscrete()
 		winterPf[i] = 0;
 	}
 
-	FILE* fpSpring = fopen("d:\\SizeSpring.txt", "w");
-	FILE* fpSummer = fopen("d:\\SizeSummer.txt", "w");
-	FILE* fpAutumn = fopen("d:\\SizeAutumn.txt", "w");
-	FILE* fpWinter = fopen("d:\\SizeWinter.txt", "w");
+	FILE* fpSpring = fopen("c:\\temp\\SizeSpring.txt", "w");
+	FILE* fpSummer = fopen("c:\\temp\\SizeSummer.txt", "w");
+	FILE* fpAutumn = fopen("c:\\temp\\SizeAutumn.txt", "w");
+	FILE* fpWinter = fopen("c:\\temp\\SizeWinter.txt", "w");
 
-	FILE* fpout = fopen("d:\\Size.txt", "w");
+	FILE* fpout = fopen("c:\\temp\\Size.txt", "w");
 
 	FILE* fp = fopen(filename, "r");
 
@@ -15956,8 +15961,8 @@ void CProject_PGStationDlg::OnAeronetSizedistributiondiscrete()
 			&pf[15],&pf[16],&pf[17],&pf[18],&pf[19],
 			&pf[20],&pf[21]);
 
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
-		sscanf(date, "%d:%d:%d", &dd, &mm, &year);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &year);
 		
 
 		//ignore the dust type
@@ -16081,7 +16086,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsSpring()
 	// TODO: Add your command handler code here
 
 	//read .vol file
-	char filename[256] = "D:\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
+	char filename[256] = "c:\\temp\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
 
 	char cline[1024];
 	char tempString[1024];
@@ -16118,8 +16123,8 @@ void CProject_PGStationDlg::OnSizedistributionseasonsSpring()
 			&cc,&ceRadius,&cr,&cs, 
 			tempString);
 
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
 
 		//spring
 		if(mm>=3 && mm<=5)
@@ -16147,7 +16152,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsSpring()
 	cs1 /= (double)(nSum);
 
 
-	FILE* fpout = fopen("d:\\beijingVolumeSizeSpring.txt", "w");
+	FILE* fpout = fopen("c:\\temp\\beijingVolumeSizeSpring.txt", "w");
 	fprintf(fpout, "%lf %lf %lf %lf %lf %lf \n", fc1, fr1, fs1, cc1, cr1, cs1);
 	fclose(fpout);
 
@@ -16171,7 +16176,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsSpring()
 	double pdf[22];
 	BimodalLogDistribution(pd, radius, pdf, 22);
 
-	fp = fopen("d:\\beijingSizeSpring.txt", "a+");
+	fp = fopen("c:\\temp\\beijingSizeSpring.txt", "a+");
 	for(int i=0; i<22; i++)
 	{
 		fprintf(fp, "%lf ", pdf[i]);
@@ -16191,7 +16196,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsSummer()
 	// TODO: Add your command handler code here
 
 	//read .vol file
-	char filename[256] = "D:\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
+	char filename[256] = "c:\\temp\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
 
 	char cline[1024];
 	char tempString[1024];
@@ -16228,8 +16233,8 @@ void CProject_PGStationDlg::OnSizedistributionseasonsSummer()
 			&cc,&ceRadius,&cr,&cs, 
 			tempString);
 
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
 
 		//summer
 		if(mm>=6 && mm<=8)
@@ -16257,7 +16262,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsSummer()
 	cs1 /= (double)(nSum);
 
 
-	FILE* fpout = fopen("d:\\beijingVolumeSizeSummer.txt", "w");
+	FILE* fpout = fopen("c:\\temp\\beijingVolumeSizeSummer.txt", "w");
 	fprintf(fpout, "%lf %lf %lf %lf %lf %lf \n", fc1, fr1, fs1, cc1, cr1, cs1);
 	fclose(fpout);
 
@@ -16281,7 +16286,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsSummer()
 	double pdf[22];
 	BimodalLogDistribution(pd, radius, pdf, 22);
 
-	fp = fopen("d:\\beijingSizeSummer.txt", "a+");
+	fp = fopen("c:\\temp\\beijingSizeSummer.txt", "a+");
 	for(int i=0; i<22; i++)
 	{
 		fprintf(fp, "%lf ", pdf[i]);
@@ -16301,7 +16306,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsAutumn()
 
 
 	//read .vol file
-	char filename[256] = "D:\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
+	char filename[256] = "c:\\temp\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
 
 	char cline[1024];
 	char tempString[1024];
@@ -16338,8 +16343,8 @@ void CProject_PGStationDlg::OnSizedistributionseasonsAutumn()
 			&cc,&ceRadius,&cr,&cs, 
 			tempString);
 
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
 
 		//autumn
 		if(mm>=9 && mm<=11)
@@ -16367,7 +16372,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsAutumn()
 	cs1 /= (double)(nSum);
 
 
-	FILE* fpout = fopen("d:\\beijingVolumeSizeAutumn.txt", "w");
+	FILE* fpout = fopen("c:\\temp\\beijingVolumeSizeAutumn.txt", "w");
 	fprintf(fpout, "%lf %lf %lf %lf %lf %lf \n", fc1, fr1, fs1, cc1, cr1, cs1);
 	fclose(fpout);
 
@@ -16391,7 +16396,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsAutumn()
 	double pdf[22];
 	BimodalLogDistribution(pd, radius, pdf, 22);
 
-	fp = fopen("d:\\beijingSizeAutumn.txt", "a+");
+	fp = fopen("c:\\temp\\beijingSizeAutumn.txt", "a+");
 	for(int i=0; i<22; i++)
 	{
 		fprintf(fp, "%lf ", pdf[i]);
@@ -16412,7 +16417,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsWinter()
 
 
 	//read .vol file
-	char filename[256] = "D:\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
+	char filename[256] = "c:\\temp\\Data\\Aeronet\\130101_131231_Beijing\\130101_131231_Beijing-space.vol";
 
 	char cline[1024];
 	char tempString[1024];
@@ -16449,8 +16454,8 @@ void CProject_PGStationDlg::OnSizedistributionseasonsWinter()
 			&cc,&ceRadius,&cr,&cs, 
 			tempString);
 
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
 
 		//winter
 		if(mm==12 || mm==1 || mm==2)
@@ -16478,7 +16483,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsWinter()
 	cs1 /= (double)(nSum);
 
 
-	FILE* fpout = fopen("d:\\beijingVolumeSizeWinter.txt", "w");
+	FILE* fpout = fopen("c:\\temp\\beijingVolumeSizeWinter.txt", "w");
 	fprintf(fpout, "%lf %lf %lf %lf %lf %lf \n", fc1, fr1, fs1, cc1, cr1, cs1);
 	fclose(fpout);
 
@@ -16501,7 +16506,7 @@ void CProject_PGStationDlg::OnSizedistributionseasonsWinter()
 	double pdf[22];
 	BimodalLogDistribution(pd, radius, pdf, 22);
 
-	fp = fopen("d:\\beijingSizeWinter.txt", "a+");
+	fp = fopen("c:\\temp\\beijingSizeWinter.txt", "a+");
 	for(int i=0; i<22; i++)
 	{
 		fprintf(fp, "%lf ", pdf[i]);
@@ -16522,7 +16527,7 @@ void CProject_PGStationDlg::OnAeronetCluster()
     memset(pAerosolInfo, 0, sizeof(stAerosolInfo)*372);
 
 	//input files: aerosol volume distribution, refractive index, SSA, asymmetric
-	char path[256] = "D:\\Data\\Aeronet\\130101_131231_Beijing";
+	char path[256] = "c:\\temp\\Data\\Aeronet\\130101_131231_Beijing";
 
 	char volFile[256];
 	char ssaFile[256];
@@ -16564,8 +16569,8 @@ void CProject_PGStationDlg::OnAeronetCluster()
 			&fc,&feRadius,&fr,&fs,
 			&cc,&ceRadius,&cr,&cs, 
 			tempString);
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
 
 		int index = (mm-1)*31+(dd-1);
 
@@ -16595,8 +16600,8 @@ void CProject_PGStationDlg::OnAeronetCluster()
 		fgets(cline, 1024, fp);
 		sscanf(cline, "%s %s %lf %lf %lf %lf %lf  %s", date, time, &day, 
 			&(ssa[0]), &(ssa[1]), &(ssa[2]), &(ssa[3]),	tempString);
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
 
 		int index = (mm-1)*31+(dd-1);
 
@@ -16624,8 +16629,8 @@ void CProject_PGStationDlg::OnAeronetCluster()
 			&(realPart[0]), &(realPart[1]), &(realPart[2]), &(realPart[3]),
 			&(imagPart[0]), &(imagPart[1]), &(imagPart[2]), &(imagPart[3]),
 			tempString);
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
 
 		int index = (mm-1)*31+(dd-1);
 
@@ -16655,8 +16660,8 @@ void CProject_PGStationDlg::OnAeronetCluster()
 		sscanf(cline, "%s %s %lf  %lf %lf %lf %lf %s", date, time, &day, 
 			&(asy[0]), &(asy[1]), &(asy[2]), &(asy[3]),
 			tempString);
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
 
 		int index = (mm-1)*31+(dd-1);
 
@@ -16690,8 +16695,8 @@ void CProject_PGStationDlg::OnAeronetCluster()
 			&pf[15],&pf[16],&pf[17],&pf[18],&pf[19],
 			&pf[20],&pf[21]);
 
-		sscanf(time, "%d:%d:%d", &hour, &minute, &second);
-		sscanf(date, "%d:%d:%d", &dd, &mm, &yy);
+		sscanf(time, "%c:\\temp%c:\\temp%d", &hour, &minute, &second);
+		sscanf(date, "%c:\\temp%c:\\temp%d", &dd, &mm, &yy);
 
 		int index = (mm-1)*31+(dd-1);
 
@@ -16758,7 +16763,7 @@ void CProject_PGStationDlg::OnAeronetCluster()
     IsoData(samples, clusters, controlParas);
     
 
-	FILE* fpall = fopen("d:\\clusterVolSize.txt", "w" );
+	FILE* fpall = fopen("c:\\temp\\clusterVolSize.txt", "w" );
 	printf("Clustered results: \n");
 	for(int i=0; i<clusters.size(); i++)
 	{		
@@ -16775,7 +16780,7 @@ void CProject_PGStationDlg::OnAeronetCluster()
 		season[0]=season[1]=season[2]=season[3]=0;
 
 		char clusterfile[256];
-		sprintf(clusterfile, "D:\\cluster_%d.txt", i);		
+		sprintf(clusterfile, "c:\\temp\\cluster_%d.txt", i);		
 		fp = fopen(clusterfile, "w");
 		for(int k=0; k<clusters[i].clusterSet.size(); k++)
 		{
@@ -16830,7 +16835,7 @@ void CProject_PGStationDlg::OnAeronetCluster()
 
 		//output the season ratio
 		char seasonfile[256];
-		sprintf(seasonfile, "D:\\season_%d.txt", i);		
+		sprintf(seasonfile, "c:\\temp\\season_%d.txt", i);		
 		fp = fopen(seasonfile, "w");
 		fprintf(fp, "%d %d %d %d \n", season[0], season[1], season[2], season[3]);
 		fclose(fp);
@@ -16839,7 +16844,7 @@ void CProject_PGStationDlg::OnAeronetCluster()
 	fclose(fpall);
 	
 	//aerosol types
-	FILE* fpType = fopen("d:\\clusterType.txt", "w");
+	FILE* fpType = fopen("c:\\temp\\clusterType.txt", "w");
 	for(int i=0; i<clusters.size(); i++)
 	{
 		fprintf(fpType, "samples: %d   ", clusters[i].clusterSet.size());
@@ -16925,7 +16930,7 @@ void CProject_PGStationDlg::OnClusterIsodata()
 		printf("%lf %lf \n", clusters[i].centroid.s[0], clusters[i].centroid.s[1]);
 	}
 
-	FILE* fp = fopen("d:\\ptCluster.txt", "w");
+	FILE* fp = fopen("c:\\temp\\ptCluster.txt", "w");
 	for(int i=0; i<samples.size(); i++)
 	{
 		fprintf(fp, "%lf %lf \n", samples[i].s[0], samples[i].s[1]);
@@ -16964,7 +16969,7 @@ void CProject_PGStationDlg::OnHjSimulate33156()
 
 	double ext550 = 1.078559;
 
-	FILE* fp = fopen("d:\\toa.txt", "w");
+	FILE* fp = fopen("c:\\temp\\toa.txt", "w");
 
 	for(double aod=0.0; aod<=2.01; aod+=0.1)
 	{			
@@ -16972,7 +16977,7 @@ void CProject_PGStationDlg::OnHjSimulate33156()
 		double aodBlue = aod * (blueExt / ext550);
 		double aodRed  = aod * (redExt / ext550);
 
-		//printf("aodBlue: %lf   aodRed:%lf \n", aodBlue, aodRed);
+		//printf("aodBlue: %lf   aodRec:\\temp%lf \n", aodBlue, aodRed);
 
 		//blue
 		double T,S;
@@ -17014,7 +17019,7 @@ void CProject_PGStationDlg::OnHjSimulate33157()
 	/*********** simulate error caused by changed ratio *********************/
 
 	//1. loading LUTs for specified aerosol type
-	char lutDir[256] = "D:\\Data\\LutTypeHJ";
+	char lutDir[256] = "c:\\temp\\Data\\LutTypeHJ";
 	vector<CAtmosphereCorrectionBase*> vecCorrectBlue;
 	vector<CAtmosphereCorrectionBase*> vecCorrectRed;
 	int aerosolTypeNumber = 1;
@@ -17041,7 +17046,7 @@ void CProject_PGStationDlg::OnHjSimulate33157()
 	for(int i=0; i<4; i++)
 	{
 		char errorAodFile[256];
-		sprintf(errorAodFile, "d:\\error_aod_%d.txt", i);
+		sprintf(errorAodFile, "c:\\temp\\error_aod_%d.txt", i);
 		
 		aod = aodArray[i]; 
 
@@ -17084,12 +17089,12 @@ void CProject_PGStationDlg::OnPlyRead()
 	// TODO: Add your command handler code here
 
 	////ascii format
-	//char* filename = "D:\\Data\\UAV\\2014-06-13-1\\sparse.ply";
-	////char* filename = "D:\\Data\\UAV\\2014-05-08\\half\\res.ply";
-	////char* filename = "D:\\Data\\3D\\bunny\\reconstruction\\bun_zipper.ply";
+	//char* filename = "c:\\temp\\Data\\UAV\\2014-06-13-1\\sparse.ply";
+	////char* filename = "c:\\temp\\Data\\UAV\\2014-05-08\\half\\res.ply";
+	////char* filename = "c:\\temp\\Data\\3D\\bunny\\reconstruction\\bun_zipper.ply";
 
 	////binary format
-	////char* filename = "D:\\Data\\UAV\\2014-05-08\\half\\111.0.ply";
+	////char* filename = "c:\\temp\\Data\\UAV\\2014-05-08\\half\\111.0.ply";
 
 	//double* x;
 	//double* y;
@@ -17111,7 +17116,7 @@ void CProject_PGStationDlg::OnPlyRead()
 
 	////printf("%d \n", nTri);
 
-	////WritePly("d:\\mesh-tri.ply", x, y, z, red, green, blue, npt, p1, p2, p3, nTri);
+	////WritePly("c:\\temp\\mesh-tri.ply", x, y, z, red, green, blue, npt, p1, p2, p3, nTri);
 	//
 
 	//free(x);
@@ -17132,8 +17137,8 @@ void CProject_PGStationDlg::OnTriangulateFitplane()
 //	// TODO: Add your command handler code here
 //
 //	//read *.out file
-//	//char* outfile = "D:\\Data\\UAV\\2014-06-13-1\\sparse.out";
-//	char* outfile = "D:\\NetDisk\\Program\\Assemble\\release\\bundle\\bundle_011.out";
+//	//char* outfile = "c:\\temp\\Data\\UAV\\2014-06-13-1\\sparse.out";
+//	char* outfile = "c:\\temp\\NetDisk\\Program\\Assemble\\release\\bundle\\bundle_011.out";
 //
 //	vector<stPOS> camParas;
 //	vector<stTrack> tracks;
@@ -17270,16 +17275,16 @@ void CProject_PGStationDlg::OnTriangulateFitplane()
 //	sInterval /= (double)( camParas.size() );
 //	printf("interval: %lf \n", sInterval);
 //
-//	FILE* fp = fopen("d:\\flyInfo.txt", "w");
+//	FILE* fp = fopen("c:\\temp\\flyInfo.txt", "w");
 //	fprintf(fp, "%s %lf \n", "resolution", sInterval);
 //	fclose(fp);
 //	
 //	int mht = (maxy-miny)/sInterval;
 //	int mwd = (maxx-minx)/sInterval;
-//	printf("mht: %d mwd:%d \n", mht, mwd);
+//	printf("mht: %d mwc:\\temp%d \n", mht, mwd);
 //
 //	//save as ply
-//	WritePly("d:\\mesh-rotate.ply", px, py, pz, red, green, blue, np, NULL, NULL, NULL, 0);
+//	WritePly("c:\\temp\\mesh-rotate.ply", px, py, pz, red, green, blue, np, NULL, NULL, NULL, 0);
 //
 //
 //	//generate triangles
@@ -17287,7 +17292,7 @@ void CProject_PGStationDlg::OnTriangulateFitplane()
 //	int* p2;
 //	int* p3;
 //	int nTri = GenerateTrianglesCMU(px, py, pz, np, &p1, &p2, &p3);
-//	WritePly("d:\\mesh-tri.ply", px, py, pz, red, green, blue, np, p1, p2, p3, nTri);
+//	WritePly("c:\\temp\\mesh-tri.ply", px, py, pz, red, green, blue, np, p1, p2, p3, nTri);
 //
 //
 //	//interpolation
@@ -17313,7 +17318,7 @@ void CProject_PGStationDlg::OnDemMba()
 	// TODO: Add your command handler code here
 
 	////multilevel b-spline interpolation
-	//char* filename = "d:\\mesh-rotate.ply";
+	//char* filename = "c:\\temp\\mesh-rotate.ply";
 
 	////read scattered 3D points from *.ply file
 	//double* x;
@@ -17328,7 +17333,7 @@ void CProject_PGStationDlg::OnDemMba()
  //  
 	//double resolution;
 	//char tc[256];
-	//FILE* fp = fopen("d:\\flyInfo.txt", "r");
+	//FILE* fp = fopen("c:\\temp\\flyInfo.txt", "r");
 	//fscanf(fp, "%s %lf \n", tc, &resolution);
 	//fclose(fp);
 
@@ -17344,9 +17349,9 @@ void CProject_PGStationDlg::OnDemMba()
 void CProject_PGStationDlg::OnOrthoMosaic()
 {
 	// TODO: Add your command handler code here
-	char* mainPath = "d:\\data\\uav";
-	char* nvmFile  = "d:\\data\\uav\\0613.nvm";
-	char* outFile  = "d:\\data\\uav\\0613.out";
+	char* mainPath = "c:\\temp\\data\\uav";
+	char* nvmFile  = "c:\\temp\\data\\uav\\0613.nvm";
+	char* outFile  = "c:\\temp\\data\\uav\\0613.out";
 	
 	MosaicWithDEM(nvmFile, outFile, mainPath);
 
@@ -17366,13 +17371,13 @@ void CProject_PGStationDlg::OnConvertMod09()
 {
 	// TODO: Add your command handler code here
 
-	char mod02File[256] = "d:\\mod02.hdf";
+	char mod02File[256] = "c:\\temp\\mod02.hdf";
 
 	char** subDataDesc = f2c(1000, 256);
 
 	//read subdata information
 	int nSubData = ReadSubDataInfo(mod02File, subDataDesc);
-	FILE* fp = fopen("d:\\subDataDesc.txt", "w");
+	FILE* fp = fopen("c:\\temp\\subDataDesc.txt", "w");
 	for(int i=0; i<nSubData; i++)
 	{
 		printf("%s \n", subDataDesc[i]);
@@ -17387,16 +17392,16 @@ void CProject_PGStationDlg::OnValidateModis()
 	// TODO: Add your command handler code here
 
 	//2010.8.16
-	//char modisFile[256] = "D:\\Data\\MODIS\\500m\\2010225\\blue.tif";
-	//char hjFile[256] = "D:\\Data\\HJ\\2010\\08\\16\\blueCr-500m.tif";
+	//char modisFile[256] = "c:\\temp\\Data\\MODIS\\500m\\2010225\\blue.tif";
+	//char hjFile[256] = "c:\\temp\\Data\\HJ\\2010\\08\\16\\blueCr-500m.tif";
 
 	//2010.9.30
-	//char modisFile[256] = "D:\\Data\\MODIS\\500m\\2010273\\bj-blue.tif";
-	//char hjFile[256] = "D:\\Data\\HJ\\2010\\09\\30\\blueCr-500m.tif";
+	//char modisFile[256] = "c:\\temp\\Data\\MODIS\\500m\\2010273\\bj-blue.tif";
+	//char hjFile[256] = "c:\\temp\\Data\\HJ\\2010\\09\\30\\blueCr-500m.tif";
 
 	//2010.10.29
-	char modisFile[256] = "D:\\Data\\MODIS\\500m\\2010305\\bj-blue.tif";
-	char hjFile[256] = "D:\\Data\\HJ\\2010\\10\\29\\blueCr-500m.tif";
+	char modisFile[256] = "c:\\temp\\Data\\MODIS\\500m\\2010305\\bj-blue.tif";
+	char hjFile[256] = "c:\\temp\\Data\\HJ\\2010\\10\\29\\blueCr-500m.tif";
 
 
 	stGeoInfo modisGeo;
@@ -17412,7 +17417,7 @@ void CProject_PGStationDlg::OnValidateModis()
 	int  hht,hwd;
 	ReadGeoFileInt(hjFile, 1, &hjBuffer, hht,hwd);
 
-	FILE* fp = fopen("d:\\mod_hj_reflectance.txt", "w");
+	FILE* fp = fopen("c:\\temp\\mod_hj_reflectance.txt", "w");
 	int nsum = 0;
 	int nout = 0; 
 	for(int j=1; j<hht-1; j+=2)
@@ -17469,8 +17474,8 @@ void CProject_PGStationDlg::OnValidateModis()
 void CProject_PGStationDlg::OnBlurEntropy()
 {
 	// TODO: Add your command handler code here
-	char filename[256] = "D:\\Data\\Belt\\BlurDetection\\blur\\0007.jpg";
-	//char filename[256] = "D:\\Data\\Belt\\BlurDetection\\clear\\0002.jpg";
+	char filename[256] = "c:\\temp\\Data\\Belt\\BlurDetection\\blur\\0007.jpg";
+	//char filename[256] = "c:\\temp\\Data\\Belt\\BlurDetection\\clear\\0002.jpg";
 	
 
 	
@@ -17508,7 +17513,7 @@ void CProject_PGStationDlg::OnBlurEntropy()
 					pBuffer[ index ] = pImage->imageData[ m*scanwd + n ];
 					index++;
 				}
-			SaveBmp("d:\\rect.bmp", pBuffer, blockWd, blockWd);
+			SaveBmp("c:\\temp\\rect.bmp", pBuffer, blockWd, blockWd);
 
 			/*
 			cvSetImageROI(pImage, rect);
@@ -17516,13 +17521,13 @@ void CProject_PGStationDlg::OnBlurEntropy()
 			rectImage->height = rectImage->roi->height;
 			rectImage->width  = rectImage->roi->width;
 			rectImage->widthStep = rectImage->roi->width;
-			cvSaveImage("d:\\rectImage.jpg", rectImage);
+			cvSaveImage("c:\\temp\\rectImage.jpg", rectImage);
 			cvResetImageROI(pImage);
 			//
 			unsigned char* pBuffer;
 			int ht,wd;
 			IplImageToGrayImage(rectImage, &pBuffer, &ht, &wd);
-			SaveBmp("d:\\rect.bmp", pBuffer, ht, wd);
+			SaveBmp("c:\\temp\\rect.bmp", pBuffer, ht, wd);
 			free(pBuffer);			
 			cvReleaseImage(&rectImage);
 			*/
@@ -17555,9 +17560,9 @@ void CProject_PGStationDlg::OnBlurBatch()
 {
 	// TODO: Add your command handler code here
 
-	char* imagePath = "D:\\Data\\Belt\\BlurDetection\\test\\all";
-	//char* imagePath = "D:\\Data\\Belt\\BlurDetection\\test\\blur";
-	//char* imagePath = "D:\\Data\\Belt\\BlurDetection\\test\\clear";
+	char* imagePath = "c:\\temp\\Data\\Belt\\BlurDetection\\test\\all";
+	//char* imagePath = "c:\\temp\\Data\\Belt\\BlurDetection\\test\\blur";
+	//char* imagePath = "c:\\temp\\Data\\Belt\\BlurDetection\\test\\clear";
 	
 
 	char** filenames = NULL;
@@ -17589,11 +17594,11 @@ void CProject_PGStationDlg::OnBlurBatch()
 		char filename[256];
         if(nIsBlur>0)
 		{
-			sprintf(filename, "d:\\blur_%d.jpg", i);
+			sprintf(filename, "c:\\temp\\blur_%d.jpg", i);
 		}
 		else
 		{
-			sprintf(filename, "d:\\clear_%d.jpg", i);
+			sprintf(filename, "c:\\temp\\clear_%d.jpg", i);
 		}		
 		cvSaveImage(filename, pImage);	
 
@@ -17684,7 +17689,7 @@ void CProject_PGStationDlg::OnDatabaseCifar()
 		GdalWriteImageByteColor(outfile, pImage, pImage+1024, pImage+2048, kCIFARSize, kCIFARSize);
 		
 		//stGeoInfo geoInfo;
-		//sprintf(outfile, "d:\\temp\\%.4d.tif", i);
+		//sprintf(outfile, "c:\\temp\\temp\\%.4d.tif", i);
 		//GdalWriteImageColor(outfile, pImage, pImage+1024, pImage+2048, kCIFARSize, kCIFARSize, geoInfo);
 	}
 
@@ -17854,13 +17859,13 @@ void CProject_PGStationDlg::OnAtmospherecorrectionHj33190()
 		printf(".");
 	}
 	
-	GdalWriteByte("d:\\blueCr-radiance.tif", pband1, ht, wd, subGeoInfo);
-	GdalWriteByte("d:\\greenCr-radiance.tif", pband2, ht, wd, subGeoInfo);
-	GdalWriteByte("d:\\redCr-radiance.tif", pband3, ht, wd, subGeoInfo);	
+	GdalWriteByte("c:\\temp\\blueCr-radiance.tif", pband1, ht, wd, subGeoInfo);
+	GdalWriteByte("c:\\temp\\greenCr-radiance.tif", pband2, ht, wd, subGeoInfo);
+	GdalWriteByte("c:\\temp\\redCr-radiance.tif", pband3, ht, wd, subGeoInfo);	
 	
-	GdalWriteInt("d:\\blueCr-reflectance.tif", cBlue, ht, wd, subGeoInfo);
-	GdalWriteInt("d:\\greenCr-reflectance.tif", cGreen, ht, wd, subGeoInfo);
-	GdalWriteInt("d:\\redCr-reflectance.tif", cRed, ht, wd, subGeoInfo);
+	GdalWriteInt("c:\\temp\\blueCr-reflectance.tif", cBlue, ht, wd, subGeoInfo);
+	GdalWriteInt("c:\\temp\\greenCr-reflectance.tif", cGreen, ht, wd, subGeoInfo);
+	GdalWriteInt("c:\\temp\\redCr-reflectance.tif", cRed, ht, wd, subGeoInfo);
 	free(cBlue);
 	free(cGreen);
 	free(cRed);
@@ -17875,7 +17880,7 @@ void SimulateTOA(CAtmosphereCorrectionBase* pCR, double ext550, double ext, doub
 				 vector<double>& toaVec)
 {
 	//output TOA
-	//FILE* fp = fopen("d:\\toa.txt", "w");
+	//FILE* fp = fopen("c:\\temp\\toa.txt", "w");
 
 	aotVec.clear();
 	toaVec.clear();
@@ -17897,7 +17902,7 @@ void SimulateTOA(CAtmosphereCorrectionBase* pCR, double ext550, double ext, doub
 
 		//calculate TOA
 		double toa = pathRef + (surf*dT)/(1-S*surf);
-		printf("aod: %lf T: %lf  S: %lf  toa: %lf \n", aot550, dT, S, toa);
+		printf("aoc:\\temp %lf T: %lf  S: %lf  toa: %lf \n", aot550, dT, S, toa);
 
 		//fprintf(fp, "%6.4lf  %6.4lf \n", aot550, toa);
 		aotVec.push_back(aot550);
@@ -17955,7 +17960,7 @@ void CProject_PGStationDlg::OnSimulationOop()
 	SimulateTOA(pCRRed, ext550, ext660, 0.66, surfRed, sza, vza, azi, aot, toa660);
 
 
-	FILE* fp = fopen("d:\\simulateTOA.txt", "w");
+	FILE* fp = fopen("c:\\temp\\simulateTOA.txt", "w");
 	for(int i=0; i<aot.size(); i++)
 	{
 		fprintf(fp, "%6.4lf %6.4lf %6.4lf  \n", aot[i], toa475[i], toa660[i]);
@@ -18144,7 +18149,7 @@ void CProject_PGStationDlg::OnSensitivityErrorbyratio()
 	//simulate TOA of 475nm and 660nm according to input aot and ratio
 	double aot550 = 0.5;
 
-	FILE* fp = fopen("d:\\error_by_surf.txt", "w");
+	FILE* fp = fopen("c:\\temp\\error_by_surf.txt", "w");
 	for(double dr=0.0; dr<0.1; dr+=0.01) //
 	{	
 		double tr[2];
@@ -18204,15 +18209,15 @@ void CProject_PGStationDlg::OnHjBlueRed()
 			double ndvi = (pIR[index] - pRed[index]) / (pIR[index] + pRed[index]);
 			pNDVI[index] = ndvi*100;
 		}
-	//cvSaveImage("d:\\ndvi.jpg", )
-	GdalWriteJpgCopy("d:\\ndvi.jpg", pNDVI, ht, wd);
+	//cvSaveImage("c:\\temp\\ndvi.jpg", )
+	GdalWriteJpgCopy("c:\\temp\\ndvi.jpg", pNDVI, ht, wd);
 	free(pNDVI);
 	
 
 	//float* ratio = (float*)malloc(ht*wd*sizeof(float));
 	//memset(ratio, 0, ht*wd*sizeof(float));
 
-	FILE* fp1 = fopen("d:\\blue-red-ndvi-gt-0.5.txt", "w");
+	FILE* fp1 = fopen("c:\\temp\\blue-red-ndvi-gt-0.5.txt", "w");
 
 	int index = 0;
 	for(int j=2; j<ht-2; j+=5)
@@ -18371,7 +18376,7 @@ void CProject_PGStationDlg::OnModisMod09()
 
 	double ratio = 0.0001;
 	
-	FILE* fp = fopen("d:\\modis_blue_vs_red.txt", "w");
+	FILE* fp = fopen("c:\\temp\\modis_blue_vs_red.txt", "w");
 	for(int j=0; j<ht; j++)
 	{
 		for(int i=0; i<wd; i++)
@@ -18467,7 +18472,7 @@ void CProject_PGStationDlg::OnReadingParasolls2()
 			if(tlon>minlon && tlon<maxlon && tlat>minlat && tlat<maxlat)
 			{				
 				char filename[256];
-				sprintf(filename, "d:\\%d_%d.txt", j, i);
+				sprintf(filename, "c:\\temp\\%d_%d.txt", j, i);
 				stLSAP data = readParasolLevelTwo.GetPtMultiViewData(j, i);
 				
 				FILE* fp = fopen(filename, "w");
@@ -18485,7 +18490,7 @@ void CProject_PGStationDlg::OnReadingParasolls2()
 
 
 	/*
-	//printf("aod: %lf \n", data.aod865);
+	//printf("aoc:\\temp %lf \n", data.aod865);
 	//double minlon=102, maxlon=125, minlat=32, maxlat=46;
 	double minlon=110, maxlon=130, minlat=20, maxlat=55;
 
@@ -18498,7 +18503,7 @@ void CProject_PGStationDlg::OnReadingParasolls2()
 	memset(pAerosol, 0, ht*wd*sizeof(float));
 
 
-	FILE* fp = fopen("d:\\parasolAot20130917.txt", "w");
+	FILE* fp = fopen("c:\\temp\\parasolAot20130917.txt", "w");
 	int index = 0;
 	for(int j=ht-1; j>=0; j--)
 	{
@@ -18523,7 +18528,7 @@ void CProject_PGStationDlg::OnReadingParasolls2()
 
 	printf("writing geotiff ... \n");
 	//GdalWriteFloatLL(aodTiffFile, pAOD, ht, wd, minlon, maxlon, minlat, maxlat);
-	GdalWriteFloatLL("d:\\parasol_fineaod.tif", pAerosol, ht, wd, minlon, maxlon, minlat, maxlat);
+	GdalWriteFloatLL("c:\\temp\\parasol_fineaod.tif", pAerosol, ht, wd, minlon, maxlon, minlat, maxlat);
 
 	free(pAerosol);
 	
@@ -18545,8 +18550,8 @@ void CProject_PGStationDlg::OnParasolLevel3()
 
 	//loading luts for atmospheric correction based on AERONET 
 	char clut0[256] = "F:\\Data\\Aeronet\\Beijing-singleDay\\20051008\\865\\";
-	char clut1[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_10.dat";
-	char clut2[256] = "D:\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_25.dat";
+	char clut1[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_10.dat";
+	char clut2[256] = "c:\\temp\\Data\\LUTEastAsia\\Double_865_176_517_73_2768_623_117_1558_10_25.dat";
 	CAtmosphereCorrectionBase* pAC = new CAtmosphereCorrectionRt3();
 	pAC->LoadLut(clut0, clut1, clut2, 0.865);
 	//pAC->Correct(sza, vza, azi, aod, 0.2, 0);
@@ -18593,7 +18598,7 @@ void CProject_PGStationDlg::OnParasolLevel3()
 				if(tlon>minlon && tlon<maxlon && tlat>minlat && tlat<maxlat)
 				{				
 					char filename[256];
-					sprintf(filename, "d:\\out1\\%d_%d_L1.txt", j, i);
+					sprintf(filename, "c:\\temp\\out1\\%d_%d_L1.txt", j, i);
 					//stLSAP data = readParasol.GetPtMultiViewData(j, i);
 					stMultiView data = readParasol.GetPtMultiViewData(j, i);
 
@@ -18657,8 +18662,8 @@ void CProject_PGStationDlg::OnParasolLevel4()
 	printf("%d %d %d %d \n", minLine, maxLine, minCol, maxCol);
 
 
-	FILE* fpall = fopen("d:\\allpr.txt", "w");
-	FILE* fp1 = fopen("d:\\linecol-latlon.txt", "w");
+	FILE* fpall = fopen("c:\\temp\\allpr.txt", "w");
+	FILE* fp1 = fopen("c:\\temp\\linecol-latlon.txt", "w");
 	for(int j=minLine; j<=maxLine; j++)
 	{		
 		for(int i=minCol; i<=maxCol; i++)
@@ -18672,7 +18677,7 @@ void CProject_PGStationDlg::OnParasolLevel4()
 				fprintf(fp1, "%d %d %lf %lf \n", j, i, tlat, tlon);
 
 				char filename[256];
-				sprintf(filename, "d:\\out1\\%d_%d_L2.txt", j, i);
+				sprintf(filename, "c:\\temp\\out1\\%d_%d_L2.txt", j, i);
 				//stLSAP data = readParasolLevelTwo.GetPtMultiViewData(j, i);
 				stMultiView data = readParasolLevelTwo.GetPtMultiViewDataOld(j, i);
 
@@ -18902,7 +18907,7 @@ void CProject_PGStationDlg::OnPanoramicMatching()
 			EstimatePose5Point_Pano(lptPano, rptPano, radius, 500, 2.5, R, T, residual);
 
 			//output the relative pose estimation result
-			FILE* fp = fopen("d:\\pano_rt.txt", "w");		
+			FILE* fp = fopen("c:\\temp\\pano_rt.txt", "w");		
 			fprintf(fp, "%d %d \n", ht, wd);
 			for(int j=0; j<3; j++)
 			{
@@ -18917,7 +18922,7 @@ void CProject_PGStationDlg::OnPanoramicMatching()
 			
 			double E[9];
 			CalculateEssentialMatrix(R, T, E);
-			fp = fopen("d:\\panoFM.txt", "w");
+			fp = fopen("c:\\temp\\panoFM.txt", "w");
 			for(int j=0; j<3; j++)
 			{
 				for(int i=0; i<3; i++)
@@ -18973,9 +18978,9 @@ void CProject_PGStationDlg::OnPanoramicMatching()
 			cvShowImage("Match2", rImage);
 			*/
 
-			cvSaveImage("d:\\left.jpg",  lImage);
-			cvSaveImage("d:\\right.jpg", rImage);
-			cvSaveImage("d:\\match.jpg", pMosaic);
+			cvSaveImage("c:\\temp\\left.jpg",  lImage);
+			cvSaveImage("c:\\temp\\right.jpg", rImage);
+			cvSaveImage("c:\\temp\\match.jpg", pMosaic);
 			cvReleaseImage(&pMosaic);		
 
 
@@ -19028,7 +19033,7 @@ void CProject_PGStationDlg::OnPanoramicMatching()
 			}
 
 			CModelFileBase* pModel = new CPlyModel();
-			pModel->Save("d:\\sphericalModel.ply", vPts, vColors);
+			pModel->Save("c:\\temp\\sphericalModel.ply", vPts, vColors);
 
 
 			//projection from panorama to plane 
@@ -19253,7 +19258,7 @@ void CProject_PGStationDlg::OnPanoramicReadingpos()
 	}
 	fclose(fp);
 
-	fp = fopen("d:\\pos-relativepose.txt", "w");
+	fp = fopen("c:\\temp\\pos-relativepose.txt", "w");
 	fprintf(fp, "pitch	 roll	yaw	 t0	 t1	 t2 \n");
 	for(int i=0; i<vax.size()-1; i++)
 	{
@@ -19336,7 +19341,7 @@ void CProject_PGStationDlg::OnPanoramicEpipolarimage()
 		//IplImage* lImage = cvLoadImage(file1);
 		//IplImage* rImage = cvLoadImage(file2);
 
-		FILE* fp = fopen("d:\\pano_rt.txt", "r");
+		FILE* fp = fopen("c:\\temp\\pano_rt.txt", "r");
 		if(fp==NULL)
 			return;
 
@@ -19375,11 +19380,11 @@ void CProject_PGStationDlg::OnMosaicGeotiff()
 	//blend 
 	printf("Blending... \n");
 	CBlenderBase *pBlend = new CMultiBandBlender();
-	pBlend->GeoBlend(blendFiles, nfile, "d:\\blend.tif");
+	pBlend->GeoBlend(blendFiles, nfile, "c:\\temp\\blend.tif");
 	delete pBlend;
 
 	//mosaic
-	GeoMosaicWithBalance(blendFiles, nfile, "d:\\mosaic.tif", GDT_Byte);
+	GeoMosaicWithBalance(blendFiles, nfile, "c:\\temp\\mosaic.tif", GDT_Byte);
 
 
 
@@ -19402,7 +19407,7 @@ void CProject_PGStationDlg::OnMosaicBundler()
 
 	char* bundlefile   = "c:\\sfm\\bundle.out";
 	char* listfile     = "c:\\sfm\\list.txt"; 
-	char* outfile      = "d:\\orthoMosaic.tif";
+	char* outfile      = "c:\\temp\\orthoMosaic.tif";
 	char* smoothfile   = "c:\\sfm\\fpt.txt";
 
 	MosaicOnBundleWithDEM(listfile, bundlefile, smoothfile, NULL, 1, outfile, 0);
@@ -19428,7 +19433,7 @@ void CProject_PGStationDlg::OnFileheaderJpeg()
 		&lat, &lon, &alt, &GpsInfoPresent);
 
 
-	printf(" ht:%d  wd:%d  f:%lf  ccd: %lf  %lf %lf %lf ", /*CameraMake, CameraModel, */ ht, wd, focalLen, ccdWidth, lat, lon, alt);
+	printf(" ht:%d  wc:\\temp%d  f:%lf  ccc:\\temp %lf  %lf %lf %lf ", /*CameraMake, CameraModel, */ ht, wd, focalLen, ccdWidth, lat, lon, alt);
 
 
 	char* exifComment;
@@ -19465,7 +19470,7 @@ void CProject_PGStationDlg::OnFileheaderJpeg()
 		pNode = pRoot->FirstChildElement("Position"); 
 		pText = pNode->GetText();
 		//double upLeftX = atof(pText);
-		printf("satelliteID: %s \n", pText);
+		printf("satelliteIc:\\temp %s \n", pText);
 		
 	}
 
@@ -19531,7 +19536,7 @@ void CProject_PGStationDlg::OnPbaCpu()
 //	if(argc < 2 || ! LoadModelFile(input_filename, camera_data, point_data, measurements,
 //		ptidx, camidx, photo_names, point_color))
 //	{
-//		std::cout << "==== Multicore Bundle Adjustment ---- Demo Driver Syntax ====\n"
+//		stc:\\temp:cout << "==== Multicore Bundle Adjustment ---- Demo Driver Syntax ====\n"
 //#ifdef WIN32
 //			"driver(_x64)(_debug) "
 //#else
@@ -19639,11 +19644,11 @@ void CProject_PGStationDlg::OnMatchingSimpleflow()
 	//char* lfile = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg\\ladybug_panoramic_000000.jpg";
 	//char* rfile = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
 
-	char* lfile = "d:\\out\\tsukuba_l.png";
-	char* rfile = "d:\\out\\tsukuba_r.png";
+	char* lfile = "c:\\temp\\out\\tsukuba_l.png";
+	char* rfile = "c:\\temp\\out\\tsukuba_r.png";
 	//char* lfile = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg\\ladybug_panoramic_000000.jpg_left.jpg";
 	//char* rfile = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg\\ladybug_panoramic_000001.jpg_left.jpg";
-	char* outfile = "d:\\flow.flo";
+	char* outfile = "c:\\temp\\flow.flo";
 	
 	vector<double> tx;
 	vector<double> ty;
@@ -19678,7 +19683,7 @@ void CProject_PGStationDlg::OnPanoramicRelativeposebatch()
 	filenames = f2c(nfile, 256);
 	GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 1);
 
-	FILE* fp = fopen("d:\\5point_relativepose.txt", "w");
+	FILE* fp = fopen("c:\\temp\\5point_relativepose.txt", "w");
 	fprintf(fp, "pitch	 roll	 yaw	 t0	 t1	 t2 \n");
 	for(int i=0; i<nfile-1; i++)
 	{
@@ -19844,7 +19849,7 @@ void CProject_PGStationDlg::OnFusionLog()
 	// TODO: Add your command handler code here
 
 
-	char* filename = "d:\\DSC04583_geotag.tif";
+	char* filename = "c:\\temp\\DSC04583_geotag.tif";
 
 	IplImage* pImage = cvLoadImage(filename, 0);
 
@@ -19869,7 +19874,7 @@ void CProject_PGStationDlg::OnFusionLog()
 	int  rht,rwd;
 	ReconstrucFromLaplacian(laplacianPI, &reconstructImage, &rht, &rwd);
  
-	SaveBmp("d:\\log_reconstruction.bmp", reconstructImage, rht, rwd);
+	SaveBmp("c:\\temp\\log_reconstruction.bmp", reconstructImage, rht, rwd);
 
 	FreePyramidImageGeneral(pyraImage);
 	FreePyramidImageGeneral(laplacianPI);
@@ -19904,11 +19909,11 @@ void CProject_PGStationDlg::OnFusionLogsequences()
 	//stGeoInfo geoInfo;
 	//GetGeoInformation( filenames[0], geoInfo);
      
-	//LoGBlend(filenames, nfile, "d:\\blend.tif", 2);
-	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
-	//BlendMosaic(filenames, nfile, "d:\\blend1.tif", 0.1, 0);
-	//GeoTiffBlend(filenames, 10, "d:\\blend1.tif", 0.2);
-	MosaicGeoTiff(filenames, nfile, "d:\\directMosaic.tif", 0.0008, 1);
+	//LoGBlend(filenames, nfile, "c:\\temp\\blend.tif", 2);
+	//BlendMosaic(filenames, nfile, "c:\\temp\\blend1.tif", 0.1, 0);
+	//BlendMosaic(filenames, nfile, "c:\\temp\\blend1.tif", 0.1, 0);
+	//GeoTiffBlend(filenames, 10, "c:\\temp\\blend1.tif", 0.2);
+	MosaicGeoTiff(filenames, nfile, "c:\\temp\\directMosaic.tif", 0.0008, 1);
 	
 }
 
@@ -19916,7 +19921,7 @@ void CProject_PGStationDlg::OnXmlOpencv()
 {
 	// TODO: Add your command handler code here
 
-	//string filename = "d:\\camera.yml";
+	//string filename = "c:\\temp\\camera.yml";
 
 	TestFileStorageWrite();
 	TestFileStorageRead();
@@ -19937,7 +19942,7 @@ void CProject_PGStationDlg::OnMrtGeneratefilelists()
 	GetDirFileName(filenames, imagepath, &n, &nfile, "hdf", 1);
 
 
-	FILE* fp = fopen("d:\\hdflist.txt", "w");
+	FILE* fp = fopen("c:\\temp\\hdflist.txt", "w");
 
 	for(int i=0; i<nfile; i++)
 	{
@@ -20109,8 +20114,8 @@ void CProject_PGStationDlg::OnKltPanoimages()
 		cvNamedWindow("KLT");
 		cvShowImage("KLT", pCurrent);
 		
-		cvSaveImage("d:\\left.jpg", pImageColor);
-		cvSaveImage("d:\\right.jpg", pCurrentColor);
+		cvSaveImage("c:\\temp\\left.jpg", pImageColor);
+		cvSaveImage("c:\\temp\\right.jpg", pCurrentColor);
 		
 		cvWaitKey();
 		
@@ -20146,7 +20151,7 @@ void CProject_PGStationDlg::OnCalibrationGeneratechessboard()
 		}
 	}
 	IplImage output = calibration;
-	cvSaveImage("D:\\calibration.jpg", &output);
+	cvSaveImage("c:\\temp\\calibration.jpg", &output);
 	*/
 }
 
@@ -20156,14 +20161,14 @@ void CProject_PGStationDlg::OnColorcorrectionVignetting()
     
 	//char* filename = "F:\\Data\\vignetting\\flickr_3.jpg";
 	//char* filename = "F:\\Data\\vignetting\\soapshop.jpg";
-	//char* filename = "d:\\DSC04616_geotag.JPG";
+	//char* filename = "c:\\temp\\DSC04616_geotag.JPG";
 	char* filename = "F:\\Data\\vignetting\\simulate\\M\\sea_Est_truth.jpg";
     
 
 
 	/*
 	IplImage* pImageColor = cvLoadImage(filename);
-    //cvSaveImage("d:\\bak.jpg", pImageColor);
+    //cvSaveImage("c:\\temp\\bak.jpg", pImageColor);
 
 	IplImage* pGrayImage = cvLoadImage(filename, 0);
 
@@ -20181,7 +20186,7 @@ void CProject_PGStationDlg::OnColorcorrectionVignetting()
 	int swd = pGrayImage->width*ratio  + 0.5;
 	IplImage* pSmallImage = cvCreateImage( cvSize(swd, sht), 8, 1 );
 	cvResize(pGrayImage, pSmallImage);
-	//cvSaveImage("d:\\small.jpg", pSmallImage);
+	//cvSaveImage("c:\\temp\\small.jpg", pSmallImage);
 	unsigned char* pImageBuffer = (unsigned char*)malloc( pSmallImage->height*pSmallImage->width );
 	for(int j=0; j<pSmallImage->height; j++)
 		for(int i=0; i<pSmallImage->width; i++)
@@ -20249,7 +20254,7 @@ void CProject_PGStationDlg::OnColorcorrectionVignetting()
 			pImageColor->imageData[(j)*scanWd+i*3+2] = min(255,b);
 		}
 
-		cvSaveImage("d:\\colorCorrect.jpg", pImageColor);
+		cvSaveImage("c:\\temp\\colorCorrect.jpg", pImageColor);
 
 		cvReleaseImage(&pImageColor);
 		cvReleaseImage(&pGrayImage);
@@ -20257,7 +20262,7 @@ void CProject_PGStationDlg::OnColorcorrectionVignetting()
 		free(pImageBuffer);
 		*/
 
-		VignettingCorrectFromFile(filename, "d:\\colorCorrect.jpg");
+		VignettingCorrectFromFile(filename, "c:\\temp\\colorCorrect.jpg");
 
 
 		printf("\n Finished ! \n");
@@ -20348,7 +20353,7 @@ void CProject_PGStationDlg::OnCharGenerateproductfile()
 {
 	// TODO: Add your command handler code here
 	
-	char* filename = "d:\\1.jpg";
+	char* filename = "c:\\temp\\1.jpg";
 
 	char* productfile;
 	
@@ -20386,7 +20391,7 @@ void CProject_PGStationDlg::OnDebugFillblackpixel()
 
 	FillBlackPixel(pImageBuffer, ht, wd);
 
-	SaveJpeg("d:\\fillblack.jpg", pImageBuffer, ht, wd);
+	SaveJpeg("c:\\temp\\fillblack.jpg", pImageBuffer, ht, wd);
 }
 
 void CProject_PGStationDlg::OnDebugGaussiansmooth()
@@ -20404,9 +20409,9 @@ void CProject_PGStationDlg::OnDebugGaussiansmooth()
 			pTestImage[j*wd+i] = 255;
 		}
 
-	SaveToJpg(pTestImage, ht, wd, "d:\\dilate-no.jpg");
+	SaveToJpg(pTestImage, ht, wd, "c:\\temp\\dilate-no.jpg");
 	MyDilate(pTestImage, ht, wd, 2);
-	SaveToJpg(pTestImage, ht, wd, "d:\\dilate-yes.jpg");
+	SaveToJpg(pTestImage, ht, wd, "c:\\temp\\dilate-yes.jpg");
 
 
 	PYRAMID_IMAGE_GENERAL<unsigned char> pyramidImage; 
@@ -20435,14 +20440,14 @@ void CProject_PGStationDlg::OnDebugGaussiansmooth()
 		pMosaicImage[i] = mosaicImage[i];		
 	}
 
-	SaveToJpg(pMosaicImage, rht, rwd, "d:\\reconstruction.jpg");
+	SaveToJpg(pMosaicImage, rht, rwd, "c:\\temp\\reconstruction.jpg");
 
 	/*
-	SaveToJpg(pTestImage, ht, wd, "d:\\smooth-no.jpg");
+	SaveToJpg(pTestImage, ht, wd, "c:\\temp\\smooth-no.jpg");
 	float k[5] = {0.05, 0.25, 0.4, 0.25, 0.05};
 	int   size = 5;
 	GaussianSmooth(pTestImage, pTestImage, ht, wd, k, size );
-	SaveToJpg(pTestImage, ht, wd, "d:\\smooth-yes.jpg");
+	SaveToJpg(pTestImage, ht, wd, "c:\\temp\\smooth-yes.jpg");
 	*/
 
 	printf("Finished ! \n");
@@ -20452,7 +20457,7 @@ void CProject_PGStationDlg::OnDebugMysmooth()
 {
 	// TODO: Add your command handler code here
 
-	char* filename = "d:\\pyramid_5.jpg";
+	char* filename = "c:\\temp\\pyramid_5.jpg";
 	IplImage* pImage = cvLoadImage(filename, 0);
 
 	int ht = pImage->height;
@@ -20469,7 +20474,7 @@ void CProject_PGStationDlg::OnDebugMysmooth()
 	SmoothImage(pBuffer, ht ,wd, 0, 2);
 	//SmoothImage(pBuffer, ht ,wd, 0, 2);
 	//SmoothImage(pBuffer, ht ,wd, 0, 2);
-	SaveBmp("d:\\smooth.bmp", pBuffer, ht, wd);
+	SaveBmp("c:\\temp\\smooth.bmp", pBuffer, ht, wd);
 
 	free(pBuffer);
 	cvReleaseImage(&pImage);
@@ -20483,7 +20488,7 @@ void CProject_PGStationDlg::OnGdalWritejpeg()
 {
 	// TODO: Add your command handler code here
 
-	char* filename = "d:\\china.tif";
+	char* filename = "c:\\temp\\china.tif";
 
 	IplImage* pImage = cvLoadImage(filename, 1);
 
@@ -20509,7 +20514,7 @@ void CProject_PGStationDlg::OnGdalWritejpeg()
 			{
 				pBuffer[j*wd+i] = (unsigned char)( pImage->imageData[j*scanwd+3*i+k] );
 			}
-		//GdalWriteJpgCopy("d:\\china.jpeg", pBuffer, ht, wd);
+		//GdalWriteJpgCopy("c:\\temp\\china.jpeg", pBuffer, ht, wd);
 
 		GDALRasterBand* ba_preview=ds_preview->GetRasterBand(3-k);
 		ba_preview->RasterIO(GF_Write, 0, 0, wd, ht, pBuffer, wd, ht, GDT_Byte, 0, 0);
@@ -20517,7 +20522,7 @@ void CProject_PGStationDlg::OnGdalWritejpeg()
 
 	char* jpgDrvName="JPEG";
 	GDALDriver *jpgDriver=GetGDALDriverManager()->GetDriverByName(jpgDrvName);
-	GDALDataset *dsjpg=jpgDriver->CreateCopy("d:\\china.ort", ds_preview,0,NULL,NULL,NULL);
+	GDALDataset *dsjpg=jpgDriver->CreateCopy("c:\\temp\\china.ort", ds_preview,0,NULL,NULL,NULL);
 
 
 	//close
@@ -20540,7 +20545,7 @@ void CProject_PGStationDlg::OnShadowLitvinov()
 
 	double kr = 0.6;
 
-	FILE* fp = fopen("d:\\litvinov.txt", "w");
+	FILE* fp = fopen("c:\\temp\\litvinov.txt", "w");
 
 	for(int i=0; i<=number; i++)
 	{
@@ -20566,7 +20571,7 @@ void CProject_PGStationDlg::OnShadowRoujean()
 	double thes = 45.0;    //sun zenith
 	double thev = 0.0;
     
-	FILE* fp = fopen("d:\\roujeanF1.txt", "w");
+	FILE* fp = fopen("c:\\temp\\roujeanF1.txt", "w");
 
 	phi = 180;
 	for(int i=89; i>0; i--)
@@ -20604,7 +20609,7 @@ void CProject_PGStationDlg::OnShadowRossli()
 	double thes = 45.0;    //sun zenith
 	double thev = 0.0;
 
-	FILE* fp = fopen("d:\\RossLiF1.txt", "w");
+	FILE* fp = fopen("c:\\temp\\RossLiF1.txt", "w");
 
 	phi = 180;
 	for(int i=89; i>0; i--)
@@ -20712,7 +20717,7 @@ void CProject_PGStationDlg::OnBrdfReading()
 		double rp = BPDF_Nadal( szaArr[i], vzaArr[i], aziArr[i], alfa, beita );
 		NadalBPDFModel[i] = rp;
 		}
-		GeneratePolarMapData(vzaArr, aziArr, NadalBPDFModel, 10.0, "d:\\modelPolar.txt");
+		GeneratePolarMapData(vzaArr, aziArr, NadalBPDFModel, 10.0, "c:\\temp\\modelPolar.txt");
 		*/
 	}
 
@@ -20723,7 +20728,7 @@ void CProject_PGStationDlg::OnBrdfReading()
 		
 		//output
 		char filename[256];
-		sprintf(filename, "d:\\out-%d-%d.txt", low, high );
+		sprintf(filename, "c:\\temp\\out-%d-%d.txt", low, high );
 
 		FILE* fp = fopen(filename, "w");
 		for(int k=0; k<szaArr.size(); k++)
@@ -20744,7 +20749,7 @@ void CProject_PGStationDlg::OnBrdfReading()
 		fclose(fp);
 	}
 
-	FILE* fp = fopen("d:\\out-all.txt", "w");
+	FILE* fp = fopen("c:\\temp\\out-all.txt", "w");
 	for(int k=0; k<szaArr.size(); k++)
 	{
 			fprintf(fp, "%lf %lf    %lf %lf %lf %lf %lf  \n", 
@@ -20784,7 +20789,7 @@ void CProject_PGStationDlg::OnBrdfLocationseperate()
 	filenames = f2c(nfile, 256);
 	GetDirFileName(filenames, dataPath, &n, &nfile, "dat", 1);
 
-	FILE* fp = fopen("d:\\bpdf-location.txt", "w");
+	FILE* fp = fopen("c:\\temp\\bpdf-location.txt", "w");
 	//find the number of file occuring repeatedly
 	for(int i=0; i<nfile1; i++)
 	{
@@ -20861,7 +20866,7 @@ void CProject_PGStationDlg::OnBpdfBaresoil()
 
 	ReadingParasolBRDF(filepath, szaArr, vzaArr, aziArr, scaArr, slopeArr, ndviArr, rp865Arr);
 
-	FILE* fp = fopen("d:\\baresoil.txt", "w");
+	FILE* fp = fopen("c:\\temp\\baresoil.txt", "w");
 	for(int i=0; i<rp865Arr.size(); i++)
 	{
 		double breonRp = BPDF_Breon( szaArr[i], vzaArr[i], aziArr[i], 0.0 );
@@ -20895,7 +20900,7 @@ void CProject_PGStationDlg::OnSurfaceNdvi()
 	int scatterAngle = 120;
 
 	char outfile[256];
-	sprintf(outfile, "d:\\%d_ndvi.txt", scatterAngle);
+	sprintf(outfile, "c:\\temp\\%d_ndvi.txt", scatterAngle);
 
 	FILE* fp = fopen(outfile, "w");
 
@@ -20973,7 +20978,7 @@ void CProject_PGStationDlg::OnPanoramicEpipolarmatchdisp()
 	//char* leftFile  = "F:\\Data\\UAV\\byler\\2-sub-1\\mvs\\visualize\\00000000.jpg";
 	//char* rightFile = "F:\\Data\\UAV\\byler\\2-sub-1\\mvs\\visualize\\00000001.jpg";
 
-	char* matchFile = "d:\\featureMatch.txt";
+	char* matchFile = "c:\\temp\\featureMatch.txt";
 
 	IplImage* pLeftImage = cvLoadImage(leftFile, 1);
 	IplImage* pRightImage = cvLoadImage(rightFile, 1);
@@ -20982,7 +20987,7 @@ void CProject_PGStationDlg::OnPanoramicEpipolarmatchdisp()
 
 	IplImage* pMosaic = VerticalMosaic(pLeftImage, pRightImage);
 
-	//cvSaveImage("d:\\verticalMosaic.jpg", pMosaic);
+	//cvSaveImage("c:\\temp\\verticalMosaic.jpg", pMosaic);
 
 	int nPt = GetFileRows(matchFile) * 0.5;
 
@@ -21007,7 +21012,7 @@ void CProject_PGStationDlg::OnPanoramicEpipolarmatchdisp()
 		}
 	}
 	fclose(fp);
-	cvSaveImage("d:\\imageFeature.jpg", pLeftImage);
+	cvSaveImage("c:\\temp\\imageFeature.jpg", pLeftImage);
 
 
 	
@@ -21037,7 +21042,7 @@ void CProject_PGStationDlg::OnPanoramicEpipolarmatchdisp()
 	}
 	fclose(fp);
 
-	cvSaveImage("d:\\verticalMosaic.jpg", pMosaic);
+	cvSaveImage("c:\\temp\\verticalMosaic.jpg", pMosaic);
 
 	printf("Finished! \n");
 
@@ -21048,7 +21053,7 @@ void CProject_PGStationDlg::OnPanoramicConverttocylinder()
 	// TODO: Add your command handler code here
 
 	char* infile = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
-	char* outfile = "d:\\cylinder.jpg";    
+	char* outfile = "c:\\temp\\cylinder.jpg";    
 
 	SphereToCilinder(infile, outfile);
 
@@ -21120,7 +21125,7 @@ int InvokeExe(char* cmdString)
 		case   WAIT_TIMEOUT:  
 			AfxMessageBox("超时");  
 			break;  
-		case   WAIT_FAILED:  
+		case   WAIT_FAILEc:\\temp  
 			AfxMessageBox("失败");  
 			break;  
 		}*/
@@ -21135,7 +21140,7 @@ void CProject_PGStationDlg::OnSelectFiles()
 	// TODO: Add your command handler code here
 
 
-	char* batFile = "d:\\copy.bat";
+	char* batFile = "c:\\temp\\copy.bat";
 
 
 	char* filepath = "F:\\Data\\OceanImages\\IOCAS_20160717_029";
@@ -21176,7 +21181,7 @@ void CProject_PGStationDlg::OnXmlJpeg()
 	// TODO: Add your command handler code here
 
 	/*
-	char* xmlFile = "d:\\ocean.xml";
+	char* xmlFile = "c:\\temp\\ocean.xml";
 
 	const char * xmlFile = "school.xml";  
 	TiXmlDocument doc;                                
@@ -21192,14 +21197,14 @@ void CProject_PGStationDlg::OnXmlJpeg()
 	for (; studentElement != NULL; studentElement = studentElement->NextSiblingElement() ) {  
 		TiXmlAttribute* attributeOfStudent = studentElement->FirstAttribute();  //获得student的name属性    
 		for (;attributeOfStudent != NULL; attributeOfStudent = attributeOfStudent->Next() ) {  
-			cout << attributeOfStudent->Name() << " : " << attributeOfStudent->Value() << std::endl;         
+			cout << attributeOfStudent->Name() << " : " << attributeOfStudent->Value() << stc:\\temp:endl;         
 		}                                   
 
 		TiXmlElement* studentContactElement = studentElement->FirstChildElement();//获得student的第一个联系方式   
 		for (; studentContactElement != NULL; studentContactElement = studentContactElement->NextSiblingElement() ) {  
 			string contactType = studentContactElement->Value();  
 			string contactValue = studentContactElement->GetText();  
-			cout << contactType  << " : " << contactValue << std::endl;             
+			cout << contactType  << " : " << contactValue << stc:\\temp:endl;             
 		}     
 	}   
 	*/
@@ -21277,7 +21282,7 @@ void CProject_PGStationDlg::OnPlyMosaic()
 		}
 
 	}
-	char plyfile[512] = "d:\\m.ply";
+	char plyfile[512] = "c:\\temp\\m.ply";
 	//strcpy(plyfile, pdlg->m_strPMVSPlyFile);
 	WritePMVSPly(plyfile, allTracks);
 	//////////////////////////////////////////////////////////////////////////
@@ -21311,5 +21316,15 @@ void CProject_PGStationDlg::OnTemplateFunction()
 	// TODO: Add your command handler code here
 	
 	//TestTemplateFunc();
+
+}
+
+
+void CProject_PGStationDlg::OnEigenTest()
+{
+	// TODO: 在此添加命令处理程序代码
+	printf("eigen test .... \n");
+
+
 
 }

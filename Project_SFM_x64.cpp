@@ -41,6 +41,7 @@ int main(int argc, char** argv[])
 	CGenerateTracksBase* pGenerateTrack = new CFastGenerateTrack();
 	pGenerateTrack->GenerateTracks(imgFeatures, matchRes, tracks);
 	
+	//output the tracks
 	FILE* fp = fopen("c:\\temp\\mytrack.txt", "w");
 	fprintf(fp, "%d \n", tracks.size());
 	for(int i=0; i<tracks.size(); i++)
