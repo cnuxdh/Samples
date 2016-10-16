@@ -10475,8 +10475,8 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 	//char* leftImage  = "F:\\Data\\panorama\\plane\\ladybug_panoramic_000000.jpg_left.jpg";
 	//char* rightImage = "F:\\Data\\panorama\\plane\\ladybug_panoramic_000001.jpg_left.jpg";
 
-	char* leftImage  = "F:\\Data\\Registration\\box.png";
-	char* rightImage = "F:\\Data\\Registration\\box_in_scene.png";
+	char* leftImage  = "c:\\Work\\Data\\relativePose\\IMG_1192.jpg";
+	char* rightImage = "c:\\Work\\Data\\relativePose\\IMG_1193.jpg";
 
 
 	IplImage* pLeft  = cvLoadImage(leftImage);
@@ -10510,9 +10510,9 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 		pr.x = rImageFeature.featPts[ri].x;
 		pr.y = rImageFeature.featPts[ri].y;
 		
-		int r = (double)(rand())/(double)(RAND_MAX)*255;
-		int g = (double)(rand())/(double)(RAND_MAX)*255;
-		int b = (double)(rand())/(double)(RAND_MAX)*255;
+		int r = 255; //(double)(rand())/(double)(RAND_MAX)*255;
+		int g = 0;   //(double)(rand())/(double)(RAND_MAX)*255;
+		int b = 0;   //(double)(rand())/(double)(RAND_MAX)*255;
 		cvDrawCircle(pLeft, pl, 2, CV_RGB(r,g,b),2);
 		cvDrawCircle(pRight, pr, 2, CV_RGB(r,g,b),2);
 	}
@@ -10538,8 +10538,8 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 	CRelativePoseBase* pRP = new CEstimatePose5Point();
 	CameraPara cam1, cam2;
 	//intrinsic parameters
-	cam1.focus = 326; //pLeft->width*0.5;
-	cam2.focus = 326; //pRight->width*0.5;
+	cam1.focus = 3212;//pLeft->width*0.5;
+	cam2.focus = 3212;//pRight->width*0.5;
 	pRP->EstimatePose(lpts, rpts, cam1, cam2 );
     
 	//output
@@ -10568,7 +10568,6 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 		printf("%lf %lf %lf \n", gpts[i].p[0], gpts[i].p[1], gpts[i].p[2]);
 	}
 	*/
-	
 
 	//5. ouput 3D model
 	CModelFileBase* pOutput = new CPlyModel();
