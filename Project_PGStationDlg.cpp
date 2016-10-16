@@ -10483,13 +10483,13 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 	IplImage* pRight = cvLoadImage(rightImage);
 
 	//1. detect feature points 
-	CFeatureBase* pFeatDetect = new CSIFT();
+	CFeatureBase* pFeatDetect = new CSIFTFloat();
 	ImgFeature lImageFeature, rImageFeature;
 	pFeatDetect->Detect(leftImage, lImageFeature);
 	pFeatDetect->Detect(rightImage, rImageFeature);
 
 	//2. matching 
-	CMatchBase* pMatch = new CSiftMatch();
+	CMatchBase* pMatch = new CKNNMatch();
 	PairMatchRes mp;
 	pMatch->Match(lImageFeature, rImageFeature, mp);
 	int nMatch = mp.matchs.size();
@@ -10542,6 +10542,7 @@ void CProject_PGStationDlg::OnRelativeposeRealimages()
 	cam2.focus = 3212;//pRight->width*0.5;
 	pRP->EstimatePose(lpts, rpts, cam1, cam2 );
     
+
 	//output
 	printf("Focus: %lf \n", cam2.focus);
 	printf("Rotation Angle x:%lf y:%lf z:%lf \n", cam2.ax, cam2.ay, cam2.az);
