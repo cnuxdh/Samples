@@ -7876,8 +7876,10 @@ void CProject_PGStationDlg::OnSfmSimulate()
 	//printf("Relative Pose \n");
 
 	int numpt = 20;
-	FILE* fp = fopen("f:\\data\\sfm\\simulatePair.txt", "w");
+	FILE* fp = fopen("c:\\temp\\simulatePair.txt", "w");
 	fprintf(fp, "%d\n", numpt);
+	vector<Point2DDouble> leftImagePts;
+	vector<Point2DDouble> rightImagePts;
 	for(int i=0; i<numpt; i++)
 	{
 		srand(time(0));
@@ -7899,7 +7901,37 @@ void CProject_PGStationDlg::OnSfmSimulate()
 		double ry2 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
 		
 		//coordinate translation from topleft to the center
-		fprintf(fp, "%lf %lf  %lf %lf \n", ix1-wd*0.5+rx1, ht*0.5-iy1+ry1, ix2-wd*0.5+rx2, ht*0.5-iy2+ry2);
+		fprintf(fp, "%lf %lf  %lf %lf \n", ix1-wd*0.5+rx1, ht*0.5-iy1+ry1, 
+			ix2-wd*0.5+rx2, ht*0.5-iy2+ry2);
+	
+		Point2DDouble pl,pr;
+		pl.x = ix1-wd*0.5+rx1;
+		pl.y = ht*0.5-iy1+ry1;
+		pr.x = ix2-wd*0.5+rx2;
+		pr.y = ht*0.5-iy2+ry2;
+
+		leftImagePts.push_back(pl);
+		rightImagePts.push_back(pr);
+	}
+	fclose(fp);
+
+
+	//output as the ba format, just like: http://grail.cs.washington.edu/projects/bal/
+	fp = fopen("c:\\temp\\pair.txt", "w");
+	fprintf(fp, "%d %d %d \n", 2, 20, 40); //<num_cameras> <num_points> <num_observations>
+	//observations
+	for(int i=0; i<numpt; i++)
+	{
+		fprintf(fp, " %d %d  %lf %lf \n", 0, i, leftImagePts[i].x, leftImagePts[i].y);
+		fprintf(fp, " %d %d  %lf %lf \n", 1, i, rightImagePts[i].x, rightImagePts[i].y);
+	}
+	//cameras
+	for(int i=0; i<2; i++)
+	{
+		//omiga phi kapa  t0 t1 t2 f k0 k1
+		fprintf(fp, "%lf %lf %lf  %lf %lf %lf %lf %lf %lf ", 0,0,0, 0,0,0, 0,0,0);
+		fprintf(fp, "%lf %lf %lf  %lf %lf %lf %lf %lf %lf ", omiga, phi, kapa, 
+			t2[0],t2[1],t2[2], focus, 0, 0);
 	}
 	fclose(fp);
 }
@@ -11488,7 +11520,7 @@ void CProject_PGStationDlg::OnBaRealimages()
 
 	//4. bundle adjustment
 	CBABase* pBA = new CSBA();
-	char* outPath = "F:\\data\\bundler";
+	char* outPath = "c:\\temp";
 	pBA->BundleAdjust(numCamera, cameras, imgFeatures, vecMatch, vecTrack, outPath);
 	
 	
@@ -13230,7 +13262,8 @@ void CProject_PGStationDlg::OnBaNewapi()
 			PairMatchRes mt;
 			mt.lId = i;
 			mt.rId = j;
-			pMatch->Match( vecImageDataPointer[i]->GetImageFeature(), vecImageDataPointer[j]->GetImageFeature(), mt);
+			pMatch->Match( vecImageDataPointer[i]->GetImageFeature(), 
+				vecImageDataPointer[j]->GetImageFeature(), mt);
 
 			//if( mt.inlierRatio>0.5 && mt.matchs.size()>16 )
 			if( mt.matchs.size()>16 )
@@ -13304,7 +13337,8 @@ void CProject_PGStationDlg::OnBaNewapi()
 			vecImageDataPointer[i]->SetInitFocus(focus);
 		}
 	}
-	pBA->BundleAdjust( cameras.size(), cameras, vecImageDataPointer, vecMatch, vecTrack, "F:\\data\\bundler");
+	pBA->BundleAdjust( cameras.size(), cameras, vecImageDataPointer, 
+		vecMatch, vecTrack, "c:\\temp");
 
 	for(int i=0; i<fileVector.size(); i++)
 	{
