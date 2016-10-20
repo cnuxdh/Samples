@@ -5,9 +5,13 @@
 #include <time.h>
 #include "stdio.h"
 
+
+
 #include "cv.h"
 #include "cxcore.h"
 #include "highgui.h"
+
+
 
 #include "vim_sift.h"
 //#include "siftfeature.h"
