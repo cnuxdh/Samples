@@ -7834,7 +7834,8 @@ void CProject_PGStationDlg::OnSfmSimulate()
 	omiga  = 1;
 	phi    = -2;
 	kapa   = 1.5;
-	GenerateRMatrix(omiga, phi, kapa, R2);
+	//GenerateRMatrix(omiga, phi, kapa, R2);
+	GenerateRMatrixDirect(omiga, phi, kapa, R2);
     t2[0] = 20; t2[1] = 20; t2[2] = 10;
 	for(int j=0; j<3; j++)
 	{
@@ -10381,7 +10382,7 @@ void CProject_PGStationDlg::OnRelativeposeSimulate()
 	
 	//read simulated file
 	//FILE* fp = fopen("c:\\temp\\pair1.txt", "r");
-	FILE* fp = fopen("F:\\data\\sfm\\simulatePair.txt", "r");
+	FILE* fp = fopen("c:\\temp\\simulatePair.txt", "r");
 	int numPt;
 	fscanf(fp, "%d", &numPt);
 	for(int i=0; i<numPt; i++)
