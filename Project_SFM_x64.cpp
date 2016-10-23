@@ -44,6 +44,8 @@ int main(int argc, char** argv[])
 	vector<ImgFeature> imgFeatures;
 	DetectFileFeaturePts(filenames, nfile, imgFeatures);
 	
+
+
 	//2. matching images 
 	vector<PairMatchRes> matchRes; 
 	MatchImageFiles(imgFeatures, matchRes);
@@ -84,7 +86,7 @@ int main(int argc, char** argv[])
 	int numImage = imgFeatures.size();
 	vector<CameraPara> cameras; 
 	cameras.resize(numImage);
-	double focalLen = (imgFeatures[0].ht + imgFeatures[0].wd) * 0.5;
+	double focalLen = imgFeatures[0].ht; //(imgFeatures[0].ht + imgFeatures[0].wd) * 0.5;
 	for(int i=0; i<numImage; i++)
 	{
 		cameras[i].focus = focalLen;
