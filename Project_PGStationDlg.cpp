@@ -7935,6 +7935,10 @@ void CProject_PGStationDlg::OnSfmSimulate()
 			t2[0],t2[1],t2[2], focus, 0, 0);
 	}
 	fclose(fp);
+
+
+	//save the simulated results for ceres bundle adjustment
+	
 }
 
 /*

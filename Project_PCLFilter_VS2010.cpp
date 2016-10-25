@@ -62,10 +62,10 @@ int PointCloudFilter(double* px, double* py, double* pz, int nPt,
 
 	//pcl::PCDWriter writer;
 	//writer.write<pcl::PointXYZ> ("d:\\table_scene_lms400_inliers.pcd", *cloud_filtered, false);
-	
 	//sor.setNegative (true);
 	//sor.filter (*cloud_filtered);
 	//writer.write<pcl::PointXYZ> ("d:\\table_scene_lms400_outliers.pcd", *cloud_filtered, false);
+
 
 	//output the smoothed points
 	int nSmoothPt = 0;
