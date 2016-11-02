@@ -7836,7 +7836,7 @@ void CProject_PGStationDlg::OnSfmSimulate()
 	kapa   = 1.5;
 	//GenerateRMatrix(omiga, phi, kapa, R2);
 	GenerateRMatrixDirect(omiga, phi, kapa, R2);
-    t2[0] = 20; t2[1] = 20; t2[2] = 10;
+    t2[0] = 10; t2[1] = 10; t2[2] = 1;
 	for(int j=0; j<3; j++)
 	{
 		for(int i=0; i<3; i++)
@@ -7848,8 +7848,15 @@ void CProject_PGStationDlg::OnSfmSimulate()
 	printf("\n");
 
 	//image 2
+	double R3[9];
+	double t3[3];
+	omiga  = -1.5;
+	phi    = -1;
+	kapa   = 0.5;
+	//GenerateRMatrix(omiga, phi, kapa, R2);
+	GenerateRMatrixDirect(omiga, phi, kapa, R3);
+	t3[0] = 20; t3[1] = 20; t3[2] = 0.5;
 	
-
 
 	//from 3D to 2D
 	double grdpt[20][3] = {0,   0,  -220,
@@ -7877,10 +7884,10 @@ void CProject_PGStationDlg::OnSfmSimulate()
 	//printf("Relative Pose \n");
 
 	int numpt = 20;
-	FILE* fp = fopen("c:\\temp\\simulatePair.txt", "w");
+	FILE* fp = fopen("c:\\temp\\simulatept.txt", "w");
 	fprintf(fp, "%d\n", numpt);
-	vector<Point2DDouble> leftImagePts;
-	vector<Point2DDouble> rightImagePts;
+	//vector<Point2DDouble> leftImagePts;
+	//vector<Point2DDouble> rightImagePts;
 	for(int i=0; i<numpt; i++)
 	{
 		srand(time(0));
@@ -7892,31 +7899,39 @@ void CProject_PGStationDlg::OnSfmSimulate()
 		double ix2,iy2;
 		GrdToImg(grdpt[i][0], grdpt[i][1], grdpt[i][2], &ix2, &iy2, 
 			R2, t2, focus, x0, y0, ht, wd );
+		
+		double ix3,iy3;
+		GrdToImg(grdpt[i][0], grdpt[i][1], grdpt[i][2], &ix3, &iy3, 
+			R3, t3, focus, x0, y0, ht, wd );
+		
 
-		printf("%lf %lf  %lf %lf \n", ix1, iy1, ix2, iy2);
+		printf("%lf %lf  %lf %lf %lf %lf \n", ix1, iy1, ix2, iy2, ix3, iy3);
 
 		//random noise
 		double rx1 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
 		double ry1 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
 		double rx2 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
 		double ry2 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
-		
-		//coordinate translation from topleft to the center
-		fprintf(fp, "%lf %lf  %lf %lf \n", ix1-wd*0.5+rx1, ht*0.5-iy1+ry1, 
-			ix2-wd*0.5+rx2, ht*0.5-iy2+ry2);
-	
-		Point2DDouble pl,pr;
-		pl.x = ix1-wd*0.5+rx1;
-		pl.y = ht*0.5-iy1+ry1;
-		pr.x = ix2-wd*0.5+rx2;
-		pr.y = ht*0.5-iy2+ry2;
+		double rx3 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
+		double ry3 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
 
-		leftImagePts.push_back(pl);
-		rightImagePts.push_back(pr);
+		//coordinate translation from topleft to the center
+		fprintf(fp, "%lf %lf  %lf %lf  %lf %lf \n", 
+			ix1-wd*0.5+rx1, ht*0.5-iy1+ry1, 
+			ix2-wd*0.5+rx2, ht*0.5-iy2+ry2,
+			ix3-wd*0.5+rx3, ht*0.5-iy3+ry3);
+	
+		//Point2DDouble pl,pr;
+		//pl.x = ix1-wd*0.5+rx1;
+		//pl.y = ht*0.5-iy1+ry1;
+		//pr.x = ix2-wd*0.5+rx2;
+		//pr.y = ht*0.5-iy2+ry2;
+		//leftImagePts.push_back(pl);
+		//rightImagePts.push_back(pr);
 	}
 	fclose(fp);
 
-
+	/*
 	//output as the ba format, just like: http://grail.cs.washington.edu/projects/bal/
 	fp = fopen("c:\\temp\\pair.txt", "w");
 	fprintf(fp, "%d %d %d \n", 2, 20, 40); //<num_cameras> <num_points> <num_observations>
@@ -7935,7 +7950,7 @@ void CProject_PGStationDlg::OnSfmSimulate()
 			t2[0],t2[1],t2[2], focus, 0, 0);
 	}
 	fclose(fp);
-
+	*/
 
 	//save the simulated results for ceres bundle adjustment
 	
@@ -10381,6 +10396,8 @@ void CProject_PGStationDlg::OnRelativeposeSimulate()
 
 	vector<Point2DDouble> p1;
 	vector<Point2DDouble> p2;
+	vector<Point2DDouble> pts;
+
 	printf("Relative Pose Estimation ... \n");
 
 	
@@ -10400,6 +10417,9 @@ void CProject_PGStationDlg::OnRelativeposeSimulate()
 		tp2.p[1] = ry;
 		p1.push_back(tp1);
 		p2.push_back(tp2);
+
+
+
 	}
 	fclose(fp);
 	
@@ -10442,6 +10462,29 @@ void CProject_PGStationDlg::OnRelativeposeSimulate()
 		printf("%lf %lf %lf   %lf %lf %lf \n", gpts[i].p[0], gpts[i].p[1], gpts[i].p[2],
 			rx, ry, rz);
 	}
+
+
+	//triangulate using multiple point interface
+	for(int i=0; i<gpts.size(); i++)
+	{
+		vector<Point2DDouble> pts;
+		vector<CameraPara> cams;
+		pts.push_back(p1[i]);
+		cams.push_back(cam1);
+		pts.push_back(p2[i]);
+		cams.push_back(cam2);
+
+		Point3DDouble grd;
+		double ferror;;
+		pTriangulate->Triangulate(pts, cams, grd, true, ferror);
+
+		double rx = grd.p[0] / grdpt[i][0];
+		double ry = grd.p[1] / grdpt[i][1];
+		double rz = grd.p[2] / grdpt[i][2];
+
+		printf("%lf %lf %lf   %lf %lf %lf   error: %lf \n", grd.p[0], grd.p[1], grd.p[2],
+			rx, ry, rz, ferror);
+	}	
 
     /*
 	//BA optimization
@@ -10707,7 +10750,7 @@ void CProject_PGStationDlg::OnObsoluteposeSimulate()
 	*/
 
 	//read projection point coordinates
-	char ptfile[256] = "c:\\temp\\Data\\SFM\\imagept2.txt";
+	char ptfile[256] = "c:\\temp\\imagept1.txt";
 	ReadProjections(ptfile, p2);
 
 	double K[9],R[9],t[3];
@@ -11029,6 +11072,48 @@ void CProject_PGStationDlg::OnSimulatedataSingleview()
 	int wd = 640;
 	int x0 = 0;
 	int y0 = 0;
+
+	double omiga[3] = {0,   1.5, 1};
+	double phi[3]   = {0.5, -1,  1.2};
+	double kapa[3]  = {1,   2,  -1.5};
+	double tx[3] = {0, 10, 20};
+	double ty[3] = {0, 10, 20};
+	double tz[3] = {0, 2,  1.5};
+
+	for(int i=0; i<3; i++)
+	{
+		char filepath[256];
+		sprintf(filepath, "c:\\temp\\imagept_%d.txt", i);
+		
+		double R[9];
+		GenerateRMatrixDirect(omiga[i], phi[i], kapa[i], R);
+		double t[3];
+		t[0] = tx[i]; t[1] = ty[i]; t[2] = tz[i];
+
+		int numpt = 20;
+		FILE* fp = fopen(filepath, "w");
+		fprintf(fp, "%d\n", numpt);
+		for(int i=0; i<numpt; i++)
+		{
+			srand(time(0));
+			
+			double ix,iy;
+			GrdToImg(grdpt[i][0], grdpt[i][1], grdpt[i][2], &ix, &iy, 
+				R, t, focus, x0, y0, ht, wd );
+
+			//printf("%lf %lf  %lf %lf \n", ix1, iy1, ix2, iy2);
+			//random noise
+			double rx = ( (double)(rand())/(double)(RAND_MAX) - 0.5 )*1;
+			double ry = ( (double)(rand())/(double)(RAND_MAX) - 0.5 )*1;
+			
+			//coordinate translation from topleft to the center
+			fprintf(fp, "%lf %lf  \n", ix-wd*0.5+rx, ht*0.5-iy+ry);
+		}
+		fclose(fp);
+
+	}
+
+	/*
 	double R2[9], t2[3];
 	double omiga, phi, kapa;
 
@@ -11040,7 +11125,7 @@ void CProject_PGStationDlg::OnSimulatedataSingleview()
 	phi    = 0;
 	kapa   = 0;	
 	t2[0] = 0; t2[1] = 0; t2[2] = 0;
-	strcpy(filename, "c:\\temp\\Data\\SFM\\imagept0.txt");
+	strcpy(filename, "c:\\temp\\imagept0.txt");
 	
 	//image 1
 	focus = 240;
@@ -11049,18 +11134,18 @@ void CProject_PGStationDlg::OnSimulatedataSingleview()
 	phi    = -2;
 	kapa   = 1.5;
 	t2[0] = 20; t2[1] = 20; t2[2] = 10;	
-	strcpy(filename, "c:\\temp\\Data\\SFM\\imagept1.txt");
+	strcpy(filename, "c:\\temp\\imagept1.txt");
 	
-	/*
+	
 	//image 2
-	focus = 180;
+	focus = 240;
 	x0 = 0; y0 = 0;
 	omiga  = -0.5;
 	phi    = 1;
 	kapa   = 3;
 	t2[0] = 10; t2[1] = -10; t2[2] = 5;
-	strcpy(filename, "c:\\temp\\Data\\SFM\\imagept2.txt");
-    */
+	strcpy(filename, "c:\\temp\\imagept2.txt");
+    
 
 	printf("Output: %s \n", filename);
 	printf("focus: %lf \n", focus);
@@ -11096,6 +11181,8 @@ void CProject_PGStationDlg::OnSimulatedataSingleview()
 		fprintf(fp, "%lf %lf  \n", ix2-wd*0.5+rx2, ht*0.5-iy2+ry2);
 	}
 	fclose(fp);
+	*/
+
 }
 
 
@@ -11289,9 +11376,9 @@ void CProject_PGStationDlg::OnBaSimulate()
 	}
 
 	//read projection points
-	char filename0[256] = "c:\\temp\\Data\\SFM\\imagept0.txt";
-	char filename1[256] = "c:\\temp\\Data\\SFM\\imagept1.txt";
-	char filename2[256] = "c:\\temp\\Data\\SFM\\imagept2.txt";
+	char filename0[256] = "c:\\temp\\Data\\SFM\\imagept_0.txt";
+	char filename1[256] = "c:\\temp\\Data\\SFM\\imagept_1.txt";
+	char filename2[256] = "c:\\temp\\Data\\SFM\\imagept_2.txt";
 	vector<Point2DDouble> vp1;
 	vector<Point2DDouble> vp2;
 	vector<Point2DDouble> vp3;
@@ -11404,9 +11491,10 @@ void CProject_PGStationDlg::OnBaSimulate()
 	cameras.push_back(cam3);
 
 	printf("\n\n Bundle Adjustment ... \n");
-	CBABase* pBA = new CSBA();
-	pBA->RunSFM(gpts, ptViews, imageFeatures, cameraIDOrder, cameras);
-
+	
+	//CBABase* pBA = new CSBA();
+	//pBA->RunSFM(gpts, ptViews, imageFeatures, cameraIDOrder, cameras);
+	//CBABase* pBA = new ();
 }
 
 void CProject_PGStationDlg::OnBaRealimages()
@@ -11482,7 +11570,8 @@ void CProject_PGStationDlg::OnBaRealimages()
 			mt.rId = j;
 			pMatch->Match(imgFeatures[i], imgFeatures[j], mt);
 
-			if( mt.inlierRatio>0.5 && mt.matchs.size()>16 )
+			//if( mt.inlierRatio>0.5 && mt.matchs.size()>16 )
+			if( mt.matchs.size()>16 )
 			{
 				vecMatch.push_back(mt);
 			}
@@ -13252,14 +13341,14 @@ void CProject_PGStationDlg::OnBaNewapi()
 		char file[256];
 		strcpy(file, fileVector[i]);
 		pImageData->Load(file);
-		pImageData->DetectPtFeature(SIFT_FEATURE);
+		pImageData->DetectPtFeature(SIFT_FLOAT_FEATURE);
 		vecImageDataPointer.push_back(pImageData);
 	}
 
 	//2. matching
 	vector<PairMatchRes> vecMatch;
-	//CMatchBase* pMatch = new CKNNMatch();
-	CMatchBase* pMatch = new CSiftMatch();
+	CMatchBase* pMatch = new CKNNMatch();
+	//CMatchBase* pMatch = new CSiftMatch();
 	for(int i=0; i<fileVector.size(); i++)
 		for(int j=i+1; j<fileVector.size(); j++)
 		{
@@ -13268,7 +13357,7 @@ void CProject_PGStationDlg::OnBaNewapi()
 			mt.lId = i;
 			mt.rId = j;
 			pMatch->Match( vecImageDataPointer[i]->GetImageFeature(), 
-				vecImageDataPointer[j]->GetImageFeature(), mt);
+						   vecImageDataPointer[j]->GetImageFeature(), mt);
 
 			//if( mt.inlierRatio>0.5 && mt.matchs.size()>16 )
 			if( mt.matchs.size()>16 )
@@ -13283,7 +13372,7 @@ void CProject_PGStationDlg::OnBaNewapi()
 	CGenerateTracksBase* pGenerateTracks = new CMyGenerateTrack();
 	vector<TrackInfo> vecTrack;
 	pGenerateTracks->GenerateTracks(vecMatch, vecImageDataPointer, vecTrack);
-	PrintTracks(vecTrack, "c:\\temp\\tracks.txt");
+	PrintTracks(vecTrack, "c:\\temp\\bundle_tracks.txt");
 
 	if(vecTrack.size()<8)
 	{
@@ -13331,16 +13420,18 @@ void CProject_PGStationDlg::OnBaNewapi()
 	//double focus = vecImageDataPointer[0]->GetHt();
 	for(int i=0; i<cameras.size(); i++)
 	{
-		if( vecImageDataPointer[i]->IsHasInitFocus() )
-		{
-			cameras[i].focus = vecImageDataPointer[i]->GetInitFocus();
-		}
-		else
-		{
-			double focus = vecImageDataPointer[i]->GetHt();
-			cameras[i].focus = focus; //vecImageDataPointer[i]->GetHt();
-			vecImageDataPointer[i]->SetInitFocus(focus);
-		}
+		cameras[i].focus = vecImageDataPointer[i]->GetInitFocus();
+
+		//if( vecImageDataPointer[i]->IsHasInitFocus() )
+		//{
+		//	cameras[i].focus = vecImageDataPointer[i]->GetInitFocus();
+		//}
+		//else
+		//{
+		//	double focus = vecImageDataPointer[i]->GetHt();
+		//	cameras[i].focus = focus; //vecImageDataPointer[i]->GetHt();
+		//	vecImageDataPointer[i]->SetInitFocus(focus);
+		//}
 	}
 	pBA->BundleAdjust( cameras.size(), cameras, vecImageDataPointer, 
 		vecMatch, vecTrack, "c:\\temp");

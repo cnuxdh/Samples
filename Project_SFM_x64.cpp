@@ -17,8 +17,134 @@
 #include <vector>
 using namespace std;
 
+
+int main_simulate_multviews(int argc, char* argv[])
+//int main()
+{
+	//from 3D to 2D 
+	double grdpt[20][3] = 
+		{0,   0,  -220,
+		160, 140, -200,
+		-230, 100, -250,
+		100, -100, -280,
+		-250, -200, -300,
+		-240,  100, -320,
+		-211, -203, -310,
+		26,  220, -280,
+		-20, -10, -250,
+		150, -230, -230,
+		-50, -140, -350,
+		30,  80, -325,
+		-28,  110, -306,
+		23, -120, -315,
+		-150, 203, -312,						   
+		-70, 100, -321,
+		80, -49, -314,
+		-70, -50, -354,
+		20, 40, -343,
+		-15, -60, -323,
+	};
+
+	//intrinsic parameters
+	double focus = 240;
+	int ht = 480;
+	int wd = 640;
+	int x0 = 0;
+	int y0 = 0;
+
+	double omiga[3] = {0,  1.5, 1};
+	double phi[3]   = {0, -1,  1.2};
+	double kapa[3]  = {0,  2,  -1.5};
+	double tx[3] = {0, 10, 20};
+	double ty[3] = {0, 10, 20};
+	double tz[3] = {0, 2,  1.5};
+
+	int numpt = 20;
+
+	//1.generate the feature points of several images
+	vector<ImgFeature> feats;
+	for(int i=0; i<3; i++)
+	{
+		double R[9];
+		GenerateRMatrixDirect(omiga[i], phi[i], kapa[i], R);
+		double t[3];
+		t[0] = tx[i]; t[1] = ty[i]; t[2] = tz[i];
+
+		ImgFeature feat;
+		feat.ht = ht;
+		feat.wd = wd;
+
+		for(int i=0; i<numpt; i++)
+		{
+			srand(time(0));
+
+			double ix,iy;
+			GrdToImg(grdpt[i][0], grdpt[i][1], grdpt[i][2], &ix, &iy, 
+				R, t, focus, x0, y0, ht, wd );
+
+			//random noise
+			double rx = ( (double)(rand())/(double)(RAND_MAX) - 0.5 )*1;
+			double ry = ( (double)(rand())/(double)(RAND_MAX) - 0.5 )*1;
+
+			double cx = ix-wd*0.5+rx;
+			double cy = ht*0.5-iy+ry;
+
+			stPtFeature pt;
+			pt.cx = cx;
+			pt.cy = cy;
+
+			feat.featPts.push_back(pt);	
+		}
+		feats.push_back(feat);
+	}
+	
+	//2.generate the matches
+	vector<PairMatchRes> matchRes; 
+	for(int j=0; j<3; j++)
+	{
+		for(int i=j+1; i<3; i++)
+		{
+			PairMatchRes sm;
+			sm.lId = j;
+			sm.rId = i;
+			sm.inlierRatio = 1;
+			
+			for(int k=0; k<numpt; k++)
+			{
+				MatchPairIndex mp;
+				mp.l = k;
+				mp.r = k;
+				sm.matchs.push_back(mp);
+			}		
+			matchRes.push_back(sm);
+		}
+	}
+
+	//3.generate the tracks
+	vector<TrackInfo> tracks; 
+	CGenerateTracksBase* pGenerateTrack = new CFastGenerateTrack();
+	pGenerateTrack->GenerateTracks(feats, matchRes, tracks);
+
+
+	//4. sparse bundle adjustment
+	int numImage = feats.size();
+	vector<CameraPara> cameras; 
+	cameras.resize(numImage);
+	double focalLen = focus*1.2; //feats[0].ht; //provide the initial focal length
+	for(int i=0; i<numImage; i++)
+	{
+		cameras[i].focus = focalLen;
+	}
+	CBABase* pBA = new CCeresBA();
+	pBA->BundleAdjust( cameras.size(), cameras, feats, matchRes, tracks); 
+	
+
+	return 0;
+}
+
+
 //test the ceres ba based on the simulated values
-int main_simluate()
+int main_simulate_pair(int argc, char* argv[])
 {
 	vector<CameraPara> cameras;
 	vector<ImgFeature> features;
@@ -38,8 +164,8 @@ int main_simluate()
 	int y0 = 0;
 
 	//outer parameters
-	double R1[9],R2[9];
-	double t1[3],t2[3];    
+	double R1[9],R2[9],R3[9];
+	double t1[3],t2[3],t3[3];    
 	memset(R1, 0, sizeof(double)*9);
 	memset(R2, 0, sizeof(double)*9);
 	memset(t1, 0, sizeof(double)*3);
@@ -56,7 +182,7 @@ int main_simluate()
 	kapa   = 1.5;
 	//GenerateRMatrix(omiga, phi, kapa, R2);
 	GenerateRMatrixDirect(omiga, phi, kapa, R2);
-	t2[0] = 20; t2[1] = 20; t2[2] = 10;
+	t2[0] = 10; t2[1] = 10; t2[2] = 1;
 	for(int j=0; j<3; j++)
 	{
 		for(int i=0; i<3; i++)
@@ -66,6 +192,16 @@ int main_simluate()
 		printf("\n");
 	}
 	printf("\n");
+
+
+	//image 2
+	omiga  = -1;
+	phi    = 1;
+	kapa   = 1.2;
+	//GenerateRMatrix(omiga, phi, kapa, R2);
+	GenerateRMatrixDirect(omiga, phi, kapa, R3);
+	t3[0] = 20; t3[1] = 20; t3[2] = 0.5;
+
 
 	//from 3D to 2D
 	double grdpt[20][3] = {0,   0,  -220,
@@ -93,15 +229,20 @@ int main_simluate()
 	//printf("Relative Pose \n");
 	FILE* fp = fopen("c:\\temp\\simulatePair.txt", "w");
 	fprintf(fp, "%d\n", numpt);
-	vector<Point2DDouble> leftImagePts;
-	vector<Point2DDouble> rightImagePts;
+	vector<Point2DDouble> pts1;
+	vector<Point2DDouble> pts2;
+	vector<Point2DDouble> pts3;
+
 	
-	ImgFeature leftFeat;
-	ImgFeature rightFeat;
-	leftFeat.ht = ht;
-	leftFeat.wd = wd;
-	rightFeat.ht = ht;
-	rightFeat.wd = wd;	
+	ImgFeature feat1;
+	ImgFeature feat2;
+	ImgFeature feat3;
+	feat1.ht = ht;
+	feat1.wd = wd;
+	feat2.ht = ht;
+	feat2.wd = wd;	
+	feat3.ht = ht;
+	feat3.wd = wd;
 	
 	for(int i=0; i<numpt; i++)
 	{
@@ -114,6 +255,11 @@ int main_simluate()
 		double ix2,iy2;
 		GrdToImg(grdpt[i][0], grdpt[i][1], grdpt[i][2], &ix2, &iy2, 
 			R2, t2, focus, x0, y0, ht, wd );
+
+		double ix3,iy3;
+		GrdToImg(grdpt[i][0], grdpt[i][1], grdpt[i][2], &ix3, &iy3, 
+			R3, t3, focus, x0, y0, ht, wd );
+
 
 		//printf("%lf %lf  %lf %lf \n", ix1, iy1, ix2, iy2);
 
@@ -141,18 +287,18 @@ int main_simluate()
 		pr.p[0] = pr.x;
 		pr.p[1] = pr.y;
 		
-		leftImagePts.push_back(pl);
-		rightImagePts.push_back(pr);
+		pts1.push_back(pl);
+		pts2.push_back(pr);
 
 		//save the feature points
 		stPtFeature featpt;
 		featpt.cx = pl.x;
 		featpt.cy = pl.y;
-		leftFeat.featPts.push_back(featpt);
+		feat1.featPts.push_back(featpt);
 
 		featpt.cx = pr.x;
 		featpt.cy = pr.y;
-		rightFeat.featPts.push_back(featpt);
+		feat2.featPts.push_back(featpt);
 		
 		//save into the tracks
 		TrackInfo singleTrack;
@@ -168,8 +314,8 @@ int main_simluate()
 	}
 	fclose(fp);
 
-	features.push_back(leftFeat);
-	features.push_back(rightFeat);
+	features.push_back(feat1);
+	features.push_back(feat2);
 
 	//getchar();
 
@@ -177,12 +323,12 @@ int main_simluate()
 	CRelativePoseBase* pRP = new CEstimatePose5Point(); 
 	cameras[0].focus = focus*0.98;
 	cameras[1].focus = focus*0.98;
-	pRP->EstimatePose(leftImagePts, rightImagePts, cameras[0], cameras[1]);
+	pRP->EstimatePose(pts1, pts2, cameras[0], cameras[1]);
 
 	//recover 3D point
 	CTriangulateBase* pTriangulate = new CTriangulateCV();
 	vector<Point3DDouble> gpts;
-	pTriangulate->Triangulate(leftImagePts, rightImagePts, cameras[0], cameras[1], gpts);
+	pTriangulate->Triangulate(pts1, pts2, cameras[0], cameras[1], gpts);
 
 	for(int i=0; i<gpts.size(); i++)
 	{
@@ -190,18 +336,24 @@ int main_simluate()
 	}
 
 	CeresBA(tracks, features, /*cameraIDOrder,*/ cameras);
-
+	
 
 	return 0;
 }
 
 
 //process the real images
-int main(int argc, char** argv[])
+//int main_realimages(int argc, char* argv[])
+int main_realimages(int argc, char* argv[])
 {
 	printf("SFM integration .... \n");
 
-	char* imagepath = "C:\\Work\\Data\\relativePose";
+	char imagepath[256] = "C:\\Work\\Data\\ba1";
+
+	if(argc==2)
+	{
+		strcpy(imagepath, argv[1]);
+	}
 
 	char** filenames = NULL;
 	int n=0;
@@ -221,8 +373,7 @@ int main(int argc, char** argv[])
 	//1. generating the image feature points
 	vector<ImgFeature> imgFeatures;
 	DetectFileFeaturePts(filenames, nfile, imgFeatures);
-	
-	
+		
 	//2. matching images 
 	vector<PairMatchRes> matchRes; 
 	MatchImageFiles(imgFeatures, matchRes);
@@ -272,6 +423,15 @@ int main(int argc, char** argv[])
 	pBA->BundleAdjust( cameras.size(), cameras, imgFeatures, matchRes, tracks); 
 
 	
+
 	return 0;
 }
 
+int main(int argc, char* argv[])
+{
+
+	//main_simulate_pair(argc, argv);
+	//main_simulate_multviews(argc, argv);
+	main_realimages(argc,argv);
+
+}
