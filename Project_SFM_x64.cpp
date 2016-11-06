@@ -423,15 +423,12 @@ int main_realimages(int argc, char* argv[])
 	pBA->BundleAdjust( cameras.size(), cameras, imgFeatures, matchRes, tracks); 
 
 	
-
 	return 0;
 }
 
 int main(int argc, char* argv[])
 {
-
 	//main_simulate_pair(argc, argv);
 	//main_simulate_multviews(argc, argv);
 	main_realimages(argc,argv);
-
 }
