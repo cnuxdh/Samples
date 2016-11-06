@@ -264,10 +264,10 @@ int main_simulate_pair(int argc, char* argv[])
 		//printf("%lf %lf  %lf %lf \n", ix1, iy1, ix2, iy2);
 
 		//random noise
-		double rx1 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
-		double ry1 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
-		double rx2 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
-		double ry2 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*2;
+		double rx1 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*1.2;
+		double ry1 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*1.2;
+		double rx2 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*1.2;
+		double ry2 = ( (double)(rand())/(double)(RAND_MAX) - 0.5)*1.2;
 
 		//coordinate translation from topleft to the center
 		fprintf(fp, "%lf %lf  %lf %lf \n", ix1-wd*0.5+rx1, ht*0.5-iy1+ry1, 
@@ -321,8 +321,8 @@ int main_simulate_pair(int argc, char* argv[])
 
 	//relative pose estimation
 	CRelativePoseBase* pRP = new CEstimatePose5Point(); 
-	cameras[0].focus = focus*0.98;
-	cameras[1].focus = focus*0.98;
+	cameras[0].focus = focus*0.9;
+	cameras[1].focus = focus*0.9;
 	pRP->EstimatePose(pts1, pts2, cameras[0], cameras[1]);
 
 	//recover 3D point
@@ -418,16 +418,75 @@ int main_realimages(int argc, char* argv[])
 	for(int i=0; i<numImage; i++)
 	{
 		cameras[i].focus = focalLen;
+		memset(cameras[i].R, 0, sizeof(double)*9);
+		cameras[i].R[0] = 1;
+		cameras[i].R[4] = 1;
+		cameras[i].R[8] = 1;
 	}
 	CBABase* pBA = new CCeresBA();
 	pBA->BundleAdjust( cameras.size(), cameras, imgFeatures, matchRes, tracks); 
-
 	
+
+	return 0;
+}
+
+int TestRotate()
+{
+	double ax = 0;
+	double ay = 0;
+	double az = 0;
+
+	double R[9];
+	GenerateRMatrixDirect(ax, ay, az, R);
+
+	printf("\n Rotation Angle x:%lf y:%lf z:%lf \n", ax, ay, az);
+	for(int j=0; j<3; j++)
+	{
+		for(int i=0; i<3; i++)
+		{
+			printf("%lf ", R[j*3+i]);
+		}
+		printf("\n");
+	}
+
+	double aa[3];
+	rot2aa(R, aa);
+	printf("\n axis-angle vector: %lf %lf %lf \n", aa[0], aa[1], aa[2]);
+
+
+	double Rt[9];
+	aa2rot(aa, Rt);
+	printf("\n Rotation generate by axis-angle vector... \n");
+	for(int j=0; j<3; j++)
+	{
+		for(int i=0; i<3; i++)
+		{
+			printf("%lf ", Rt[j*3+i]);
+		}
+		printf("\n");
+	}
+
+	double nR[9];
+	//transpose(Rt, nR, 3, 3);
+	for(int j=0; j<3; j++)
+	{
+		for(int i=0; i<3; i++)
+		{
+			nR[j*3+i] = Rt[i*3 + j];
+		}
+	}
+
+	double ea[3];
+	rot2eular(nR, ea);
+	printf("\n Eular angle: %lf %lf %lf \n", ea[0], ea[1], ea[2]);
+
 	return 0;
 }
 
 int main(int argc, char* argv[])
 {
+	//TestRotate();
+
 	//main_simulate_pair(argc, argv);
 	//main_simulate_multviews(argc, argv);
 	main_realimages(argc,argv);
