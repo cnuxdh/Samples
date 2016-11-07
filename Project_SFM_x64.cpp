@@ -417,7 +417,7 @@ int main_realimages(int argc, char* argv[])
 	double focalLen = imgFeatures[0].ht; //(imgFeatures[0].ht + imgFeatures[0].wd) * 0.5;
 	for(int i=0; i<numImage; i++)
 	{
-		cameras[i].focus = focalLen;
+		cameras[i].focus = focalLen; //initialize the focal length 
 		memset(cameras[i].R, 0, sizeof(double)*9);
 		cameras[i].R[0] = 1;
 		cameras[i].R[4] = 1;
@@ -436,6 +436,7 @@ int TestRotate()
 	double ay = 0;
 	double az = 0;
 
+	//generate rotation matrix based on Tsai paper
 	double R[9];
 	GenerateRMatrixDirect(ax, ay, az, R);
 
@@ -449,11 +450,13 @@ int TestRotate()
 		printf("\n");
 	}
 
+	//rotation matrix to axis-angle
 	double aa[3];
 	rot2aa(R, aa);
 	printf("\n axis-angle vector: %lf %lf %lf \n", aa[0], aa[1], aa[2]);
 
 
+	//axis-angle to rotation matrix column order 
 	double Rt[9];
 	aa2rot(aa, Rt);
 	printf("\n Rotation generate by axis-angle vector... \n");
@@ -476,6 +479,7 @@ int TestRotate()
 		}
 	}
 
+	//rotation matrix to Eular angle
 	double ea[3];
 	rot2eular(nR, ea);
 	printf("\n Eular angle: %lf %lf %lf \n", ea[0], ea[1], ea[2]);
