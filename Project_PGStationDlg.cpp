@@ -19066,6 +19066,7 @@ void CProject_PGStationDlg::OnPanoramicMatching()
 
 			//4. remove outliers and display
 			srand(100);
+			/*
 			IplImage* pMosaic = VerticalMosaic(lImage, rImage);
 
 			for(int i=0; i<lptImagePts.size(); i++)
@@ -19099,19 +19100,17 @@ void CProject_PGStationDlg::OnPanoramicMatching()
 					cvDrawCircle(rImage, pr, 2, CV_RGB(r,g,b),2);
 					cvDrawLine(pMosaic, pl, cvPoint( pr.x, pr.y+ht ), CV_RGB(255,0,0));
 				}				
-			}
-	
-			/*
-			cvNamedWindow("Match1");
-			cvShowImage("Match1", lImage);
-			cvNamedWindow("Match2");
-			cvShowImage("Match2", rImage);
-			*/
-
+			}			
+			//cvNamedWindow("Match1");
+			//cvShowImage("Match1", lImage);
+			//cvNamedWindow("Match2");
+			//cvShowImage("Match2", rImage);
+			
 			cvSaveImage("c:\\temp\\left.jpg",  lImage);
 			cvSaveImage("c:\\temp\\right.jpg", rImage);
 			cvSaveImage("c:\\temp\\match.jpg", pMosaic);
 			cvReleaseImage(&pMosaic);		
+			*/
 
 
 			//5. 3D reconstruction and output
@@ -19168,12 +19167,6 @@ void CProject_PGStationDlg::OnPanoramicMatching()
 
 			//projection from panorama to plane 
 			int nAngleStep = 30;
-
-			
-
-
-
-
 		}	
 }
 
@@ -19348,7 +19341,8 @@ void CProject_PGStationDlg::OnCalibrationOpencv()
 void CProject_PGStationDlg::OnPanoramicReadingpos()
 {
 	// TODO: Add your command handler code here
-	char* filepath = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg\\0-40_jpg.cam";
+	//char* filepath = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg\\0-40_jpg.cam";
+	char* filepath = "C:\\Work\\Data\\panorama\\Pano_Cam_1108\\1104_170_new.cam";
 	
 	char sline[512];
 	char sname[256];
@@ -19371,7 +19365,7 @@ void CProject_PGStationDlg::OnPanoramicReadingpos()
 	while(!feof(fp))
 	{
 		fscanf( fp, "%s  %lf %lf   %lf %lf %lf  %lf %lf %lf   %s %s %s ", sname, 
-			&lat, &lon, &gx, &gy, &gz, &ax, &ay, &az, sGpsTime, sDay, sTime ); 
+			&lat, &lon, &gx, &gy, &gz, &ay, &ax, &az, sGpsTime, sDay, sTime ); 
 			
 		//position of camera
 		vgx.push_back(gx);
@@ -19379,9 +19373,9 @@ void CProject_PGStationDlg::OnPanoramicReadingpos()
 		vgz.push_back(gz);
 		
 		//rotation angle
-		ax = ax; // / PI * 180;
-		ay = ay; // / PI * 180;
-		az = az; // / PI * 180;
+		ax = ax / PI * 180;
+		ay = ay / PI * 180;
+		az = az / PI * 180;
 		vax.push_back(ax);
 		vay.push_back(ay);
 		vaz.push_back(az);
@@ -19399,8 +19393,8 @@ void CProject_PGStationDlg::OnPanoramicReadingpos()
 		double R2[9], T2[3];
 
 		//double omiga,phi,kapa; //x,y,z
-		GenerateRMatrixDirect(vay[i],   vax[i],   vaz[i], R1);
-		GenerateRMatrixDirect(vay[i+1], vax[i+1], vaz[i+1], R2);
+		GenerateRMatrixDirect(vax[i],   vay[i],   vaz[i], R1);
+		GenerateRMatrixDirect(vax[i+1], vay[i+1], vaz[i+1], R2);
 		
 		/*
 		//input must be degree
@@ -19416,6 +19410,7 @@ void CProject_PGStationDlg::OnPanoramicReadingpos()
 		invers_matrix(R1, 3);
 		double R12[9];
 		mult(R2, R1, R12, 3, 3, 3);
+
 		double ax1 = atan( R12[5]/R12[8] ) / PI*180; 
 		double ay1 = asin( -R12[2] ) /PI*180;
 		double az1 = atan( R12[1]/R12[0]) /PI*180;
@@ -19804,7 +19799,8 @@ void CProject_PGStationDlg::OnPanoramicRelativeposebatch()
 {
 	// TODO: Add your command handler code here
 
-	char* imagepath = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg";
+	//char* imagepath = "F:\\Data\\panorama\\ladybug_jpg\\ladybug_jpg";
+	char* imagepath = "C:\\Work\\Data\\panorama\\Pano_Cam_1108";
     
 	char** filenames = NULL;
 	int n=0;

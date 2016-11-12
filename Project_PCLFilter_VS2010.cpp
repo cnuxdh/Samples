@@ -28,6 +28,7 @@ using namespace std;
 int PointCloudFilter(double* px, double* py, double* pz, int nPt,
 					 int numNeibor, double stddev_mult)
 {
+	
 	//prepare the 3D points
 	//pcl::PointCloud<pcl::PointXYZ> ptCloud;
 	pcl::PointCloud<pcl::PointXYZ>::Ptr ptCloud(new pcl::PointCloud<pcl::PointXYZ>);

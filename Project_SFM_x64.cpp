@@ -18,6 +18,12 @@
 using namespace std;
 
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+using namespace cv;
+
+
 int main_simulate_multviews(int argc, char* argv[])
 //int main()
 {
@@ -486,6 +492,48 @@ int TestRotate()
 
 	return 0;
 }
+
+
+
+void on_leftimage_mouse( int event, int x, int y, int flags, void* param)
+{
+	if( event == CV_EVENT_LBUTTONDOWN )
+	{
+		CvPoint cp;
+		cp.x = x;
+		cp.y = y;
+		
+	}
+}
+
+void on_rightimage_mouse( int event, int x, int y, int flags, void* param)
+{
+	if( event == CV_EVENT_LBUTTONDOWN )
+	{
+
+		CvPoint cp;
+		cp.x = x;
+		cp.y = y;
+
+	}
+}
+
+int TestPanoMatch()
+{
+
+	char* lImageFile = "C:\\Work\\Data\\panorama\\Pano_Cam_1108\\ladybug_panoramic_000170.jpg";
+	char* rImageFile = "C:\\Work\\Data\\panorama\\Pano_Cam_1108\\ladybug_panoramic_000170.jpg";
+	
+
+
+
+
+	cvSetMouseCallback("Left", on_leftimage_mouse, NULL );
+	cvSetMouseCallback("Right", on_rightimage_mouse, NULL );
+
+}
+
+
 
 int main(int argc, char* argv[])
 {
