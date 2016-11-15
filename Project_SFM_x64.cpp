@@ -524,13 +524,11 @@ int TestPanoMatch()
 	char* lImageFile = "C:\\Work\\Data\\panorama\\Pano_Cam_1108\\ladybug_panoramic_000170.jpg";
 	char* rImageFile = "C:\\Work\\Data\\panorama\\Pano_Cam_1108\\ladybug_panoramic_000170.jpg";
 	
-
-
-
-
+	
 	cvSetMouseCallback("Left", on_leftimage_mouse, NULL );
 	cvSetMouseCallback("Right", on_rightimage_mouse, NULL );
 
+	return 0;
 }
 
 
