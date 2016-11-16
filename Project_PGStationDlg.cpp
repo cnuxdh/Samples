@@ -8599,7 +8599,7 @@ void CProject_PGStationDlg::OnBlockmatchingTwoframes()
 void CProject_PGStationDlg::OnRegisterSiftFloat()
 {
 	// TODO: Add your command handler code here
-
+	/*
 	if( m_imagePointerVector.size()>1 )
 	{
 		CWaitCursor waitCursor;
@@ -8670,6 +8670,77 @@ void CProject_PGStationDlg::OnRegisterSiftFloat()
 		delete[] matches;
 		free(fImage1);
 		free(fImage2);
+	}
+	*/
+
+
+	if( m_imagePointerVector.size()>1 )
+	{
+
+		IplImage* pLeft  = cvLoadImage(m_imagePointerVector[0]->GetFilePath());
+		IplImage* pRight = cvLoadImage(m_imagePointerVector[1]->GetFilePath());
+
+
+		//1. detect feature points 
+		printf("\n");
+		CFeatureBase* pFeatDetect = new CSIFTFloat();
+		ImgFeature lImageFeature, rImageFeature;
+		pFeatDetect->Detect(m_imagePointerVector[0]->GetFilePath(), lImageFeature);
+		pFeatDetect->Detect(m_imagePointerVector[1]->GetFilePath(), rImageFeature);
+		delete pFeatDetect;
+
+
+		//2. matching 
+		printf("\n");
+		CMatchBase* pMatch = new CSiftMatch();
+		PairMatchRes mp;
+		pMatch->Match(lImageFeature, rImageFeature, mp);
+		delete pMatch;
+		int nMatch = mp.matchs.size();
+		printf("Matching Point Number: %d \n", nMatch);
+		
+		
+		//display 
+		srand(100);
+		for(int i=0; i<mp.matchs.size(); i++)
+		{
+			int li = mp.matchs[i].l;
+			int ri = mp.matchs[i].r;
+			CvPoint pl;
+			pl.x = lImageFeature.featPts[li].x;
+			pl.y = lImageFeature.featPts[li].y;
+			CvPoint pr;
+			pr.x = rImageFeature.featPts[ri].x;
+			pr.y = rImageFeature.featPts[ri].y;
+			int r = (double)(rand())/(double)(RAND_MAX)*255;
+			int g = (double)(rand())/(double)(RAND_MAX)*255;
+			int b = (double)(rand())/(double)(RAND_MAX)*255;
+			cvDrawCircle(pLeft, pl, 5, CV_RGB(r,g,b), 5);
+			cvDrawCircle(pRight, pr, 5, CV_RGB(r,g,b), 5);
+		}
+		cvSaveImage("c:\\temp\\left.jpg", pLeft);
+		cvSaveImage("c:\\temp\\right.jpg", pRight);
+
+
+		IplImage* pMosaic = VerticalMosaic(pLeft, pRight);
+
+		for(int k=0; k<nMatch; k++)
+		{	
+			int    lx,ly;
+			int    rx,ry;
+			int    nLeftHt = pLeft->height;
+
+			lx = lImageFeature.featPts[ mp.matchs[k].l ].x;
+			ly = lImageFeature.featPts[ mp.matchs[k].l ].y;
+			rx = rImageFeature.featPts[ mp.matchs[k].r ].x;
+			ry = rImageFeature.featPts[ mp.matchs[k].r ].y;
+
+			cvDrawCircle(pMosaic, cvPoint(lx, ly), 1, CV_RGB(255,0,0), 5);
+			cvDrawCircle(pMosaic, cvPoint(rx, ry+nLeftHt), 1, CV_RGB(255,0,0), 5);
+			cvDrawLine( pMosaic, cvPoint(lx, ly), cvPoint(rx, ry+nLeftHt), CV_RGB(0,255,0), 3 );
+		}
+		cvSaveImage("c:\\temp\\match_mosaic.jpg", pMosaic);
+		cvReleaseImage(&pMosaic);
 	}
 }
 
@@ -12536,6 +12607,18 @@ void CProject_PGStationDlg::OnEpipolargeometryFundamentalmatrix()
 	vector<double> fm;
 	m_pEstimateFM->Estimate(lPts, rPts, fm);
     
+	printf("\n fundamental matrix by opencv .... \n");
+	for(int i=0; i<fm.size(); i++)
+		printf("%lf ", fm[i]);
+	printf("\n");
+
+	double fm1[9];
+	EstimateFMatrix(lPts, rPts, 512, 24, fm1);
+
+	printf("\n fundamental matrix by myself .... \n");
+	for(int i=0; i<fm.size(); i++)
+		printf("%lf ", fm1[i]);
+	printf("\n");
 
 	//display 
 	srand(100);
@@ -13356,8 +13439,9 @@ void CProject_PGStationDlg::OnBaNewapi()
 			PairMatchRes mt;
 			mt.lId = i;
 			mt.rId = j;
-			pMatch->Match( vecImageDataPointer[i]->GetImageFeature(), 
-						   vecImageDataPointer[j]->GetImageFeature(), mt);
+			
+			//pMatch->Match( vecImageDataPointer[i]->GetImageFeature(), 
+			//			   vecImageDataPointer[j]->GetImageFeature(), mt);
 
 			//if( mt.inlierRatio>0.5 && mt.matchs.size()>16 )
 			if( mt.matchs.size()>16 )

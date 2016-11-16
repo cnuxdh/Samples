@@ -68,7 +68,7 @@ IplImage* VerticalMosaic(IplImage* pLeft, IplImage* pRight)
 }
 
 
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int argc, char* argv[])
 {
 	printf("%d \n", argc);
 
