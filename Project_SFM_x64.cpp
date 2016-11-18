@@ -368,6 +368,13 @@ int main_realimages(int argc, char* argv[])
 	filenames = f2c(nfile, 256);
 	GetDirFileName(filenames, imagepath, &n, &nfile, "JPG", 1);
 
+	if(nfile==0)
+	{
+		GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 0);
+		filenames = f2c(nfile, 256);
+		GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 1);
+	}
+
 	printf("image number: %d \n", nfile);
 
 	if(nfile<2)

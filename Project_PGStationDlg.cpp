@@ -12617,7 +12617,7 @@ void CProject_PGStationDlg::OnEpipolargeometryFundamentalmatrix()
 
 	printf("\n fundamental matrix by myself .... \n");
 	for(int i=0; i<fm.size(); i++)
-		printf("%lf ", fm1[i]);
+		printf("%lf ", fm1[i]/fm1[8]);
 	printf("\n");
 
 	//display 
