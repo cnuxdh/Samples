@@ -538,7 +538,43 @@ int TestPanoMatch()
 	return 0;
 }
 
+int main_realimages_bundler(int argc, char* argv[])
+{
+	char imagepath[256] = "C:\\Work\\Data\\ba1";
 
+	if(argc==2)
+	{
+		strcpy(imagepath, argv[1]);
+	}
+
+	char** filenames = NULL;
+	int n=0;
+	int nfile = 0;
+	GetDirFileName(filenames, imagepath, &n, &nfile, "JPG", 0);
+	filenames = f2c(nfile, 256);
+	GetDirFileName(filenames, imagepath, &n, &nfile, "JPG", 1);
+
+	if(nfile==0)
+	{
+		GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 0);
+		filenames = f2c(nfile, 256);
+		GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 1);
+	}
+
+	printf("image number: %d \n", nfile);
+
+	if(nfile<2)
+	{
+		printf("images are less than 2 ! \n");
+		return -1;
+	}
+
+
+
+
+
+	return 0;
+}
 
 
 int main(int argc, char* argv[])
