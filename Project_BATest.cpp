@@ -60,7 +60,7 @@ int main_realimages(int argc, char* argv[])
 
 	//1. generating the image feature points
 	vector<ImgFeature> imgFeatures;
-	DetectFileFeaturePts(filenames, nfile, imgFeatures, 640);
+	DetectFileFeaturePts(filenames, nfile, imgFeatures, 600);
 
 	//2. matching images 
 	vector<PairMatchRes> matchRes; 
