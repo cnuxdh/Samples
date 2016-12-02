@@ -19256,10 +19256,9 @@ void CProject_PGStationDlg::OnPanoramicMatching()
 
 void CProject_PGStationDlg::OnPanoramicSimulation()
 {
-	
 	// TODO: Add your command handler code here	
 	int ht,wd;
-  ht = 512;
+    ht = 512;
 	wd = 1024;
 	double radius = (double)(wd) / (2*PI);
 	printf("radius: %lf \n", radius);
