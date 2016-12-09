@@ -10,11 +10,24 @@
 #include "cvInvoke.hpp"
 #include "ba.hpp"
 #include "ceresba.hpp"
+#include "panorama.hpp"
+#include "bundlerio.hpp"
 
 
 //corelib
 #include "commonfile.h"
 //#include "File.h"
+
+#ifdef OPENCV_1X 
+#include "cv.h"
+#include "highgui.h"
+#include "cxcore.h"
+#else
+//opencv
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+#endif
 
 
 #include <vector>
@@ -272,8 +285,8 @@ int main_simulate_multviews(int argc, char* argv[])
 			srand(time(0));
 
 			double ix,iy;
-			GrdToImg(grdpt[i][0], grdpt[i][1], grdpt[i][2], &ix, &iy, 
-				R, t, focus, x0, y0, ht, wd );
+			//GrdToImg(grdpt[i][0], grdpt[i][1], grdpt[i][2], &ix, &iy, 
+				//R, t, focus, x0, y0, ht, wd );
 
 			//random noise
 			double rx = ( (double)(rand())/(double)(RAND_MAX) - 0.5 )*2;
@@ -336,13 +349,421 @@ int main_simulate_multviews(int argc, char* argv[])
 }
 
 
+int main_pano_rp(int argc, char* argv[])
+{
+	char* imagepath = "C:\\Work\\Data\\panorama\\ladybug_jpg";
+
+	char** filenames = NULL;
+	int n=0;
+	int nfile =0;
+	GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 0);
+	filenames = f2c(nfile, 256);
+	GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 1);
+
+	FILE* fp = fopen("c:\\temp\\5point_relativepose.txt", "w");
+	//fprintf(fp, "pitch	 roll	 yaw	 t0	 t1	 t2 \n");
+	
+	for(int i=0; i<nfile-1; i++)
+	//int i = 1;
+	{
+		/*
+		MSG msg;
+		while (PeekMessage(&msg,NULL,NULL,NULL,PM_REMOVE))         
+		{            
+			TranslateMessage(&msg);            
+			DispatchMessage(&msg);         
+		}*/
+
+		printf("%d-%d \n", i, i+1);
+
+		//IplImage* lImage = cvLoadImage(filenames[i]);
+		//IplImage* rImage = cvLoadImage(filenames[i+1]);
+		//printf("%s \n", file1);
+		//printf("%s \n", file2);
+		//1. feature detection
+		//CFeatureBase* pFeatDetect = new CSIFTFloat(); 
+		//CFeatureBase* pFeatDetect = new CSURF(); 
+		ImgFeature lImageFeats;
+		ImgFeature rImageFeats;
+		
+		//pFeatDetect->Detect(filenames[i], lImageFeats);
+		//pFeatDetect->Detect(filenames[i+1], rImageFeats);
+		DetectFileFeaturePts(filenames[i],   lImageFeats, 480);
+		DetectFileFeaturePts(filenames[i+1], rImageFeats, 480);
+
+		//convert from spherical to real 3D
+		//int ht = lImage->height;
+		//int wd = lImage->width;
+		int ht = lImageFeats.ht;
+		int wd = lImageFeats.wd;
+
+		//2. matching
+		printf("Matching... \n");
+		CMatchBase* pMatch = new CPanoMatch();
+		vector<MatchPairIndex> mi;
+		pMatch->Match(lImageFeats, rImageFeats, mi);
+		printf("Match Pair: %d \n", mi.size());
+
+
+		//3. pose estimation and compute residual error 
+		double ratio = 0.6;
+		vector<Point3DDouble> lptPano;     //3D spherical points
+		vector<Point3DDouble> rptPano;
+		vector<Point2DDouble> lptImagePts; //image points
+		vector<Point2DDouble> rptImagePts;
+		vector<int> matchIndex;
+		double radius = (double)(wd) / (2*PI); 
+
+		for(int i=0; i<mi.size(); i++)
+		{
+			int li = mi[i].l;
+			int ri = mi[i].r;
+
+			Point2DDouble pl;
+			pl.x = lImageFeats.featPts[li].col;
+			pl.y = lImageFeats.featPts[li].row;
+			Point2DDouble pr;
+			pr.x = rImageFeats.featPts[ri].col;
+			pr.y = rImageFeats.featPts[ri].row;
+
+			//remove the match without motion
+			double dis = sqrt( (double)( (pl.x-pr.x)*(pl.x-pr.x) + (pl.y-pr.y)*(pl.y-pr.y)) );
+			if(dis<5) continue;
+
+			if( pl.y<ht*ratio && pr.y<ht*ratio )
+			{
+				Point2DDouble ip;
+				ip.p[0] = pl.x;
+				ip.p[1] = pl.y;
+				lptImagePts.push_back(ip);
+				ip.p[0] = pr.x;
+				ip.p[1] = pr.y;
+				rptImagePts.push_back(ip);
+
+				Point3DDouble gp;					
+				SphereTo3D_center(pl.x, pl.y, radius, gp.p[0], gp.p[1], gp.p[2]);
+				lptPano.push_back(gp);
+				SphereTo3D_center(pr.x, pr.y, radius, gp.p[0], gp.p[1], gp.p[2]);
+				rptPano.push_back(gp);
+			}
+		}
+
+		double R[9];
+		double T[3];
+		vector<double> residual;
+		residual.resize(lptPano.size());
+		dll_EstimatePose5Point_Pano(lptPano, rptPano, radius, 500, 2.5, R, T, residual);
+		
+		//GeneratePanoEpipolarImageHeading(R, T, filenames[i], filenames[i+1]);
+		//GeneratePanoEpipolarImage(R, T, filenames[i], filenames[i+1]);
+		
+		//double eT[3];
+		//CalculateExplicitT(R, T, eT);
+
+		double ax = atan( R[5]/R[8] ) / PI*180; 
+		double ay = asin( -R[2] ) /PI*180;
+		double az = atan( R[1]/R[0]) /PI*180;
+		
+		printf("%d-%d \n", i, i+1);
+		printf("Rotation... \n");
+		printf("%lf %lf %lf \n", ax, ay, az);
+		printf("Translation .... \n");
+		printf("%lf %lf %lf \n", T[0], T[1], T[2]);			
+
+		//fprintf(fp, "%d-%d \n", i, i+1);
+		//fprintf(fp, "rotation: %lf %lf %lf \n", ax, ay, az);
+		//fprintf(fp, "translation: %lf %lf %lf \n", T[0], T[1], T[2]);
+		fprintf(fp, "%lf %lf %lf %lf %lf %lf\n", ax, ay, az, T[0], T[1], T[2]);
+	}
+	fclose(fp);
+
+
+	return 0;
+}
+
+
+int main_generate_pmvsfiles(int argc, char* argv[])
+{
+	//char* leftImageFile  = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000000.jpg";
+	//char* rightImageFile = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
+
+
+	char* leftImageFile = "C:\\Work\\Data\\panorama\\2016.10.13-yizhuang\\L10_1013\\indoor\\jpg\\ladybug_panoramic_000006.jpg";
+	char* rightImageFile = "C:\\Work\\Data\\panorama\\2016.10.13-yizhuang\\L10_1013\\indoor\\jpg\\ladybug_panoramic_000007.jpg";
+
+
+	IplImage* lImage = cvLoadImage(leftImageFile);
+	IplImage* rImage = cvLoadImage(rightImageFile);
+	printf("%s \n", leftImageFile);
+	printf("%s \n", rightImageFile);
+	
+	ImgFeature lImageFeats;
+	ImgFeature rImageFeats;
+
+	DetectFileFeaturePts(leftImageFile, lImageFeats, 1600);
+	DetectFileFeaturePts(rightImageFile, rImageFeats, 1600);
+
+	//convert from spherical to real 3D
+	int ht = lImageFeats.ht;
+	int wd = lImageFeats.wd;
+
+	//2. matching
+	printf("Matching... \n");
+	CMatchBase* pMatch = new CPanoMatch();
+	vector<MatchPairIndex> mi;
+	pMatch->Match(lImageFeats, rImageFeats, mi);
+	printf("Match Pair: %d \n", mi.size());
+	
+	//3. pose estimation and compute residual error 
+	double ratio = 0.6;
+	vector<Point3DDouble> lptPano;     //3D spherical points
+	vector<Point3DDouble> rptPano;
+	vector<Point2DDouble> lptImagePts; //image points
+	vector<Point2DDouble> rptImagePts;
+	vector<int> matchIndex;
+	double radius = (double)(wd) / (2*PI); 
+
+	for(int i=0; i<mi.size(); i++)
+	{
+		int li = mi[i].l;
+		int ri = mi[i].r;
+
+		Point2DDouble pl;
+		pl.x = lImageFeats.featPts[li].col;
+		pl.y = lImageFeats.featPts[li].row;
+		Point2DDouble pr;
+		pr.x = rImageFeats.featPts[ri].col;
+		pr.y = rImageFeats.featPts[ri].row;
+
+		//remove the match without motion
+		double dis = sqrt( (double)( (pl.x-pr.x)*(pl.x-pr.x) + (pl.y-pr.y)*(pl.y-pr.y)) );
+		if(dis<5) continue;
+
+		if( pl.y<ht*ratio && pr.y<ht*ratio )
+		{
+			Point2DDouble ip;
+			ip.p[0] = pl.x;
+			ip.p[1] = pl.y;
+			lptImagePts.push_back(ip);
+			ip.p[0] = pr.x;
+			ip.p[1] = pr.y;
+			rptImagePts.push_back(ip);
+
+			Point3DDouble gp;					
+			SphereTo3D(pl.x, pl.y, radius, gp.p[0], gp.p[1], gp.p[2]);
+			lptPano.push_back(gp);
+			SphereTo3D(pr.x, pr.y, radius, gp.p[0], gp.p[1], gp.p[2]);
+			rptPano.push_back(gp);
+		}
+	}
+	
+	double R0[9];
+	double T0[3];
+	memset(R0, 0, sizeof(double)*9);
+	memset(T0, 0, sizeof(double)*3);
+	R0[0] = R0[4] = R0[8] = 1;
+
+	double R[9];
+	double T[3];
+	vector<double> residual;
+	residual.resize(lptPano.size());
+	dll_EstimatePose5Point_Pano(lptPano, rptPano, radius, 512, 2.5, R, T, residual);
+
+
+	//GeneratePanoEpipolarImageHeading(R, T, leftImageFile, rightImageFile);
+	//GeneratePanoEpipolarImage(R, T, leftImageFile, rightImageFile);
+
+
+	//output the relative pose estimation result
+	FILE* fp = fopen("c:\\temp\\pano_rt.txt", "w");		
+	fprintf(fp, "%d %d \n", ht, wd);
+	for(int j=0; j<3; j++)
+	{
+		for(int i=0; i<3; i++)
+		{
+			fprintf(fp, " %lf ", R[j*3+i]);
+		}
+		fprintf(fp, "\n");
+	}
+	fprintf(fp, " %lf %lf %lf \n", T[0], T[1], T[2]);
+	fclose(fp);
+
+	//double eT[3];
+	//CalculateExplicitT(R, T, eT);
+
+	double ea[3];
+	rot2eular(R, ea);
+	printf("angle: %lf %lf %lf \n", ea[0], ea[1], ea[2]);
+	printf("translation: %lf %lf %lf \n", T[0], T[1], T[2]);
+
+	/*
+	if(0)
+	{
+		IplImage* pMosaic = VerticalMosaic1(lImage, rImage);
+
+		for(int i=0; i<lptImagePts.size(); i++)
+		{				
+			//if(residual[i]>2.5)
+			//	continue;
+
+			int r,g,b;
+			if(residual[i]>2.5)
+			{
+				//continue;
+				r = 0;
+				g = 0;
+				b = 0;
+
+			}
+			else
+			{
+				r = (double)(rand())/(double)(RAND_MAX)*255;
+				g = (double)(rand())/(double)(RAND_MAX)*255;
+				b = (double)(rand())/(double)(RAND_MAX)*255;
+
+				CvPoint pl;
+				pl.x = lptImagePts[i].p[0];
+				pl.y = lptImagePts[i].p[1];
+				CvPoint pr;
+				pr.x = rptImagePts[i].p[0];
+				pr.y = rptImagePts[i].p[1];	
+
+				//remove the match without motion
+				double dis = sqrt( (double)( (pl.x-pr.x)*(pl.x-pr.x) + (pl.y-pr.y)*(pl.y-pr.y)) );
+				if(dis<5) continue;
+
+				cvDrawCircle(lImage, pl, 2, CV_RGB(r,g,b),2);
+				cvDrawCircle(rImage, pr, 2, CV_RGB(r,g,b),2);
+				cvDrawLine(pMosaic, pl, cvPoint( pr.x, pr.y+ht ), CV_RGB(255,0,0));
+			}				
+		}			
+		//cvNamedWindow("Match1");
+		//cvShowImage("Match1", lImage);
+		//cvNamedWindow("Match2");
+		//cvShowImage("Match2", rImage);
+
+		cvSaveImage("c:\\temp\\left.jpg",  lImage);
+		cvSaveImage("c:\\temp\\right.jpg", rImage);
+		cvSaveImage("c:\\temp\\match.jpg", pMosaic);
+		cvReleaseImage(&pMosaic);		
+	}
+	*/
+	
+	
+	//5. 3D reconstruction and output
+	double dis = 2;     //the real distance of 
+	//double R0[9];
+	//double T0[3];
+	//memset(R0, 0, sizeof(double)*9);
+	//memset(T0, 0, sizeof(double)*3);
+	//R0[0] = R0[4] = R0[8] = 1;
+
+	vector<Point3DDouble> vPts;
+	vector<Point3DDouble> vColors;
+	for(int i=0; i<lptPano.size(); i++)
+	{
+		Point3DDouble gp;
+		if(residual[i]<8)
+		{
+			Point2DDouble lp,rp;
+			//normalized coordinates
+			lp.p[0] = lptPano[i].p[0] / lptPano[i].p[2];
+			lp.p[1] = lptPano[i].p[1] / lptPano[i].p[2];
+			rp.p[0] = rptPano[i].p[0] / rptPano[i].p[2];
+			rp.p[1] = rptPano[i].p[1] / rptPano[i].p[2];
+			double error = 0;
+			Point3DDouble gp = dll_TriangulatePt(lp, rp, R0, T0, R, T, &error);
+			gp.p[0] *= dis;
+			gp.p[1] *= dis;
+			gp.p[2] *= dis;
+
+			if( fabs(gp.p[0])>50 || fabs(gp.p[1])>50 || fabs(gp.p[2])>50 )
+				continue;
+
+			vPts.push_back(gp);
+
+			//get color
+			Point3DDouble color;
+			
+			
+			int x = lptImagePts[i].p[0];
+			int y = lImage->height - lptImagePts[i].p[1];
+			int scanWd = lImage->widthStep;
+			int r = (unsigned char)(lImage->imageData[ y*scanWd + x*3 ]);
+			int g = (unsigned char)(lImage->imageData[ y*scanWd + x*3 + 1 ]);
+			int b = (unsigned char)(lImage->imageData[ y*scanWd + x*3 + 2 ]);
+
+			color.p[0] = r;
+			color.p[1] = g;
+			color.p[2] = b;
+			
+
+			//color.p[0] = 255;
+			//color.p[1] = 0;
+			//color.p[2] = 0;
+			
+			vColors.push_back(color);
+		}
+	}
+
+	CModelFileBase* pModel = new CPlyModel();
+	pModel->Save("c:\\temp\\sphericalModel.ply", vPts, vColors);
+	
+
+	if(0)
+	{			
+	//6. generate projection images, save them and the corresponding projective matrix into the files
+	vector<stCameraPara> camParas;
+	bool bIsBundlerOut = false;
+	double vangle=60,hangle=60;
+	double anglestep = 60;
+	double focalratio = 1;
+	PanoToPlanes(0,leftImageFile, anglestep, vangle, hangle, focalratio, R0, T0, camParas);
+	PanoToPlanes(1,rightImageFile, anglestep, vangle, hangle, focalratio, R, T, camParas);
+	
+	//generate the bundler.out file 
+	WriteBundlerOutFile("bundler.out", camParas);
+	
+
+	printf("generate pmvs_options.txt ... \n");
+	int nImageNum = 2 * (360/anglestep);
+	/* Write the options file */
+	char buf[512];
+	sprintf(buf, "pmvs_options.txt");
+	FILE *f_opt = fopen(buf, "w");
+	fprintf(f_opt, "level 1\n");
+	fprintf(f_opt, "csize 2\n");
+	fprintf(f_opt, "threshold 0.7\n");
+	fprintf(f_opt, "wsize 7\n");
+	fprintf(f_opt, "minImageNum 2\n");
+	fprintf(f_opt, "CPU 4\n");
+	fprintf(f_opt, "setEdge 0\n");
+	fprintf(f_opt, "useBound 0\n");
+	fprintf(f_opt, "useVisData 0\n");
+	fprintf(f_opt, "sequence -1\n");
+	fprintf(f_opt, "timages -1 0 %d\n", nImageNum);
+	fprintf(f_opt, "oimages -3\n");
+	fclose(f_opt);
+	}
+
+	printf("Finished! \n");
+	
+	return 0;
+}
+
+
+
 int _tmain(int argc, char* argv[])
 {
 	printf("BA test.... \n");
 
-	//main_realimages_bundler(argc, argv);
-	main_realimages(argc, argv);
 
+	//main_generate_pmvsfiles(argc, argv);
+
+	main_pano_rp(argc, argv);
+
+	//main_realimages_bundler(argc, argv);
+	//main_realimages(argc, argv);
 	//main_simulate_multviews(argc, argv);
 
 
