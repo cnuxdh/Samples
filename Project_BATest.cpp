@@ -366,34 +366,14 @@ int main_pano_rp(int argc, char* argv[])
 	for(int i=0; i<nfile-1; i++)
 	//int i = 1;
 	{
-		/*
-		MSG msg;
-		while (PeekMessage(&msg,NULL,NULL,NULL,PM_REMOVE))         
-		{            
-			TranslateMessage(&msg);            
-			DispatchMessage(&msg);         
-		}*/
-
 		printf("%d-%d \n", i, i+1);
 
-		//IplImage* lImage = cvLoadImage(filenames[i]);
-		//IplImage* rImage = cvLoadImage(filenames[i+1]);
-		//printf("%s \n", file1);
-		//printf("%s \n", file2);
-		//1. feature detection
-		//CFeatureBase* pFeatDetect = new CSIFTFloat(); 
-		//CFeatureBase* pFeatDetect = new CSURF(); 
 		ImgFeature lImageFeats;
 		ImgFeature rImageFeats;
 		
-		//pFeatDetect->Detect(filenames[i], lImageFeats);
-		//pFeatDetect->Detect(filenames[i+1], rImageFeats);
-		DetectFileFeaturePts(filenames[i],   lImageFeats, 480);
-		DetectFileFeaturePts(filenames[i+1], rImageFeats, 480);
+		DetectFileFeaturePts(filenames[i],   lImageFeats, 640);
+		DetectFileFeaturePts(filenames[i+1], rImageFeats, 640);
 
-		//convert from spherical to real 3D
-		//int ht = lImage->height;
-		//int wd = lImage->width;
 		int ht = lImageFeats.ht;
 		int wd = lImageFeats.wd;
 
@@ -403,7 +383,7 @@ int main_pano_rp(int argc, char* argv[])
 		vector<MatchPairIndex> mi;
 		pMatch->Match(lImageFeats, rImageFeats, mi);
 		printf("Match Pair: %d \n", mi.size());
-
+		delete pMatch;
 
 		//3. pose estimation and compute residual error 
 		double ratio = 0.6;
@@ -453,27 +433,78 @@ int main_pano_rp(int argc, char* argv[])
 		vector<double> residual;
 		residual.resize(lptPano.size());
 		dll_EstimatePose5Point_Pano(lptPano, rptPano, radius, 500, 2.5, R, T, residual);
-		
-		//GeneratePanoEpipolarImageHeading(R, T, filenames[i], filenames[i+1]);
-		//GeneratePanoEpipolarImage(R, T, filenames[i], filenames[i+1]);
+	
 		
 		//double eT[3];
 		//CalculateExplicitT(R, T, eT);
-
 		double ax = atan( R[5]/R[8] ) / PI*180; 
 		double ay = asin( -R[2] ) /PI*180;
-		double az = atan( R[1]/R[0]) /PI*180;
-		
+		double az = atan( R[1]/R[0]) /PI*180;		
 		printf("%d-%d \n", i, i+1);
 		printf("Rotation... \n");
 		printf("%lf %lf %lf \n", ax, ay, az);
 		printf("Translation .... \n");
-		printf("%lf %lf %lf \n", T[0], T[1], T[2]);			
-
+		printf("%lf %lf %lf \n", T[0], T[1], T[2]);	
 		//fprintf(fp, "%d-%d \n", i, i+1);
 		//fprintf(fp, "rotation: %lf %lf %lf \n", ax, ay, az);
 		//fprintf(fp, "translation: %lf %lf %lf \n", T[0], T[1], T[2]);
 		fprintf(fp, "%lf %lf %lf %lf %lf %lf\n", ax, ay, az, T[0], T[1], T[2]);
+
+
+		
+		//############# detect sift feature points of epipolar images ###########
+		GeneratePanoEpipolarImageHeading(R, T, filenames[i], filenames[i+1]);
+		//GeneratePanoEpipolarImage(R, T, filenames[i], filenames[i+1]);
+		char* leftImageFile  = "C:\\temp\\epipolarLeftHeading.jpg";
+		char* rightImageFile = "C:\\temp\\epipolarRightHeading.jpg";
+		ImgFeature lEpipolarImageFeats;
+		ImgFeature rEpipolarImageFeats;
+		DetectFileFeaturePts(leftImageFile,  lEpipolarImageFeats, 640);
+		DetectFileFeaturePts(rightImageFile, rEpipolarImageFeats, 640);
+		//convert from spherical to real 3D
+		ht = lEpipolarImageFeats.ht;
+		wd = lEpipolarImageFeats.wd;
+
+		//matching
+		printf("Matching... \n");
+		CMatchBase* pMatch1 = new CPanoMatch();
+		vector<MatchPairIndex> mi1;
+		pMatch1->Match(lEpipolarImageFeats, rEpipolarImageFeats, mi1);
+		printf("Match Pair: %d \n", mi1.size());
+		delete pMatch1;
+
+		int nMatch = 0;
+		double ferror = 0;
+		printf("epipolar error.... \n");
+		for(int i=0; i<mi1.size(); i++)
+		{
+			int nl = mi1[i].l;
+			int nr = mi1[i].r;
+
+			double lx,ly;
+			lx = lEpipolarImageFeats.featPts[nl].col;
+			ly = lEpipolarImageFeats.featPts[nl].row;
+			double rx,ry;
+			rx = rEpipolarImageFeats.featPts[nr].col;
+			ry = rEpipolarImageFeats.featPts[nr].row;
+
+			if( abs(lx-rx)>2 )
+				continue;
+			else
+			{
+				printf("%.4lf ", lx-rx);
+				ferror += abs(lx-rx);
+				nMatch ++;
+			}
+		}			
+		printf("\n");
+
+		double merror = ferror/(double)(nMatch);
+		printf("\n epipolar error: %lf \n",  merror);
+		FILE* fpEpipolarError = fopen("c:\\temp\\epipolarError.txt", "a+");
+		fprintf(fpEpipolarError, "%lf \n", merror);
+		fclose(fpEpipolarError);
+		//##########################################################################
 	}
 	fclose(fp);
 
@@ -484,12 +515,12 @@ int main_pano_rp(int argc, char* argv[])
 
 int main_generate_pmvsfiles(int argc, char* argv[])
 {
-	//char* leftImageFile  = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000000.jpg";
-	//char* rightImageFile = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
+	char* leftImageFile  = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000000.jpg";
+	char* rightImageFile = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
 
 
-	char* leftImageFile = "C:\\Work\\Data\\panorama\\2016.10.13-yizhuang\\L10_1013\\indoor\\jpg\\ladybug_panoramic_000006.jpg";
-	char* rightImageFile = "C:\\Work\\Data\\panorama\\2016.10.13-yizhuang\\L10_1013\\indoor\\jpg\\ladybug_panoramic_000007.jpg";
+	//char* leftImageFile = "C:\\Work\\Data\\panorama\\2016.10.13-yizhuang\\L10_1013\\indoor\\jpg\\ladybug_panoramic_000006.jpg";
+	//char* rightImageFile = "C:\\Work\\Data\\panorama\\2016.10.13-yizhuang\\L10_1013\\indoor\\jpg\\ladybug_panoramic_000007.jpg";
 
 
 	IplImage* lImage = cvLoadImage(leftImageFile);
@@ -500,8 +531,8 @@ int main_generate_pmvsfiles(int argc, char* argv[])
 	ImgFeature lImageFeats;
 	ImgFeature rImageFeats;
 
-	DetectFileFeaturePts(leftImageFile, lImageFeats, 1600);
-	DetectFileFeaturePts(rightImageFile, rImageFeats, 1600);
+	DetectFileFeaturePts(leftImageFile, lImageFeats, 800);
+	DetectFileFeaturePts(rightImageFile, rImageFeats, 800);
 
 	//convert from spherical to real 3D
 	int ht = lImageFeats.ht;
@@ -570,7 +601,7 @@ int main_generate_pmvsfiles(int argc, char* argv[])
 	dll_EstimatePose5Point_Pano(lptPano, rptPano, radius, 512, 2.5, R, T, residual);
 
 
-	//GeneratePanoEpipolarImageHeading(R, T, leftImageFile, rightImageFile);
+	GeneratePanoEpipolarImageHeading(R, T, leftImageFile, rightImageFile);
 	//GeneratePanoEpipolarImage(R, T, leftImageFile, rightImageFile);
 
 
@@ -756,12 +787,9 @@ int main_generate_pmvsfiles(int argc, char* argv[])
 int _tmain(int argc, char* argv[])
 {
 	printf("BA test.... \n");
-
-
+	
 	//main_generate_pmvsfiles(argc, argv);
-
 	main_pano_rp(argc, argv);
-
 	//main_realimages_bundler(argc, argv);
 	//main_realimages(argc, argv);
 	//main_simulate_multviews(argc, argv);
