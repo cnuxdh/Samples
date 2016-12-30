@@ -12,6 +12,7 @@
 #include "ceresba.hpp"
 #include "panorama.hpp"
 #include "bundlerio.hpp"
+#include "panoba.hpp"
 
 
 //corelib
@@ -38,7 +39,8 @@ int main_realimages(int argc, char* argv[])
 {
 	printf("SFM integration .... \n");
 
-	char imagepath[256] = "C:\\Work\\Data\\ba2";
+	//char imagepath[256] = "C:\\Work\\Data\\ba2";
+	char imagepath[256] = "C:\\Work\\Data\\panorama\\test";
 
 	if(argc==2)
 	{
@@ -77,7 +79,7 @@ int main_realimages(int argc, char* argv[])
 
 	//2. matching images 
 	vector<PairMatchRes> matchRes; 
-	MatchImageFiles(imgFeatures, matchRes);
+	MatchImageFiles(imgFeatures, matchRes, PanoramCam);
 
 	//3.generating the tracks
 	vector<TrackInfo> tracks; 
@@ -111,11 +113,15 @@ int main_realimages(int argc, char* argv[])
 		cameras[i].R[0] = 1;
 		cameras[i].R[4] = 1;
 		cameras[i].R[8] = 1;
+		cameras[i].rows = imgFeatures[0].ht;
+		cameras[i].cols = imgFeatures[0].wd;
 	}
 
-	CBABase* pBA = new CCeresBA();
+
+	CBABase* pBA = new CPanoBA();
 	pBA->BundleAdjust( cameras.size(), cameras, imgFeatures, matchRes, tracks); 
 	
+
 	return 0;
 }
 
@@ -789,9 +795,9 @@ int _tmain(int argc, char* argv[])
 	printf("BA test.... \n");
 	
 	//main_generate_pmvsfiles(argc, argv);
-	main_pano_rp(argc, argv);
+	//main_pano_rp(argc, argv);
 	//main_realimages_bundler(argc, argv);
-	//main_realimages(argc, argv);
+	main_realimages(argc, argv);
 	//main_simulate_multviews(argc, argv);
 
 
