@@ -37,10 +37,13 @@ using namespace std;
 
 int main_realimages(int argc, char* argv[])
 {
+
+	CameraType camType = PerspectiveCam;
+
 	printf("SFM integration .... \n");
 
-	//char imagepath[256] = "C:\\Work\\Data\\ba2";
-	char imagepath[256] = "C:\\Work\\Data\\panorama\\test";
+	char imagepath[256] = "C:\\Work\\Data\\ba3";
+	//char imagepath[256] = "C:\\Work\\Data\\panorama\\test";
 
 	if(argc==2)
 	{
@@ -75,11 +78,11 @@ int main_realimages(int argc, char* argv[])
 
 	//1. generating the image feature points
 	vector<ImgFeature> imgFeatures;
-	DetectFileFeaturePts(filenames, nfile, imgFeatures, 600);
+	DetectFileFeaturePts(filenames, nfile, imgFeatures, 640);
 
 	//2. matching images 
 	vector<PairMatchRes> matchRes; 
-	MatchImageFiles(imgFeatures, matchRes, PanoramCam);
+	MatchImageFiles(imgFeatures, matchRes, camType);
 
 	//3.generating the tracks
 	vector<TrackInfo> tracks; 
@@ -116,11 +119,21 @@ int main_realimages(int argc, char* argv[])
 		cameras[i].rows = imgFeatures[0].ht;
 		cameras[i].cols = imgFeatures[0].wd;
 	}
+	
+	CBABase* pBA = NULL;
 
+	if(camType == PerspectiveCam)
+	{
+		pBA = new CCeresBA();
+	}
+	else if(camType == PanoramCam)
+	{
+		pBA = new CPanoBA();
+	}
 
-	CBABase* pBA = new CPanoBA();
 	pBA->BundleAdjust( cameras.size(), cameras, imgFeatures, matchRes, tracks); 
 	
+	delete pBA;
 
 	return 0;
 }
