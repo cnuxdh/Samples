@@ -37,7 +37,7 @@ using namespace std;
 
 int main_realimages(int argc, char* argv[])
 {
-
+	//set the type of camera
 	CameraType camType = PerspectiveCam;
 
 	printf("SFM integration .... \n");
@@ -118,6 +118,7 @@ int main_realimages(int argc, char* argv[])
 		cameras[i].R[8] = 1;
 		cameras[i].rows = imgFeatures[0].ht;
 		cameras[i].cols = imgFeatures[0].wd;
+		cameras[i].camtype = camType;
 	}
 	
 	CBABase* pBA = NULL;
