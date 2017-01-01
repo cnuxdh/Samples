@@ -42,7 +42,7 @@ int main_realimages(int argc, char* argv[])
 
 	printf("SFM integration .... \n");
 
-	char imagepath[256] = "C:\\Work\\Data\\ba3";
+	char imagepath[256] = "C:\\Work\\Data\\ba1";
 	//char imagepath[256] = "C:\\Work\\Data\\panorama\\test";
 
 	if(argc==2)
@@ -78,7 +78,7 @@ int main_realimages(int argc, char* argv[])
 
 	//1. generating the image feature points
 	vector<ImgFeature> imgFeatures;
-	DetectFileFeaturePts(filenames, nfile, imgFeatures, 640);
+	DetectFileFeaturePts(filenames, nfile, imgFeatures, 480);
 
 	//2. matching images 
 	vector<PairMatchRes> matchRes; 
@@ -802,17 +802,119 @@ int main_generate_pmvsfiles(int argc, char* argv[])
 	return 0;
 }
 
+IplImage* pLeft  = NULL;
+IplImage* pRight = NULL;
+//IplImage* pLeftDisp = NULL;
+//IplImage* pLeftSmall = NULL;
 
+int DrawCross(CvPoint p, int len, IplImage* pImage)
+{
+	cvLine( pImage, cvPoint( p.x-len,p.y), cvPoint( p.x+len,p.y),CV_RGB(255,0,0),3,8,0);
+	cvLine( pImage, cvPoint( p.x,p.y-len), cvPoint( p.x,p.y+len),CV_RGB(255,0,0),3,8,0);
+
+	return 0;
+}
+
+void on_left_mouse( int event, int x, int y, int flags, void* param)
+{
+	if( event == CV_EVENT_LBUTTONDOWN )
+	{
+		CvPoint cp;
+		cp.x = x;
+		cp.y = y;
+
+		IplImage* pLeftDisp = cvCloneImage(pLeft);
+		//cvDrawCircle(pLeftDisp, cp, 5, CV_RGB(255,0,0));
+		DrawCross(cp, 21, pLeftDisp);
+		cvShowImage("Left", pLeftDisp);
+		//cvUpdateWindow("Left");
+		//cvSaveImage("c:\\temp\\cross.jpg", pLeftDisp);
+		cvReleaseImage(&pLeftDisp);
+		
+
+		printf("Left: %d %d \n", x, y);
+	}
+}
+
+void on_right_mouse( int event, int x, int y, int flags, void* param)
+{
+	if( event == CV_EVENT_LBUTTONDOWN )
+	{
+		CvPoint cp;
+		cp.x = x;
+		cp.y = y;
+
+		printf("Right: %d %d \n", x, y);
+
+	}
+}
+
+int main_pano_match(int argc, char* argv[])
+{
+	char* leftImage  = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000000.jpg";
+	char* rightImage = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
+
+	int windowWd = 630;
+	
+	pLeft = cvLoadImage(leftImage);
+	int imageHt = pLeft->height;
+	int imageWd = pLeft->width;
+
+	double ratio = (double)(windowWd) / (double)(imageWd);
+	int windowHt = ratio*imageHt;
+
+	
+	cvNamedWindow("Left", 0);
+	cvMoveWindow("Left", 0, 0);
+	cvResizeWindow("Left", windowWd, windowHt);
+	cvShowImage("Left", pLeft);
+
+	
+	pRight = cvLoadImage(rightImage);
+	imageHt = pRight->height;
+	imageWd = pRight->width;
+	ratio = (double)(windowWd) / (double)(imageWd);
+	windowHt = ratio*imageHt;
+
+	cvNamedWindow("Right", 0);
+	cvMoveWindow("Right", windowWd+5, 0);
+	cvResizeWindow("Right", windowWd, windowHt);
+	cvShowImage("Right", pRight);
+
+	//small window
+	//cvNamedWindow("LeftSub",0);
+	//cvMoveWindow("LeftSub", 0, windowHt+32);
+	//cvResizeWindow("LeftSub", 64, 64);
+	
+	cvSetMouseCallback("Left", on_left_mouse, NULL );
+	cvSetMouseCallback("Right", on_right_mouse, NULL );
+
+	cvWaitKey();
+	
+	return 0;
+}
 
 int _tmain(int argc, char* argv[])
 {
 	printf("BA test.... \n");
 	
+
 	//main_generate_pmvsfiles(argc, argv);
+	
+	
 	//main_pano_rp(argc, argv);
+	
 	//main_realimages_bundler(argc, argv);
+	
+	//########  bundle adjustment for real images ####
 	main_realimages(argc, argv);
+	
 	//main_simulate_multviews(argc, argv);
+
+
+	//######## interactive panorama matching  ###################
+	//main_pano_match(argc, argv);
+
 
 
 	return 0;
