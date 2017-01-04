@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 
+//#include "mmsystem.h"
+
 
 //cvlib
 #include "relativepose.hpp"
@@ -13,6 +15,8 @@
 #include "panorama.hpp"
 #include "bundlerio.hpp"
 #include "panoba.hpp"
+#include "sift.hpp"
+#include "interactReg.hpp"
 
 
 //corelib
@@ -33,10 +37,14 @@
 
 #include <vector>
 using namespace std;
+using namespace cv;
 
 
 int main_realimages(int argc, char* argv[])
 {
+	//DWORD start = timeGetTime();
+	double t = (double)getTickCount();
+
 	//set the type of camera
 	CameraType camType = PerspectiveCam;
 
@@ -135,6 +143,10 @@ int main_realimages(int argc, char* argv[])
 	pBA->BundleAdjust( cameras.size(), cameras, imgFeatures, matchRes, tracks); 
 	
 	delete pBA;
+
+	t = ((double)getTickCount() - t)/getTickFrequency();
+
+	printf("\n running time: %lf \n\n", t);
 
 	return 0;
 }
@@ -769,8 +781,9 @@ int main_generate_pmvsfiles(int argc, char* argv[])
 	double vangle=60,hangle=60;
 	double anglestep = 60;
 	double focalratio = 1;
-	PanoToPlanes(0,leftImageFile, anglestep, vangle, hangle, focalratio, R0, T0, camParas);
-	PanoToPlanes(1,rightImageFile, anglestep, vangle, hangle, focalratio, R, T, camParas);
+
+	PanoToPlanes(0, leftImageFile, anglestep, vangle, hangle, focalratio,  R0, T0, camParas);
+	PanoToPlanes(1, rightImageFile, anglestep, vangle, hangle, focalratio, R,  T,  camParas);
 	
 	//generate the bundler.out file 
 	WriteBundlerOutFile("bundler.out", camParas);
@@ -802,10 +815,10 @@ int main_generate_pmvsfiles(int argc, char* argv[])
 	return 0;
 }
 
-IplImage* pLeft  = NULL;
-IplImage* pRight = NULL;
-//IplImage* pLeftDisp = NULL;
-//IplImage* pLeftSmall = NULL;
+
+
+
+
 
 int DrawCross(CvPoint p, int len, IplImage* pImage)
 {
@@ -814,6 +827,11 @@ int DrawCross(CvPoint p, int len, IplImage* pImage)
 
 	return 0;
 }
+
+IplImage* pLeft  = NULL;
+IplImage* pRight = NULL;
+CIRegBase* pIReg = NULL;
+Point2DDouble srcPt,dstPt;
 
 void on_left_mouse( int event, int x, int y, int flags, void* param)
 {
@@ -831,6 +849,9 @@ void on_left_mouse( int event, int x, int y, int flags, void* param)
 		//cvSaveImage("c:\\temp\\cross.jpg", pLeftDisp);
 		cvReleaseImage(&pLeftDisp);
 		
+		srcPt.p[0] = x;
+		srcPt.p[1] = y;
+		pIReg->PtReg(srcPt, dstPt, 0);
 
 		printf("Left: %d %d \n", x, y);
 	}
@@ -857,24 +878,24 @@ int main_pano_match(int argc, char* argv[])
 	int windowWd = 630;
 	
 	pLeft = cvLoadImage(leftImage);
+	pRight = cvLoadImage(rightImage);
 	int imageHt = pLeft->height;
 	int imageWd = pLeft->width;
+	
+	pIReg = new CIPanoReg();
+	pIReg->Init(leftImage, rightImage);
+	
 
+	//for display
 	double ratio = (double)(windowWd) / (double)(imageWd);
 	int windowHt = ratio*imageHt;
+	ratio = (double)(windowWd) / (double)(imageWd);
+	windowHt = ratio*imageHt;
 
-	
 	cvNamedWindow("Left", 0);
 	cvMoveWindow("Left", 0, 0);
 	cvResizeWindow("Left", windowWd, windowHt);
 	cvShowImage("Left", pLeft);
-
-	
-	pRight = cvLoadImage(rightImage);
-	imageHt = pRight->height;
-	imageWd = pRight->width;
-	ratio = (double)(windowWd) / (double)(imageWd);
-	windowHt = ratio*imageHt;
 
 	cvNamedWindow("Right", 0);
 	cvMoveWindow("Right", windowWd+5, 0);
@@ -907,13 +928,13 @@ int _tmain(int argc, char* argv[])
 	//main_realimages_bundler(argc, argv);
 	
 	//########  bundle adjustment for real images ####
-	main_realimages(argc, argv);
+	//main_realimages(argc, argv);
 	
 	//main_simulate_multviews(argc, argv);
 
 
 	//######## interactive panorama matching  ###################
-	//main_pano_match(argc, argv);
+	main_pano_match(argc, argv);
 
 
 
