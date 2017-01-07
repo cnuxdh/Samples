@@ -853,6 +853,14 @@ void on_left_mouse( int event, int x, int y, int flags, void* param)
 		srcPt.p[1] = y;
 		pIReg->PtReg(srcPt, dstPt, 0);
 
+		cp.x = dstPt.p[0];
+		cp.y = dstPt.p[1];
+		IplImage* pRightDisp = cvCloneImage(pRight);
+		DrawCross(cp, 21, pRightDisp);
+		cvShowImage("Right", pRightDisp);
+		cvReleaseImage(&pRightDisp);
+
+
 		printf("Left: %d %d \n", x, y);
 	}
 }
@@ -882,6 +890,7 @@ int main_pano_match(int argc, char* argv[])
 	int imageHt = pLeft->height;
 	int imageWd = pLeft->width;
 	
+	//pIReg = new CIPanoRegTri();
 	pIReg = new CIPanoReg();
 	pIReg->Init(leftImage, rightImage);
 	
