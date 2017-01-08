@@ -878,10 +878,12 @@ void on_right_mouse( int event, int x, int y, int flags, void* param)
 	}
 }
 
+
+//interactive panorama matching
 int main_pano_match(int argc, char* argv[])
 {
-	char* leftImage  = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000000.jpg";
-	char* rightImage = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
+	char* leftImage  = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
+	char* rightImage = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000002.jpg";
 
 	int windowWd = 630;
 	
@@ -891,7 +893,7 @@ int main_pano_match(int argc, char* argv[])
 	int imageWd = pLeft->width;
 	
 	//pIReg = new CIPanoRegTri();
-	pIReg = new CIPanoReg();
+	pIReg = new CIPanoRegDirect();
 	pIReg->Init(leftImage, rightImage);
 	
 
