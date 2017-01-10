@@ -17,6 +17,8 @@
 #include "panoba.hpp"
 #include "sift.hpp"
 #include "interactReg.hpp"
+#include "pos.hpp"
+#include "funcs.hpp"
 
 
 //corelib
@@ -32,6 +34,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/imgproc/imgproc_c.h"
 #endif
 
 
@@ -831,7 +834,31 @@ int DrawCross(CvPoint p, int len, IplImage* pImage)
 IplImage* pLeft  = NULL;
 IplImage* pRight = NULL;
 CIRegBase* pIReg = NULL;
-Point2DDouble srcPt,dstPt;
+Point2DDouble srcPt,dstPt;     //top-left
+Point2DDouble leftPt, rightPt; // center
+CameraPara leftCam,rightCam;
+Point3DDouble grdpt;
+
+int CalculateGrd()
+{
+	CTriangulateBase* pTri = new CTriangulateCV();
+	vector<CameraPara> cams;
+	vector<Point2DDouble> pts;
+	cams.push_back(leftCam);
+	cams.push_back(rightCam);
+	pts.push_back(leftPt);
+	pts.push_back(rightPt);
+	double ferror;
+	pTri->Triangulate(pts, cams, grdpt, true, ferror);
+	delete pTri;
+
+	//printf("Left: %lf %lf \n", leftPt.p[0], leftPt.p[1]);
+	//printf("right: %lf %lf \n", rightPt.p[0], rightPt.p[1]);
+	printf("ground pt: %lf %lf %lf    error: %lf \n", grdpt.p[0], grdpt.p[1], grdpt.p[2], ferror);
+	//printf("triangulate error: %lf \n", ferror);
+
+	return 0;
+}
 
 void on_left_mouse( int event, int x, int y, int flags, void* param)
 {
@@ -842,6 +869,10 @@ void on_left_mouse( int event, int x, int y, int flags, void* param)
 		cp.y = y;
 
 		IplImage* pLeftDisp = cvCloneImage(pLeft);
+
+		leftPt.p[0] = x - pLeft->width*0.5;
+		leftPt.p[1] = pLeft->height*0.5 - y;
+
 		//cvDrawCircle(pLeftDisp, cp, 5, CV_RGB(255,0,0));
 		DrawCross(cp, 21, pLeftDisp);
 		cvShowImage("Left", pLeftDisp);
@@ -851,7 +882,9 @@ void on_left_mouse( int event, int x, int y, int flags, void* param)
 		
 		srcPt.p[0] = x;
 		srcPt.p[1] = y;
-		pIReg->PtReg(srcPt, dstPt, 0);
+
+		if(pIReg!=NULL)
+			pIReg->PtReg(srcPt, dstPt, 0);
 
 		cp.x = dstPt.p[0];
 		cp.y = dstPt.p[1];
@@ -860,8 +893,10 @@ void on_left_mouse( int event, int x, int y, int flags, void* param)
 		cvShowImage("Right", pRightDisp);
 		cvReleaseImage(&pRightDisp);
 
-
-		printf("Left: %d %d \n", x, y);
+		rightPt.p[0] = dstPt.p[0] - pRight->width*0.5;
+		rightPt.p[1] = pRight->height*0.5 - dstPt.p[1];
+		
+		CalculateGrd();
 	}
 }
 
@@ -873,21 +908,180 @@ void on_right_mouse( int event, int x, int y, int flags, void* param)
 		cp.x = x;
 		cp.y = y;
 
-		printf("Right: %d %d \n", x, y);
+		IplImage* pRightDisp = cvCloneImage(pRight);
+		DrawCross(cp, 21, pRightDisp);
+		cvShowImage("Right", pRightDisp);
+		//cvUpdateWindow("Left");
+		//cvSaveImage("c:\\temp\\cross.jpg", pLeftDisp);
+		cvReleaseImage(&pRightDisp);
 
+		rightPt.p[0] = x - pRight->width*0.5;
+		rightPt.p[1] = pRight->height*0.5 - y;
+		
+		CalculateGrd();
 	}
+}
+
+
+int main_pano_match_usingpos()
+{
+
+	//################  loading pos data ###########################
+	//char* camfile = "C:\\Work\\Data\\panorama\\20161202-linlonglu\\ladybug\\161130_025822Trig_zt.cam";
+	char* camfile ="C:\\Work\\Data\\panorama\\Pano_Cam_1108\\1104_170_new.cam";
+	CReadPosBase* pReadPos = new CReadCarPos();
+	pReadPos->ReadPOSData(camfile);
+
+	
+	//###############   loading image filenames ##############################
+	//char* imagepath="C:\\Work\\Data\\panorama\\20161202-linlonglu\\ladybug";
+	char* imagepath="C:\\Work\\Data\\panorama\\Pano_Cam_1108";
+	char** filenames = NULL;
+	int n=0,nfile=0;
+	GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 0);
+	filenames = f2c(nfile, 512);
+	GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 1);
+	//from char to string
+	vector<string> files;
+	for(int i=0; i<nfile; i++)
+	{
+		string file = filenames[i];
+		//printf("%s \n", filenames[i]);
+		//cout<<file<<endl;
+		files.push_back(file);
+	}
+
+	//######################  image show ###############################
+	int windowWd = 630;
+		
+	pLeft  = cvLoadImage(files[0].c_str());
+	pRight = cvLoadImage(files[1].c_str());
+		
+	//################  resize the images ##############
+	int dstWd = 2048;
+	int dstHt = 1024;
+	IplImage* pResizeImg = cvCreateImage(cvSize(dstWd, dstHt), 8, pLeft->nChannels);
+	cvResize(pLeft, pResizeImg);
+	cvReleaseImage(&pLeft);
+	pLeft = cvCloneImage(pResizeImg);
+	
+	cvResize(pRight, pResizeImg);
+	cvReleaseImage(&pRight);
+	pRight = cvCloneImage(pResizeImg);
+    cvReleaseImage(&pResizeImg);
+	//###################################################
+
+	int imageHt = pLeft->height;
+	int imageWd = pLeft->width;
+
+	POSInfo leftPos,rightPos;
+	pReadPos->GetPOS(0, leftPos);
+	pReadPos->GetPOS(1, rightPos);
+
+	leftCam.rows  = imageHt;	    leftCam.cols  = imageWd;
+	rightCam.rows = imageHt;	    rightCam.cols = imageWd;
+	leftCam.camtype = PanoramCam;	rightCam.camtype = PanoramCam;
+	InitCamera(leftCam, leftPos);
+	InitCamera(rightCam, rightPos);
+	
+
+	pIReg = new CIPanoRegDirect();
+	pIReg->Init(pLeft, pRight, leftCam, rightCam);
+	//pIReg->Init(leftImage, rightImage);
+	
+	//for display
+	double ratio = (double)(windowWd) / (double)(imageWd);
+	int windowHt = ratio*imageHt;
+	ratio = (double)(windowWd) / (double)(imageWd);
+	windowHt = ratio*imageHt;
+
+	cvNamedWindow("Left", 0);
+	cvMoveWindow("Left", 0, 0);
+	cvResizeWindow("Left", windowWd, windowHt);
+	cvShowImage("Left", pLeft);
+
+	cvNamedWindow("Right", 0);
+	cvMoveWindow("Right", windowWd+5, 0);
+	cvResizeWindow("Right", windowWd, windowHt);
+	cvShowImage("Right", pRight);
+
+	//small window
+	//cvNamedWindow("LeftSub",0);
+	//cvMoveWindow("LeftSub", 0, windowHt+32);
+	//cvResizeWindow("LeftSub", 64, 64);
+
+	cvSetMouseCallback("Left",  on_left_mouse, NULL );
+	cvSetMouseCallback("Right", on_right_mouse, NULL );
+	
+	int nCurrent = 0;
+	while(true)
+	{  
+		int c = cv::waitKey(0);  
+		//printf("%d \n", c);
+		switch(c)
+		{
+		case 'a':
+			//printf("press A \n");
+			nCurrent --;
+			nCurrent = max(0, nCurrent);
+			//printf("%d \n", nCurrent);		
+
+			break;
+		case 'd':
+			//printf("press D \n");
+			nCurrent ++;
+			nCurrent = min(files.size()-2, nCurrent);
+			//printf("%d \n", nCurrent);		
+
+			break;
+		}
+
+		cvReleaseImage(&pLeft);
+		cvReleaseImage(&pRight);
+		pLeft  = cvLoadImage(files[nCurrent].c_str());
+		pRight = cvLoadImage(files[nCurrent+1].c_str());
+
+		//################### resize ##########################################
+		int dstWd = 2048;
+		int dstHt = 1024;
+		IplImage* pResizeImg = cvCreateImage(cvSize(dstWd, dstHt), 8, pLeft->nChannels);
+		cvResize(pLeft, pResizeImg);
+		cvReleaseImage(&pLeft);
+		pLeft = cvCloneImage(pResizeImg);
+		cvResize(pRight, pResizeImg);
+		cvReleaseImage(&pRight);
+		pRight = cvCloneImage(pResizeImg);
+		cvReleaseImage(&pResizeImg);
+		//######################################################################
+		
+		cvShowImage("Left", pLeft);
+		cvShowImage("Right", pRight);
+
+		POSInfo leftPos,rightPos;
+		pReadPos->GetPOS(nCurrent, leftPos);
+		pReadPos->GetPOS(nCurrent+1, rightPos);
+		leftCam.rows  = imageHt;	    leftCam.cols  = imageWd;
+		rightCam.rows = imageHt;	    rightCam.cols = imageWd;
+		leftCam.camtype = PanoramCam;	rightCam.camtype = PanoramCam;
+		CameraPara leftCam,rightCam;
+		InitCamera(leftCam, leftPos);
+		InitCamera(rightCam, rightPos);
+		pIReg->Init(pLeft, pRight, leftCam, rightCam);
+	}
+	
+	return 0;
 }
 
 
 //interactive panorama matching
 int main_pano_match(int argc, char* argv[])
-{
+{	
 	char* leftImage  = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000001.jpg";
 	char* rightImage = "C:\\Work\\Data\\panorama\\ladybug_jpg\\ladybug_panoramic_000002.jpg";
 
 	int windowWd = 630;
 	
-	pLeft = cvLoadImage(leftImage);
+	pLeft  = cvLoadImage(leftImage);
 	pRight = cvLoadImage(rightImage);
 	int imageHt = pLeft->height;
 	int imageWd = pLeft->width;
@@ -945,7 +1139,11 @@ int _tmain(int argc, char* argv[])
 
 
 	//######## interactive panorama matching  ###################
-	main_pano_match(argc, argv);
+	//main_pano_match(argc, argv);
+
+
+	//######## interactive panorama matching based on pos #############
+	main_pano_match_usingpos();
 
 
 
