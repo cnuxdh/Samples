@@ -883,13 +883,26 @@ void on_left_mouse( int event, int x, int y, int flags, void* param)
 		srcPt.p[0] = x;
 		srcPt.p[1] = y;
 
+		vector<Point2DDouble> rEPts;
 		if(pIReg!=NULL)
+		{
 			pIReg->PtReg(srcPt, dstPt, 0);
+			pIReg->GetEpipolarLinePts(srcPt, 0, rEPts);
+		}
 
 		cp.x = dstPt.p[0];
 		cp.y = dstPt.p[1];
 		IplImage* pRightDisp = cvCloneImage(pRight);
 		DrawCross(cp, 21, pRightDisp);
+
+		for(int i=0; i<rEPts.size(); i++)
+		{
+			cvDrawCircle(pRightDisp, cvPoint(rEPts[i].p[0], rEPts[i].p[1]), 2, CV_RGB(0,255,0));
+			
+			//cvLine(pRightDisp, cvPoint(rEPts[i].p[0], rEPts[i].p[1]), cvPoint(rEPts[i+1].p[0], rEPts[i+1].p[1]),
+			//	CV_RGB(255,0,0), 1);
+		}
+
 		cvShowImage("Right", pRightDisp);
 		cvReleaseImage(&pRightDisp);
 
@@ -927,15 +940,15 @@ int main_pano_match_usingpos()
 {
 
 	//################  loading pos data ###########################
-	//char* camfile = "C:\\Work\\Data\\panorama\\20161202-linlonglu\\ladybug\\161130_025822Trig_zt.cam";
-	char* camfile ="C:\\Work\\Data\\panorama\\Pano_Cam_1108\\1104_170_new.cam";
+	char* camfile = "C:\\Work\\Data\\panorama\\20161202-linlonglu\\ladybug\\161130_025822Trig_zt.cam";
+	//char* camfile ="C:\\Work\\Data\\panorama\\Pano_Cam_1108\\1104_170_new.cam";
 	CReadPosBase* pReadPos = new CReadCarPos();
 	pReadPos->ReadPOSData(camfile);
 
 	
 	//###############   loading image filenames ##############################
-	//char* imagepath="C:\\Work\\Data\\panorama\\20161202-linlonglu\\ladybug";
-	char* imagepath="C:\\Work\\Data\\panorama\\Pano_Cam_1108";
+	char* imagepath="C:\\Work\\Data\\panorama\\20161202-linlonglu\\ladybug";
+	//char* imagepath="C:\\Work\\Data\\panorama\\Pano_Cam_1108";
 	char** filenames = NULL;
 	int n=0,nfile=0;
 	GetDirFileName(filenames, imagepath, &n, &nfile, "jpg", 0);
