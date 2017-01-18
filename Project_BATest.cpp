@@ -882,6 +882,7 @@ void on_left_mouse( int event, int x, int y, int flags, void* param)
 		
 		srcPt.p[0] = x;
 		srcPt.p[1] = y;
+		srcPt.nType = 0; //ground point
 
 		vector<Point2DDouble> rEPts;
 		if(pIReg!=NULL)
@@ -984,6 +985,9 @@ int main_pano_match_usingpos()
     cvReleaseImage(&pResizeImg);
 	//###################################################
 
+
+	double cameraRelativeHei = 2; //meter
+
 	int imageHt = pLeft->height;
 	int imageWd = pLeft->width;
 
@@ -991,8 +995,9 @@ int main_pano_match_usingpos()
 	pReadPos->GetPOS(0, leftPos);
 	pReadPos->GetPOS(1, rightPos);
 
-	leftCam.rows  = imageHt;	    leftCam.cols  = imageWd;
-	rightCam.rows = imageHt;	    rightCam.cols = imageWd;
+	//initialize the cameras
+	leftCam.rows  = imageHt;	    leftCam.cols  = imageWd;	leftCam.camRelativeHei = cameraRelativeHei;
+	rightCam.rows = imageHt;	    rightCam.cols = imageWd;	rightCam.camRelativeHei = cameraRelativeHei;
 	leftCam.camtype = PanoramCam;	rightCam.camtype = PanoramCam;
 	InitCamera(leftCam, leftPos);
 	InitCamera(rightCam, rightPos);
