@@ -21,9 +21,20 @@
 #include "funcs.hpp"
 
 
+
 //corelib
 #include "commonfile.h"
+#include "CommonFuncs.h"
+#include "hist.h"
 //#include "File.h"
+
+#include "LatLong-UTMconversion.h"
+#include "geotiff.h"
+
+
+//mbalib
+#include "mbaExports.h"
+
 
 #ifdef OPENCV_1X 
 #include "cv.h"
@@ -49,12 +60,12 @@ int main_realimages(int argc, char* argv[])
 	double t = (double)getTickCount();
 
 	//set the type of camera
-	CameraType camType = PerspectiveCam;
+	CameraType camType = PanoramCam;
 
 	printf("SFM integration .... \n");
 
-	char imagepath[256] = "C:\\Work\\Data\\ba1";
-	//char imagepath[256] = "C:\\Work\\Data\\panorama\\test";
+	//char imagepath[256] = "C:\\Work\\Data\\ba1";
+	char imagepath[256] = "C:\\Work\\Data\\panorama\\test";
 
 	if(argc==2)
 	{
@@ -1138,21 +1149,116 @@ int main_pano_match(int argc, char* argv[])
 	return 0;
 }
 
+
+//
+int main_scattered_interpolation()
+{
+
+	char* sptFile = "C:\\Work\\Data\\interpolation\\tmppixels.txt";
+
+	int npt = GetFileRows(sptFile);
+	
+	double* lon = new double[npt];
+	double* lat = new double[npt];
+	double* g = new double[npt];
+	//mbaTest();
+
+	FILE* fp = fopen(sptFile, "r");
+	for(int i=0; i<npt; i++)
+	{
+		fscanf(fp, "%lf %lf %lf ", lon+i, lat+i, g+i);
+	}
+	fclose(fp);
+
+	double aveLon = 0;
+	for(int i=0; i<npt; i++)
+	{
+		aveLon += lon[i];
+	}
+	aveLon /= npt;
+
+	//calculate the zone number
+	int zoneNumber = int((aveLon + 180)/6) + 1;
+	printf("zone number:%d \n", zoneNumber);
+
+	//convert to the ground point
+	double* gx = new double[npt];
+	double* gy = new double[npt];
+	double minx=100000000, maxy=-100000000;
+	for(int i=0; i<npt; i++)
+	{
+		LLtoUTM(23, lat[i], lon[i], gy[i], gx[i], zoneNumber);
+		if(minx>gx[i])	minx = gx[i];
+		if(maxy<gy[i])  maxy = gy[i];
+	}
+	printf("minx: %lf maxy:%lf \n", minx, maxy);
+
+
+	double resolution = 15;
+	//interpolation
+	printf("Interpolation.... \n");
+	float* ig = NULL;
+	int dstHt, dstWd;
+	int nLevel = 10; //important, decide the result
+	MBAInterpolation(gx, gy, g, npt, 1, resolution, nLevel, dstHt, dstWd, &ig);
+	printf("dstHt: %d  dstWd:%d \n", dstHt, dstWd);
+
+	printf("write image.... \n");
+	stGeoInfo gi;
+	gi.left = minx;
+	gi.top  = maxy;
+	gi.dx   = resolution;
+	gi.dy   = -resolution;
+	gi.projectRef = NULL;
+
+	//GdalWriteFloat("c:\\temp\\ig.tif", ig, dstHt, dstWd, gi);
+
+	double ming=100000;
+	double maxg=0;
+	for(int i=0; i<dstHt*dstWd; i++)
+	{
+		if(ming>ig[i]) ming = ig[i];
+		if(maxg<ig[i]) maxg = ig[i];
+	}
+
+	unsigned char* pImage = (unsigned char*)malloc(dstWd*dstHt);
+	for(int i=0; i<dstHt*dstWd; i++)
+	{
+		pImage[i] = (ig[i]-ming) / (maxg-ming) * 255;
+	}
+
+	//AutoLevelImage1(pImage, dstHt, dstWd);
+	
+
+	GdalWriteImageByteColor("c:\\temp\\ig.jpg", pImage, pImage, pImage, dstHt, dstWd);
+
+	free(gx);
+	free(gy);
+	free(ig);
+	free(lon);
+	free(lat);
+	free(g);
+	free(pImage);
+
+	return 0;
+}
+
 int _tmain(int argc, char* argv[])
 {
 	printf("BA test.... \n");
 	
 
-	//main_generate_pmvsfiles(argc, argv);
-	
+	//main_generate_pmvsfiles(argc, argv);	
 	
 	//main_pano_rp(argc, argv);
 	
 	//main_realimages_bundler(argc, argv);
 	
+
 	//########  bundle adjustment for real images ####
-	//main_realimages(argc, argv);
+	main_realimages(argc, argv);
 	
+
 	//main_simulate_multviews(argc, argv);
 
 
@@ -1161,8 +1267,11 @@ int _tmain(int argc, char* argv[])
 
 
 	//######## interactive panorama matching based on pos #############
-	main_pano_match_usingpos();
+	//main_pano_match_usingpos();
 
+
+	//######## scattered point interpolation ###################
+	//main_scattered_interpolation();
 
 
 	return 0;
