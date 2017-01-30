@@ -60,12 +60,19 @@ int main_realimages(int argc, char* argv[])
 	double t = (double)getTickCount();
 
 	//set the type of camera
-	CameraType camType = PanoramCam;
+	CameraType camType = PanoramCam;//PerspectiveCam; //;
 
 	printf("SFM integration .... \n");
 
+	//perspective data
 	//char imagepath[256] = "C:\\Work\\Data\\ba1";
-	char imagepath[256] = "C:\\Work\\Data\\panorama\\test";
+	
+	//panorama data
+	char imagepath[256] = "C:\\Work\\Data\\panorama\\test2";
+	//char imagepath[256] = "C:\\Work\\Data\\panorama\\2016.10.13-yizhuang\\L10_1013\\indoor\\jpg";
+	//char imagepath[256] = "C:\\Work\\Data\\panorama\\cheku20161011\\garageoutput";
+	//char imagepath[256] = "C:\\Work\\Data\\panorama\\cheku2016.10.26\\Output";
+
 
 	if(argc==2)
 	{
@@ -100,7 +107,7 @@ int main_realimages(int argc, char* argv[])
 
 	//1. generating the image feature points
 	vector<ImgFeature> imgFeatures;
-	DetectFileFeaturePts(filenames, nfile, imgFeatures, 480);
+	DetectFileFeaturePts(filenames, nfile, imgFeatures, 800);
 
 	//2. matching images 
 	vector<PairMatchRes> matchRes; 
@@ -1243,6 +1250,54 @@ int main_scattered_interpolation()
 	return 0;
 }
 
+int main_feature()
+{
+
+
+	char* file1 = "C:\\Work\\Data\\panorama\\cheku2016.10.26\\Output\\20161026-141804.jpg";
+	char* file2 = "C:\\Work\\Data\\panorama\\cheku2016.10.26\\Output\\20161026-141928.jpg";
+
+	//feature point detection
+	ImgFeature feat1,feat2;
+	CFeatureBase* pSift = new CSIFTFloat; //CSIFTPano();
+	pSift->Detect(file1, feat1, 1200);
+	pSift->Detect(file2, feat2, 1200);
+	delete pSift;
+
+	printf("left feat: %d  right feat: %d \n", feat1.GetFeatPtSum(), feat2.GetFeatPtSum());
+
+
+	//matching
+	CMatchBase* pMatch = new CPanoMatch();
+	PairMatchRes mt;
+	pMatch->Match(feat1, feat2, mt);
+	printf("Match Number: %d \n", mt.matchs.size());
+
+	//draw match
+	vector<Point2DDouble> lpts,rpts;
+	for(int i=0; i<mt.matchs.size(); i++)
+	{
+		int li = mt.matchs[i].l;
+		int ri = mt.matchs[i].r;
+		lpts.push_back(feat1.GetTopLeftPt(li));
+		rpts.push_back(feat2.GetTopLeftPt(ri));		
+	}
+	IplImage* pLeft  = cvLoadImage(file1);
+	IplImage* pRight = cvLoadImage(file2);
+	//DrawFeatPt(feat1,pLeft);
+	//DrawFeatPt(feat2,pRight);
+	//cvSaveImage("c:\\temp\\leftpano.jpg", pLeft);
+	//cvSaveImage("c:\\temp\\rightpano.jpg", pRight);
+	DrawMatches("c:\\temp\\siftMatch.jpg", pLeft, pRight, lpts, rpts, 3);
+	cvReleaseImage(&pLeft);
+	cvReleaseImage(&pRight);
+
+	printf("sift finished! \n");
+
+	return 0;
+}
+
+
 int _tmain(int argc, char* argv[])
 {
 	printf("BA test.... \n");
@@ -1272,6 +1327,10 @@ int _tmain(int argc, char* argv[])
 
 	//######## scattered point interpolation ###################
 	//main_scattered_interpolation();
+
+	//########### feature detection and matching ################
+	//main_feature();
+
 
 
 	return 0;
